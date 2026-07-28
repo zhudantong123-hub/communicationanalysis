@@ -8,8 +8,6 @@
     "build": "tsc -b && vite build"
   },
   "dependencies": {
-    "@auix/ui": "^0.3.70",
-    "@okee-fe/react-icons-bytes": "^1.1.25",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
     "react": "latest",
