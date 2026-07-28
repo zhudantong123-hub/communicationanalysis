@@ -657,6 +657,9 @@ html,body,#root{height:auto;min-height:100%}.app{height:auto!important;min-heigh
 .videoRelationshipBoard .opinionClusterSurface>em{top:16px;right:22px}
 
 .commandCenter .signalMarker.hovering>span,.commandCenter .signalMarker.active>span{display:flex}
+.commandCenter .signalMarker>span{bottom:18px;padding:6px 9px;font-size:11px;line-height:1.35}
 .commandCenter .signalMarker.negative>span{color:#c95762}
 .commandCenter .signalMarker.neutral>span{color:#7059c7}
+.commandCenter .coreOpinionRows>button>span{font-size:11px}
+.commandCenter .coreOpinionRows>button>b{font-size:11px}
 @media(max-width:900px){.commandCenter .trendGrid{grid-template-columns:1fr!important}.coreOpinionPanel{border-top:1px solid #ecebf4;border-left:0}.coreOpinionRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px}}
