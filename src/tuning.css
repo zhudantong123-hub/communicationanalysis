@@ -655,4 +655,8 @@ html,body,#root{height:auto;min-height:100%}.app{height:auto!important;min-heigh
 .videoRelationshipBoard .opinionClusterSurface>span{top:14px;left:22px}
 .videoRelationshipBoard .opinionClusterSurface>small{top:45px;left:23px}
 .videoRelationshipBoard .opinionClusterSurface>em{top:16px;right:22px}
+
+.commandCenter .signalMarker.hovering>span,.commandCenter .signalMarker.active>span{display:flex}
+.commandCenter .signalMarker.negative>span{color:#c95762}
+.commandCenter .signalMarker.neutral>span{color:#7059c7}
 @media(max-width:900px){.commandCenter .trendGrid{grid-template-columns:1fr!important}.coreOpinionPanel{border-top:1px solid #ecebf4;border-left:0}.coreOpinionRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px}}
