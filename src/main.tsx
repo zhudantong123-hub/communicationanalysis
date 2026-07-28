@@ -137,9 +137,9 @@ function InteractiveSankey({select,onVideoFilter,activeVideoFilter,activeOpinion
  },[])
  const sourceY=60.5+trafficTree.findIndex(item=>item.id===source.id)*36
  const secondY=[114.5,157.5,200.5],actionY=[76,137,198,259]
- const firstRight=source.id==='feed'?canvasWidth*.015+180.5:canvasWidth*.33
+ const firstRight=canvasWidth*.015+180.5
  const secondLeft=canvasWidth*.38
- const secondRight=source.id==='feed'?canvasWidth*.38+180.5:canvasWidth*.63
+ const secondRight=canvasWidth*.38+180.5
  const thirdLeft=canvasWidth*.62
  const dimensionLabel=source.id==='feed'?'内容 / 广告 / 交易流量':source.id==='search'?'搜索词':source.id==='message'?'群聊 / 私聊':source.id==='local'?'同城城市':'入口场景'
  const feedLayer=source.id==='feed'?(source.children.find(item=>item.name===activeVideoFilter)||source.children.find(item=>item.id===feedLayerId)):null
