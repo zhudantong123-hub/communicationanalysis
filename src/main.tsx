@@ -133,6 +133,7 @@ function InteractiveSankey({select,onVideoFilter,activeVideoFilter,activeOpinion
  const [sourceId,setSourceId]=useState('feed')
  const canvasRef=useRef<HTMLDivElement>(null)
  const [canvasWidth,setCanvasWidth]=useState(1000)
+ const [linkGeometry,setLinkGeometry]=useState<any>(null)
  const source:any=trafficTree.find(item=>item.id===sourceId) || trafficTree[0]
  const analysisBase=channelAnalysis[source.id]
  const [feedLayerId,setFeedLayerId]=useState('m1')
@@ -144,12 +145,27 @@ function InteractiveSankey({select,onVideoFilter,activeVideoFilter,activeOpinion
  useEffect(()=>{
   const canvas=canvasRef.current
   if(!canvas)return
-  const update=()=>setCanvasWidth(canvas.clientWidth||1000)
+  const update=()=>{
+   const rect=canvas.getBoundingClientRect()
+   const heightScale=500/(canvas.clientHeight||500)
+   const point=(element:Element|null,edge:'left'|'right')=>{
+    if(!element)return null
+    const itemRect=element.getBoundingClientRect()
+    return {x:(edge==='right'?itemRect.right:itemRect.left)-rect.left,y:(itemRect.top+itemRect.height/2-rect.top)*heightScale}
+   }
+   const selected=canvas.querySelector('.levelOne button[aria-pressed="true"]')
+   const secondButtons=Array.from(canvas.querySelectorAll('.levelTwo button'))
+   const second=secondButtons.map(item=>point(item,'left'))
+   const secondRight=secondButtons.map(item=>point(item,'right'))
+   const third=Array.from(canvas.querySelectorAll('.levelThree button')).map(item=>point(item,'left'))
+   setCanvasWidth(canvas.clientWidth||1000)
+   setLinkGeometry({source:point(selected,'right'),second,secondRight,third})
+  }
   update()
   const observer=new ResizeObserver(update)
   observer.observe(canvas)
   return ()=>observer.disconnect()
- },[])
+ },[sourceId])
  const sourceY=60.5+trafficTree.findIndex(item=>item.id===source.id)*36
  const secondY=[114.5,157.5,200.5],actionY=[76,137,198,259]
  const columnWidth=Math.max(108,Math.min(260,canvasWidth*.24))
@@ -162,8 +178,13 @@ function InteractiveSankey({select,onVideoFilter,activeVideoFilter,activeOpinion
  const feedLayer=source.id==='feed'?(source.children.find(item=>item.name===activeVideoFilter)||source.children.find(item=>item.id===feedLayerId)):null
  const thirdItems=feedLayer?.children||[]
  const feedThirdItems=source.id==='feed'?source.children.flatMap((parent,parentIndex)=>parent.children.map((item,index)=>({parent,parentIndex,item,index}))):[]
- const analysis=source.id==='feed'?{...analysisBase,interactions:thirdItems.map(item=>[item[0],item[1]+'万',(item[1]/source.value*100).toFixed(1)+'%'])}:analysisBase
- return <div className="hierSankey channelSankey"><div className="sankeyHead"><div><b>渠道传播路径</b><span>流量渠道 → 下钻分析层；流量单位：万</span></div><div className="pathCrumb"><span>{source.name}</span><ChevronRight/><b>{dimensionLabel}</b></div></div><div ref={canvasRef} className={'flowCanvas twoLevel '+(source.id==='feed'?'feedThreeLevel allFeedTargets':'')}><svg viewBox={`0 0 ${canvasWidth} 500`} preserveAspectRatio="none">{source.children.map((item,i)=><g key={'s-'+item.id}><path className="active" d={`M${firstRight} ${sourceY} C${firstRight+(secondLeft-firstRight)*.42} ${sourceY} ${firstRight+(secondLeft-firstRight)*.58} ${secondY[i]} ${secondLeft} ${secondY[i]}`} style={{strokeWidth:Math.max(7,item.value/source.value*42)}}/><text className="flowLinkLabel" x={(firstRight+secondLeft)/2} y={(sourceY+secondY[i])/2-5}>{(item.value/source.value*100).toFixed(1)}%</text></g>)}{source.id==='feed'&&feedThirdItems.map(({parent,parentIndex,item,index},allIndex)=><path key={parent.id+'-'+item[0]} className="tertiary" d={`M${secondRight} ${secondY[parentIndex]} C${secondRight+(thirdLeft-secondRight)*.42} ${secondY[parentIndex]} ${secondRight+(thirdLeft-secondRight)*.58} ${62+allIndex*20} ${thirdLeft} ${62+allIndex*20}`} style={{strokeWidth:Math.max(2,item[1]/source.value*18)}}/>)}</svg><div className="flowColumn levelOne"><h4>一级 · 流量渠道（单选）</h4>{trafficTree.map(item=><button key={item.id} className={source.id===item.id?'selected':''} aria-pressed={source.id===item.id} onClick={()=>chooseSource(item)}><span>{item.name}<small>{item.share}</small></span><b>{item.value.toLocaleString()}万</b></button>)}</div><div className="flowColumn levelTwo"><h4>二级 · {dimensionLabel}</h4>{source.children.map(item=><button key={item.id}><span>{item.name}<small>{(item.value/source.value*100).toFixed(1)}%</small></span><b>{item.value.toLocaleString()}万</b></button>)}</div>{source.id==='feed'&&<div className="flowColumn levelThree actionColumn"><h4>三级 · 全部业务子类</h4><div className="feedGroupTotals">{source.children.map(item=><span key={item.id} className={item.id}><i/>{item.name.replace('流量','')}<b>{(item.value/source.value*100).toFixed(1)}%</b></span>)}</div>{feedThirdItems.map(({parent,item})=><button key={parent.id+'-'+item[0]} onClick={()=>onVideoFilter(item[0])}><span><i className={'feedGroupDot '+parent.id}/>{item[0]}<small>{(item[1]/parent.value*100).toFixed(2)}%</small></span><b>{item[1].toLocaleString()}万</b></button>)}</div>}</div>{source.id==='feed'&&<MultiObjectiveContribution/>}<div className="channelAnalysis"><div className="analysisTitle"><div><b>{analysis.title}</b><span>{analysis.dimension}</span></div><div><em>{source.name} 流量 {source.value.toLocaleString()}万</em><span>数据范围：近 7 天</span></div></div><div className="analysisTable"><div className="analysisRow head"><span>类型</span><b>分析项</b><em>{source.id==='search'?'搜索次数':'流量'}</em><i>渠道占比</i><u>关键指标</u></div>{analysis.rows.map((row,index)=><button className={'analysisRow '+(activeVideoFilter===row[1]?'selected':'')} aria-pressed={activeVideoFilter===row[1]} key={row[1]} onClick={()=>onVideoFilter(row[1])}><span>{row[0]}</span><b><small>{index+1}</small>{row[1]}</b><em>{row[2]}</em><i>{row[3]}</i><u>{row[4]}</u><ChevronRight/></button>)}</div><div className="analysisInsight"><b>自动洞察</b><span>点击任一分析层或分析项，即可联动筛选下方代表视频。</span></div></div><div className="sankeyFoot"><span>当前选中渠道</span><b>{source.name}</b><em>全站流量占比 {source.share}</em><i>点击分析层或分析项可筛选下方代表视频</i></div></div>
+ const thirdNodeY=(index:number)=>62+index*20
+ const measuredSource=linkGeometry?.source
+ const measuredSecond=(index:number)=>linkGeometry?.second?.[index]
+ const measuredThird=(index:number)=>linkGeometry?.third?.[index]
+ const detailAnalysisRows=source.children.flatMap(parent=>parent.children.map((item,index)=>[parent.name,`${parent.name} · ${item[0]}`,item[1]+'万',(item[1]/source.value*100).toFixed(1)+'%',index===0?'主要细分路径':'关联细分路径']))
+ const analysis=source.id==='feed'?{...analysisBase,interactions:thirdItems.map(item=>[item[0],item[1]+'万',(item[1]/source.value*100).toFixed(1)+'%'])}:{...analysisBase,rows:[...analysisBase.rows,...detailAnalysisRows].slice(0,10)}
+ return <div className="hierSankey channelSankey"><div className="sankeyHead"><div><b>渠道传播路径</b><span>流量渠道 → 下钻分析层；流量单位：万</span></div><div className="pathCrumb"><span>{source.name}</span><ChevronRight/><b>{dimensionLabel}</b></div></div><div ref={canvasRef} className={'flowCanvas twoLevel '+(source.id==='feed'?'feedThreeLevel allFeedTargets':'')}><svg viewBox={`0 0 ${canvasWidth} 500`} preserveAspectRatio="none">{source.children.map((item,i)=>{const start=measuredSource||{x:firstRight,y:sourceY},end=measuredSecond(i)||{x:secondLeft,y:secondY[i]};return <g key={'s-'+item.id}><path className="active" d={`M${start.x} ${start.y} C${start.x+(end.x-start.x)*.42} ${start.y} ${start.x+(end.x-start.x)*.58} ${end.y} ${end.x} ${end.y}`} style={{strokeWidth:Math.max(7,item.value/source.value*42)}}/><text className="flowLinkLabel" x={(start.x+end.x)/2} y={(start.y+end.y)/2-5}>{(item.value/source.value*100).toFixed(1)}%</text></g>})}{feedThirdItems.map(({parent,parentIndex,item},allIndex)=>{const start=linkGeometry?.secondRight?.[parentIndex]||{x:secondRight,y:secondY[parentIndex]},end=measuredThird(allIndex)||{x:thirdLeft,y:thirdNodeY(allIndex)};return <path key={parent.id+'-'+item[0]} className={'tertiary '+parent.id} d={`M${start.x} ${start.y} C${start.x+(end.x-start.x)*.42} ${start.y} ${start.x+(end.x-start.x)*.58} ${end.y} ${end.x} ${end.y}`} style={{strokeWidth:Math.max(2,item[1]/source.value*18)}}/>})}</svg><div className="flowColumn levelOne"><h4>一级 · 流量渠道（单选）</h4>{trafficTree.map(item=><button key={item.id} className={source.id===item.id?'selected':''} aria-pressed={source.id===item.id} onClick={()=>chooseSource(item)}><span>{item.name}<small>{item.share}</small></span><b>{item.value.toLocaleString()}万</b></button>)}</div><div className="flowColumn levelTwo"><h4>二级 · {dimensionLabel}</h4>{source.children.map(item=><button key={item.id}><span>{item.name}<small>{(item.value/source.value*100).toFixed(1)}%</small></span><b>{item.value.toLocaleString()}万</b></button>)}</div>{source.id==='feed'&&<div className="flowColumn levelThree actionColumn"><h4>三级 · 业务归属</h4><div className="feedGroupTotals">{source.children.map(item=><span key={item.id} className={item.id}><i/>{item.name.replace('流量','')}<b>{(item.value/source.value*100).toFixed(1)}%</b></span>)}</div>{feedThirdItems.map(({parent,item})=><button key={parent.id+'-'+item[0]} onClick={()=>onVideoFilter(item[0])}><span><i className={'feedGroupDot '+parent.id}/>{item[0]}<small>{(item[1]/parent.value*100).toFixed(2)}%</small></span><b>{item[1].toLocaleString()}万</b></button>)}</div>}</div>{source.id==='feed'&&<MultiObjectiveContribution/>}<div className="channelAnalysis"><div className="analysisTitle"><div><b>{analysis.title}</b><span>{analysis.dimension}</span></div><div><em>{source.name} 流量 {source.value.toLocaleString()}万</em><span>数据范围：近 7 天</span></div></div><div className="analysisTable"><div className="analysisRow head"><span>类型</span><b>分析项</b><em>{source.id==='search'?'搜索次数':'流量'}</em><i>渠道占比</i><u>关键指标</u></div>{analysis.rows.map((row,index)=><button className={'analysisRow '+(activeVideoFilter===row[1]?'selected':'')} aria-pressed={activeVideoFilter===row[1]} key={row[1]} onClick={()=>onVideoFilter(row[1])}><span>{row[0]}</span><b><small>{index+1}</small>{row[1]}</b><em>{row[2]}</em><i>{row[3]}</i><u>{row[4]}</u><ChevronRight/></button>)}</div><div className="analysisInsight"><b>自动洞察</b><span>点击任一分析层或分析项，即可联动筛选下方代表视频。</span></div></div><div className="sankeyFoot"><span>当前选中渠道</span><b>{source.name}</b><em>全站流量占比 {source.share}</em><i>点击分析层或分析项可筛选下方代表视频</i></div></div>
 }
 function PublisherDistribution(){
  const [kind,setKind]=useState('全部')
@@ -241,14 +262,15 @@ function VideoDynamicLinks({pos,arrival,timeIndex,cluster}:{pos:number[][],arriv
   return [[clusterIndices[Math.min(order-4,4)],index]]
  })
  const overviewEdges:any[]=[
-  [0,1,'backbone'],[0,2,'backbone'],[0,3,'backbone'],[0,4,'backbone'],
+  [0,1,'backbone'],[1,2,'branch'],[1,3,'branch'],[2,4,'branch'],
   [0,5,'clusterBridge'],[5,6,'branch'],[6,7,'branch'],[5,8,'branch'],[8,9,'branch'],[6,10,'branch'],[8,11,'branch'],
   [0,12,'clusterBridge'],[12,13,'branch'],[13,14,'branch'],[12,15,'branch'],[15,16,'branch'],
   [0,17,'clusterBridge'],[17,18,'branch'],[18,19,'branch'],[17,20,'branch'],[20,21,'branch'],[18,22,'branch'],[20,23,'branch']
  ]
  const edges:any[]=cluster?expandedEdges.map(edge=>[...edge,'branch']):overviewEdges
  const allowed=(index:number)=>arrival[index]<=timeIndex&&(!cluster||cluster.indices.includes(index))
- return <svg className="links dynamicVideoLinks" viewBox="0 0 1200 720">{edges.filter(([from,to])=>allowed(from)&&allowed(to)).map(([from,to,type])=>{const x1=pos[from][0]+75,y1=pos[from][1]+62,x2=pos[to][0]+75,y2=pos[to][1]+62,mx=(x1+x2)/2;return <path key={from+'-'+to} className={type} d={`M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`}/>})}</svg>
+ const point=(index:number)=>({x:pos[index][0]+(index===0?48:39),y:pos[index][1]+(index===0?44:35)})
+ return <svg className="links dynamicVideoLinks" viewBox="0 0 1200 720">{edges.filter(([from,to])=>allowed(from)&&allowed(to)).map(([from,to,type])=>{const fromPoint=point(from),toPoint=point(to),mx=(fromPoint.x+toPoint.x)/2;return <path key={from+'-'+to} className={type} d={`M${fromPoint.x} ${fromPoint.y} C${mx} ${fromPoint.y} ${mx} ${toPoint.y} ${toPoint.x} ${toPoint.y}`}/>})}</svg>
 }
 function VideoCard({v,i,select,addToChat}){return <button className="vcard" onClick={()=>select('video',v)}><div className={'thumb th'+i}><span>{v.tone}</span><i><Play size={15} fill="currentColor"/></i><b>00:{36+i*11}</b><span role="button" tabIndex={0} className="addVideoToChat" onClick={event=>{event.stopPropagation();addToChat(v,i)}} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.stopPropagation();addToChat(v,i)}}}><Sparkles size={11}/>添加到 Chat</span></div><h3>{v.title}</h3><p>{v.author} · {v.time}</p><footer><span><Eye size={12}/>{v.play}</span><span><MessageCircle size={12}/>{v.interaction}</span><em>{v.grade}</em></footer></button>}
 function VideoChain({select}){
@@ -267,18 +289,18 @@ function VideoChain({select}){
  ]
  const chainVideos=clusterThemes.map(([author,title],index)=>({...videos[index%videos.length],id:'chain-'+index,author,title,play:(328.6-index*9.7).toFixed(1)+'万'}))
  const videoClusters=[
-  {id:'position',name:'名不副实者身居高位',summary:'围绕能力与职位不匹配展开讽刺和质疑',indices:[0,1,2,3,4],plays:'531.1万',risk:'高争议',x:210,y:155,w:230,h:150,c:'violet'},
-  {id:'metaphor',name:'“乌龟上杆”隐喻解读',summary:'解释俗语来源、寓意及网络语境变化',indices:[5,6,7,8,9,10,11],plays:'335.5万',risk:'语义解读',x:520,y:125,w:205,h:132,c:'blue'},
-  {id:'target',name:'影射对象猜测',summary:'评论区对号入座并猜测具体影射对象',indices:[12,13,14,15,16],plays:'227.8万',risk:'风险聚集',x:690,y:390,w:245,h:166,c:'orange'},
-  {id:'power',name:'权力来源与推举关系',summary:'讨论谁将其推上高位及背后的利益网络',indices:[17,18,19,20,21,22,23],plays:'173.5万',risk:'观点发散',x:350,y:470,w:215,h:140,c:'cyan'}
+  {id:'position',name:'名不副实者身居高位',summary:'围绕能力与职位不匹配展开讽刺和质疑',indices:[1,2,3,4],plays:'531.1万',risk:'高争议',x:715,y:35,w:450,h:285,c:'violet'},
+  {id:'metaphor',name:'“乌龟上杆”隐喻解读',summary:'解释俗语来源、寓意及网络语境变化',indices:[5,6,7,8,9,10,11],plays:'335.5万',risk:'语义解读',x:35,y:35,w:450,h:295,c:'blue'},
+  {id:'target',name:'影射对象猜测',summary:'评论区对号入座并猜测具体影射对象',indices:[12,13,14,15,16],plays:'227.8万',risk:'风险聚集',x:715,y:390,w:450,h:290,c:'orange'},
+  {id:'power',name:'权力来源与推举关系',summary:'讨论谁将其推上高位及背后的利益网络',indices:[17,18,19,20,21,22,23],plays:'173.5万',risk:'观点发散',x:35,y:390,w:470,h:290,c:'cyan'}
  ]
  const videoArrival=[0,2,1,4,3,1,5,2,6,4,3,6,2,5,3,6,4,1,4,2,6,3,5,6]
  const activeCluster=videoClusters.find(cluster=>cluster.id===expandedCluster)
  const clusterOverviewPos=[
-  [554,318],[430,210],[620,210],[430,355],[620,355],
-  [90,100],[240,80],[330,170],[90,220],[230,230],[350,90],[350,260],
-  [760,100],[900,80],[1030,150],[760,230],[920,230],
-  [280,450],[430,420],[580,450],[730,420],[850,500],[380,560],[650,560]
+  [552,306],[760,105],[900,72],[1025,145],[850,215],
+  [75,108],[190,70],[325,112],[105,205],[225,180],[365,220],[300,252],
+  [755,455],[890,415],[1025,475],[820,565],[980,570],
+  [75,455],[190,410],[330,455],[110,565],[245,545],[375,585],[405,495]
  ]
  const pos=chainVideos.map((_,index)=>{
   if(!activeCluster)return clusterOverviewPos[index]
@@ -298,7 +320,7 @@ function VideoChain({select}){
   setExpandedCluster(id);setSelectedEntities([]);setZoom(Number(fittedZoom.toFixed(2)))
   setPan({x:Math.max(18,(viewportWidth-1100*fittedZoom)/2),y:4})
  }
- return <><Section title="视频传播链路" desc="以首发视频为中心，展示视频与视频之间的相似、引用和二次传播关系" action={<div className="tools"><button><Search size={14}/>查找视频</button><button onClick={()=>changeZoom(-.1)} aria-label="缩小画布"><ZoomOut size={15}/></button><button onClick={()=>changeZoom(.1)} aria-label="放大画布"><ZoomIn size={15}/></button></div>}/><div className="chips">关系筛选：{relationOptions.map(item=><button key={item} className={relations.includes(item)?'on':''} onClick={()=>toggleRelation(item)}>{item}</button>)}</div>{selectedEntities.length>=2&&<div className="entityAnalysisBar"><span>已选择 <b>{selectedEntities.length}</b> 个视频</span><button onClick={analyze}><Network size={14}/>传播链路分析</button><button className="clearSelection" onClick={()=>setSelectedEntities([])}>清空</button></div>}<div className="canvas boardCanvas videoRelationshipBoard pannableCanvas" ref={boardRef} {...panHandlers}><div className="zoomHud"><span>缩放 {Math.round(zoom*100)}%</span><button onClick={()=>{setZoom(.78);setPan({x:0,y:0})}}>重置视图</button></div><div className="boardScene" style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`}}><div className="stages"><span>首发视频</span><i/><span>直接衍生视频</span><i/><span>二次传播视频</span></div>{!activeCluster&&<div className="videoOpinionSurfaces">{videoClusters.map(cluster=><div key={cluster.id} className={'opinionClusterSurface '+cluster.c} style={{left:cluster.id==='position'?390:cluster.id==='metaphor'?45:cluster.id==='target'?720:220,top:cluster.id==='position'?155:cluster.id==='metaphor'?45:cluster.id==='target'?55:385,width:cluster.id==='position'?370:cluster.id==='power'?760:440,height:cluster.id==='position'?335:cluster.id==='power'?290:330}}><span>{cluster.name}</span><small>{cluster.indices.length} 个视频 · {cluster.plays}</small><em>{cluster.risk}</em></div>)}</div>}<VideoDynamicLinks pos={pos} arrival={videoArrival} timeIndex={timeIndex} cluster={null}/>{chainVideos.map((v,i)=><button key={v.id} className={'videoNode relationVideoNode'+(i===0?' originVideo':'')+(selectedEntities.includes(v.id)?' entitySelected':'')+(videoArrival[i]>timeIndex?' entityFuture':'')} style={{left:pos[i][0],top:pos[i][1]}} onClick={()=>select('video',v)}><i className={'miniThumb m'+(i%4)}><Play size={12} fill="currentColor"/></i><span><b>{v.author}</b><em>{v.title.slice(0,16)}…</em><small>{v.play} 播放</small></span><i className="entityCheck" role="checkbox" aria-checked={selectedEntities.includes(v.id)} onClick={event=>{event.stopPropagation();toggleEntity(v.id)}}>{selectedEntities.includes(v.id)?'✓':''}</i>{i===0?<u>首发中心</u>:<u>{i%3===0?'同话题':i%3===1?'OCR 相似 '+(90-i)+'%':'文本相似 '+(95-i)+'%'}</u>}</button>)}</div><div className="miniMap"/><p className="canvasTip">首发视频位于画布中心 · 半透明色块代表观点簇 · 连线表示传播承接关系</p></div><ChainTimeline value={timeIndex} onChange={setTimeIndex} total={visibleVideoCount} label="视频扩散时间"/><div className="legend">观点簇：紫 · 职位争议　蓝 · 隐喻解读　橙 · 对象猜测　青 · 权力来源　　━ 强关联　┅ 弱关联</div></>}
+ return <><Section title="视频传播链路" desc="以首发视频为中心，展示视频与视频之间的相似、引用和二次传播关系" action={<div className="tools"><button><Search size={14}/>查找视频</button><button onClick={()=>changeZoom(-.1)} aria-label="缩小画布"><ZoomOut size={15}/></button><button onClick={()=>changeZoom(.1)} aria-label="放大画布"><ZoomIn size={15}/></button></div>}/><div className="chips">关系筛选：{relationOptions.map(item=><button key={item} className={relations.includes(item)?'on':''} onClick={()=>toggleRelation(item)}>{item}</button>)}</div>{selectedEntities.length>=2&&<div className="entityAnalysisBar"><span>已选择 <b>{selectedEntities.length}</b> 个视频</span><button onClick={analyze}><Network size={14}/>传播链路分析</button><button className="clearSelection" onClick={()=>setSelectedEntities([])}>清空</button></div>}<div className="canvas boardCanvas videoRelationshipBoard pannableCanvas" ref={boardRef} {...panHandlers}><div className="zoomHud"><span>缩放 {Math.round(zoom*100)}%</span><button onClick={()=>{setZoom(.78);setPan({x:0,y:0})}}>重置视图</button></div><div className="boardScene" style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`}}><div className="stages"><span>首发视频</span><i/><span>直接衍生视频</span><i/><span>二次传播视频</span></div>{!activeCluster&&<div className="videoOpinionSurfaces">{videoClusters.map(cluster=><div key={cluster.id} className={'opinionClusterSurface '+cluster.c} style={{left:cluster.x,top:cluster.y,width:cluster.w,height:cluster.h}}><span>{cluster.name}</span><small>{cluster.indices.length} 个视频 · {cluster.plays}</small><em>{cluster.risk}</em></div>)}</div>}<VideoDynamicLinks pos={pos} arrival={videoArrival} timeIndex={timeIndex} cluster={null}/>{chainVideos.map((v,i)=><button key={v.id} className={'videoNode relationVideoNode'+(i===0?' originVideo':'')+(selectedEntities.includes(v.id)?' entitySelected':'')+(videoArrival[i]>timeIndex?' entityFuture':'')} style={{left:pos[i][0],top:pos[i][1]}} onClick={()=>select('video',v)}><i className={'miniThumb m'+(i%4)}><Play size={12} fill="currentColor"/></i><span><b>{v.author}</b><em>{v.title.slice(0,16)}…</em><small>{v.play} 播放</small></span><i className="entityCheck" role="checkbox" aria-checked={selectedEntities.includes(v.id)} onClick={event=>{event.stopPropagation();toggleEntity(v.id)}}>{selectedEntities.includes(v.id)?'✓':''}</i>{i===0?<u>首发中心</u>:<u>{i%3===0?'同话题':i%3===1?'OCR 相似 '+(90-i)+'%':'文本相似 '+(95-i)+'%'}</u>}</button>)}</div><div className="miniMap"/><p className="canvasTip">首发视频位于画布中心 · 每个视频严格归入对应观点簇 · 连线从中心向四周放射</p></div><ChainTimeline value={timeIndex} onChange={setTimeIndex} total={visibleVideoCount} label="视频扩散时间"/><div className="legend">观点簇：紫 · 职位争议　蓝 · 隐喻解读　橙 · 对象猜测　青 · 权力来源　　━ 强关联　┅ 弱关联</div></>}
 function AccountChain({select,highlight,setHighlight}){
  const [focusTier,setFocusTier]=useState('全部'),[showEvidence,setShowEvidence]=useState(true)
  const [selectedEntities,setSelectedEntities]=useState<string[]>([])
