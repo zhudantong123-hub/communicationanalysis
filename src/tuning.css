@@ -614,3 +614,6 @@ html,body,#root{height:auto;min-height:100%}.app{height:auto!important;min-heigh
 .chatPendingReference.ref1>span,.chatVideoReference.ref1>span{background-position:100% 0}.chatPendingReference.ref2>span,.chatVideoReference.ref2>span{background-position:0 100%}.chatPendingReference.ref3>span,.chatVideoReference.ref3>span{background-position:100% 100%}
 .chatPendingReference>div,.chatVideoReference>div{min-width:0;display:flex;flex:1;flex-direction:column;gap:2px}.chatPendingReference small,.chatVideoReference small{color:#7863c9;font-size:7px}.chatPendingReference b,.chatVideoReference b{overflow:hidden;color:#4c5260;font-size:8px;text-overflow:ellipsis;white-space:nowrap}.chatPendingReference>button{display:grid;place-items:center;color:#9298a3}
 .chatVideoReference{margin-bottom:6px;padding:6px;border-radius:7px}.chatVideoReference em{color:#949aa4;font-size:7px;font-style:normal}
+.videoRelationshipBoard .stages{display:none}
+.videoRelationshipBoard .originVideo{z-index:8!important;border-color:#f0b85b!important;box-shadow:0 0 0 4px #fff,0 0 0 8px #efb24f,0 0 28px #f1b65099!important}
+.videoRelationshipBoard .originVideo>u{background:#f4b84f!important;color:#291d07!important;font-weight:700!important}
