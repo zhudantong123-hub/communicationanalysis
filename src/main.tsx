@@ -19,6 +19,81 @@ const accounts=[
  {id:'a4',name:'热点播报台',handle:'@hot-news',risk:'需关注',fans:'8.3万',auth:'普通用户',c:'pink'},
  {id:'a5',name:'夜航笔记',handle:'@night-note',risk:'需关注',fans:'5.6万',auth:'普通用户',c:'cyan'}
 ]
+const analysisDates=['06-29','06-30','07-01','07-02','07-03','07-04','07-05','07-06','07-07','07-08','07-09','07-10','07-11','07-12','07-13','07-14','07-15']
+type AnalysisWindow={index:number|null,date:string,sourceId:string,chainTime:number,change:string,cause:string,path:string,governance:string,contentFocus:string,actorFocus:string}
+const fullAnalysisWindow:AnalysisWindow={index:null,date:'06-29—07-15',sourceId:'feed',chainTime:6,change:'',cause:'',path:'',governance:'',contentFocus:'',actorFocus:''}
+function getAnalysisWindow(index:number|null):AnalysisWindow{
+ if(index===null)return fullAnalysisWindow
+ const phases=index<=3
+  ?{sourceId:'feed',change:'VV +24%，评论量 +11%，负向观点占比 +3pp',cause:'首发内容进入探索流量池，同城用户完成第一轮转发',path:'Feed → 探索流量池 → 视频完播 → 首轮扩散',governance:'核验首发内容与身份猜测评论',contentFocus:'首发事实核验簇',actorFocus:'首发账号与本地搬运账号'}
+  :index<=7
+  ?{sourceId:'feed',change:'VV +68%，评论量 +42%，负向观点占比 +19pp',cause:'新华社客户端发文，央视新闻跟进转载，责任讨论快速放大',path:'Feed → 内容消费 → 权威解读 → 评论发酵',governance:'优先处理失实剪辑与高赞引战评论',contentFocus:'权威解读与责任争议簇',actorFocus:'政媒号与法律类创作者'}
+  :index<=11
+  ?{sourceId:'search',change:'VV +83%，评论量 +57%，负向观点占比 +8pp',cause:'事件词进入热榜前三，搜索回流放大处罚争议',path:'搜索 → 事件词 → 视频点击 → 评论发酵',governance:'干预热榜联想词与处罚争议内容簇',contentFocus:'处罚争议与情绪二创簇',actorFocus:'热点搬运与高互动账号簇'}
+  :{sourceId:'feed',change:'VV +39%，评论量 +61%，制度讨论占比 +9pp',cause:'揭阳公安发布情况通报，官媒集中转载并开放评论',path:'Feed → 官方通报 → 媒体解读 → 二次扩散',governance:'治理曲解通报内容和攻击性评论',contentFocus:'官方通报与制度讨论簇',actorFocus:'属地政务号与本地资讯账号群'}
+ return {
+  index,
+  date:analysisDates[index],
+  ...phases,
+  chainTime:index<=2?1:index<=4?2:index<=6?3:index<=8?4:index<=11?5:6
+ }
+}
+function GovernanceScope({context}:{context:AnalysisWindow}){
+ if(context.index===null)return null
+ return <section className="governanceScope">
+  <div><span>当前拐点建议治理动作</span><b>{context.governance}</b></div>
+  <dl>
+   <div><dt>优先内容簇</dt><dd>{context.contentFocus}</dd></div>
+   <div><dt>关注账号簇</dt><dd>{context.actorFocus}</dd></div>
+   <div><dt>热点 / 搜索词</dt><dd>{context.sourceId==='search'?'“揭阳虐狗”及处罚争议联想词':'通报曲解词与身份猜测词'}</dd></div>
+   <div><dt>建议新增策略</dt><dd>{context.sourceId==='search'?'降低异常搜索放大，提升权威结果首位率':'高风险内容降权，高赞引战评论复核'}</dd></div>
+  </dl>
+ </section>
+}
+function AnalysisFilterBar({timeContext,opinion,tab,onClearTime,onClearOpinion,onClearAll}:{timeContext:AnalysisWindow,opinion:string|null,tab:string,onClearTime:()=>void,onClearOpinion:()=>void,onClearAll:()=>void}){
+ const hasTime=timeContext.index!==null
+ const hasFilter=hasTime||Boolean(opinion)
+ const timeSeed=hasTime?(timeContext.index||0)+1:0
+ const titlePrefix=hasTime?`${timeContext.date} 窗口`:opinion?`“${opinion}”`:'全周期'
+ const result:any=tab==='视频传播链'
+  ?{title:`${titlePrefix}视频链路`,items:[['核心内容簇',hasFilter?String(Math.max(1,Math.min(4,Math.ceil((timeSeed||6)/2)))):'4',hasFilter?'当前窗口命中':'全周期'],['可见视频',hasFilter?String(8+timeSeed*3):'24',hasFilter?'按扩散阶段定位':'完整链路'],['贡献 VV',hasFilter?`${(96.4+timeSeed*31.7).toFixed(1)}万`:'6328.4万',hasFilter?'当前窗口增量':'累计播放'],['风险内容占比',hasFilter?`${(18.4+timeSeed*1.9).toFixed(1)}%`:'28.4%','负向内容']]}
+  :tab==='账号关联链'
+  ?{title:`${titlePrefix}账号链路`,items:[['关联账号',hasFilter?String(21+timeSeed*6):'82',hasFilter?'当前窗口命中':'全量账号'],['账号圈层',hasFilter?String(Math.max(2,Math.ceil((timeSeed||6)/2))):'6','传播群体'],['贡献 VV',hasFilter?`${(68.2+timeSeed*24.6).toFixed(1)}万`:'4286.7万','主体带动'],['异常账号占比',hasFilter?`${(9.8+timeSeed*1.3).toFixed(1)}%`:'17.6%','风险主体']]}
+  :{title:`${titlePrefix}结果`,items:[['命中视频',hasFilter?String(180+timeSeed*22):'2,846',hasFilter?'代表视频 8 条':'全量'],['贡献 VV',hasFilter?`${(82.6+timeSeed*18.7).toFixed(1)}万`:'6328.4万',hasFilter?'当前窗口增量':'累计播放'],['关联账号',hasFilter?String(36+timeSeed*3):'1,062',hasFilter?'较全周期收敛':'全量'],['风险内容占比',hasFilter?`${(24.6+timeSeed*1.5).toFixed(1)}%`:'28.4%','负向']]}
+ return <section className={'analysisContextPanel'+(hasFilter?' active':'')} aria-live="polite"><div className={'analysisFilterBar'+(hasFilter?' active':'')} aria-label="下方模块分析筛选条件">
+  <span>分析条件</span>
+  <div className="analysisFilterChips">
+   <button className={hasTime?'selected':''} disabled={!hasTime} onClick={hasTime?onClearTime:undefined} aria-label={hasTime?`移除时间筛选 ${timeContext.date}`:'时间范围：全周期'}>
+    <Clock3 size={12}/><b>{hasTime?`${timeContext.date} 当日窗口`:'全周期'}</b>{hasTime&&<X size={11}/>}
+   </button>
+   <button className={opinion?'selected':''} disabled={!opinion} onClick={opinion?onClearOpinion:undefined} aria-label={opinion?`移除观点筛选 ${opinion}`:'观点范围：全部观点'}>
+    <MessageCircle size={12}/><b>{opinion||'全部观点'}</b>{opinion&&<X size={11}/>}
+   </button>
+  </div>
+  <em>{hasFilter?'下方各分析模块已按当前条件联动':'当前展示全周期、全部观点数据'}</em>
+  {hasFilter&&<button className="clearAnalysisFilters" onClick={onClearAll}>清除全部</button>}
+  </div><FilterResultSummary title={result.title} items={result.items}/></section>
+}
+function getOpinionFilterProfile(opinion:string|null){
+ const text=opinion||''
+ const seed=Array.from(text).reduce((sum,char)=>sum+char.charCodeAt(0),0)
+ const positive=/立法|完善|理性|正向|保护/.test(text)
+ const neutral=/监护|教育|网暴|核验|事实|中立/.test(text)
+ const clusterId=/网暴|核验|事实|人肉/.test(text)?'source':/音频|二创|搬运/.test(text)?'audio':/立法|动物|监护|教育|责任/.test(text)?'topic':'opinion'
+ const baseVideos=positive?112:neutral?86:148
+ const baseVv=positive?318.6:neutral?226.4:438.2
+ const baseAccounts=positive?31:neutral?24:46
+ const baseRisk=positive?7.2:neutral?11.8:29.4
+ return {
+  seed,
+  clusterId,
+  tone:positive?'正向':neutral?'中立':'负向',
+  matchedVideos:baseVideos+seed%37,
+  vv:`${(baseVv+(seed%83)*2.1).toFixed(1)}万`,
+  accounts:baseAccounts+seed%19,
+  risk:`${(baseRisk+(seed%31)*.4).toFixed(1)}%`
+ }
+}
 function AIChatWorkspace({onOpenReport,onGenerate,reportTitle,collapsed,reference,onClearReference}:{onOpenReport:()=>void,onGenerate:(event:string)=>void,reportTitle:string,collapsed:boolean,reference:any,onClearReference:()=>void}){
  const [input,setInput]=useState(''),[messages,setMessages]=useState<any[]>([{role:'assistant',text:'你好，我是舆情分析助手。输入一个事件、关键词或链接，我会生成传播态势、视频链路、账号关系和风险研判报告。'}])
  const submit=(text=input)=>{const value=text.trim();if(!value&&!reference)return;const prompt=value||`分析引用视频：${reference.title}`;setMessages(current=>[...current,{role:'user',text:prompt,attachment:reference},{role:'assistant',text:'已识别事件主体和传播语境，完成多源内容聚合、观点聚类与账号关系分析。事件报告已生成在右侧产物区。',report:true}]);setInput('');onClearReference();onGenerate(prompt)}
@@ -37,10 +112,9 @@ function App(){
  const [chatCollapsed,setChatCollapsed]=useState(false)
  const [chatReference,setChatReference]=useState<any>(null)
  const [activeOpinion,setActiveOpinion]=useState<string|null>(null)
+ const [analysisWindow,setAnalysisWindow]=useState<AnalysisWindow>(fullAnalysisWindow)
  const select=(type,item)=>{setSelected({type,item});setDetailOpen(true)}
- const focusOpinion=(opinion:string|null)=>{
-  setActiveOpinion(opinion);setTab('传播数据统计')
- }
+ const focusOpinion=(opinion:string|null)=>setActiveOpinion(opinion)
  const sideItems:any[]=[[FileText,'舆情'],[Flag,'指令'],[Zap,'应急'],[ScanLine,'巡检'],[TriangleAlert,'举报'],[Search,'搜索']]
  return <div className="app">
   <div className="platformTopbar">
@@ -64,15 +138,16 @@ function App(){
   <div className="layout full"><section className="left">
    <div className="artifactTabs"><button className={'chatPanelToggle '+(chatCollapsed?'collapsed':'')} onClick={()=>setChatCollapsed(value=>!value)} aria-label={chatCollapsed?'展开对话区域':'收起对话区域'}><ChevronRight size={16}/></button><button className={artifactOpen?'active':''} onClick={()=>setArtifactOpen(true)}><FileText size={14}/><span>{reportEvent}</span>{artifactOpen&&<X size={13} onClick={event=>{event.stopPropagation();setArtifactOpen(false)}}/>}</button><button className="newArtifactTab" onClick={()=>setArtifactOpen(true)} aria-label="打开当前事件报告">+</button></div>
    {artifactOpen?<>
-   <div className="hero"><h1><span className="eventGrade" aria-label="指令等级 S，舆情等级 A"><i>S</i><em>|</em><b>A</b></span>“{reportEvent}”舆情传播分析</h1><p>{reportEvent==='揭阳虐狗事件'?'2026 年 2 月 5 日，广东揭阳一段疑似虐狗视频在多个平台传播，引发对涉事人员责任、动物保护立法、视频真实性及网络暴力边界的集中讨论。相关部门已介入核查，部分网传细节仍待权威确认。':`AI 已围绕“${reportEvent}”完成内容聚合、传播趋势识别、观点聚类和账号关系分析。当前报告展示模拟的全链路研判结果，可继续通过左侧对话追加分析要求。`}</p></div>
-   <InsightCommandCenter select={select} activeOpinion={activeOpinion} onOpinionSelect={focusOpinion}/>
-   <nav>{([['传播数据统计',Sparkles],['视频传播链',GitBranch],['账号关联链',Network],['相关指令',Flag]] as [string, any][]).map(([n,Icon])=><button key={n} className={tab===n?'active':''} onClick={()=>setTab(n)}><Icon size={16}/>{n}</button>)}</nav>
-   <div className="content">{tab==='传播数据统计'?<Stats open={open} setOpen={setOpen} select={select} activeOpinion={activeOpinion} onOpinionChange={setActiveOpinion} addToChat={(video:any,index:number)=>{setChatReference({...video,coverIndex:index%4});setChatCollapsed(false)}}/>:tab==='视频传播链'?<VideoChain select={select}/>:tab==='账号关联链'?<AccountChain select={select} highlight={highlight} setHighlight={setHighlight}/>:<RelatedCommands eventName={reportEvent}/>}</div>
+   <div className="hero"><h1>{reportEvent==='揭阳虐狗事件'?'揭阳虐狗事件':reportEvent}</h1><p>{reportEvent==='揭阳虐狗事件'?'2026 年 2 月 5 日，广东揭阳一段疑似虐待犬只的现场视频被发布后，迅速经短视频搬运、评论区转述、热榜与搜索回流扩散至多个平台。围绕视频是否完整、涉事人员身份与责任认定等事实问题，网络讨论进一步延伸至未成年人教育与监护责任、虐待动物行为的法律规制、动物保护立法，以及对涉事者人肉搜索和网络暴力的边界。当地相关部门随后介入核查并持续回应；目前部分事实已经得到确认，但视频前后经过、个别网传身份信息及具体处置依据仍需以权威通报为准。':`AI 已围绕“${reportEvent}”完成内容聚合、传播趋势识别、观点聚类和账号关系分析。当前报告展示模拟的全链路研判结果，可继续通过左侧对话追加分析要求。`}</p></div>
+   <InsightCommandCenter select={select} activeOpinion={activeOpinion} timeFilterIndex={analysisWindow.index} onOpinionSelect={focusOpinion} onTimeWindowChange={index=>setAnalysisWindow(getAnalysisWindow(index))}/>
+   <nav>{([['传播数据统计',Sparkles],['视频传播链',GitBranch],['账号关联链',Users],['相关指令',Flag]] as [string, any][]).map(([n,Icon])=><button key={n} className={tab===n?'active':''} onClick={()=>setTab(n)}><Icon size={16}/>{n}</button>)}</nav>
+   <AnalysisFilterBar timeContext={analysisWindow} opinion={activeOpinion} tab={tab} onClearTime={()=>setAnalysisWindow(fullAnalysisWindow)} onClearOpinion={()=>setActiveOpinion(null)} onClearAll={()=>{setAnalysisWindow(fullAnalysisWindow);setActiveOpinion(null)}}/>
+   <div className="content">{tab==='传播数据统计'?<Stats open={open} setOpen={setOpen} select={select} activeOpinion={activeOpinion} onOpinionChange={setActiveOpinion} timeContext={analysisWindow} addToChat={(video:any,index:number)=>{setChatReference({...video,coverIndex:index%4});setChatCollapsed(false)}}/>:tab==='视频传播链'?<VideoChain select={select} timeContext={analysisWindow} activeOpinion={activeOpinion} onTimeChange={index=>setAnalysisWindow(getAnalysisWindow(index))}/>:tab==='账号关联链'?<AccountChain select={select} highlight={highlight} setHighlight={setHighlight} timeContext={analysisWindow} activeOpinion={activeOpinion} onTimeChange={index=>setAnalysisWindow(getAnalysisWindow(index))}/>:<><GovernanceScope context={analysisWindow}/><RelatedCommands eventName={reportEvent} timeContext={analysisWindow} activeOpinion={activeOpinion}/></>}</div>
    </>:<div className="artifactEmpty"><div><FileText size={28}/><h2>暂无打开的分析报告</h2><p>从左侧快捷分析打开当前事件，或输入新事件生成报告。</p><button onClick={()=>setArtifactOpen(true)}>打开当前事件报告</button></div></div>}
   </section>{detailOpen&&<Detail state={selected} close={()=>setDetailOpen(false)}/>}</div></div>
  </div>
 }
-function RelatedCommands({eventName}:{eventName:string}){
+function RelatedCommands({eventName,timeContext,activeOpinion}:{eventName:string,timeContext:AnalysisWindow,activeOpinion:string|null}){
  const [level,setLevel]=useState('全部')
  const commands=[
   {source:'北京网信办',level:'C',title:`单条加私处置任务（涉“${eventName}”媒体信息不予处置）`,summary:'【系统标题】单条加私　【任务内容】对相关隐喻解读视频进行定向观察，暂不扩大处置范围。',requirement:'视频自见',video:41,account:39,live:0,attachments:2,tone:'violet'},
@@ -80,19 +155,35 @@ function RelatedCommands({eventName}:{eventName:string}){
   {source:'公安部',level:'C',title:'要求对影射对象猜测及引战评论开展清评并对违规账号禁言 30 天',summary:'【任务内容】核查传播链中煽动对立、恶意影射和人身攻击内容，对明确违规内容执行清评。',requirement:'评论自见',video:6,account:24,live:0,attachments:1,tone:'dark'},
   {source:'属地网信办',level:'B',title:'关注事件跨平台搬运扩散，压降异常推荐并阻断恶意关联',summary:'【任务内容】跟踪首发、相似扩散及二创节点，对集中爆发的异常流量进行复核和处置。',requirement:'流量干预',video:27,account:16,live:1,attachments:1,tone:'green'}
  ]
- const visible=level==='全部'?commands:commands.filter(item=>item.level===level)
- return <section className="relatedCommands"><div className="commandFilterBar"><label><Search size={15}/><input placeholder="搜索指令名称"/></label><div>{['全部','S级','A级','B级','C级'].map(item=><button key={item} className={level===item.replace('级','')||level===item?'active':''} onClick={()=>setLevel(item==='全部'?'全部':item.replace('级',''))}>{item}</button>)}</div><button className="commandSelect">指令类型 <ChevronDown size={13}/></button><button className="commandSelect">风险域 <ChevronDown size={13}/></button><button className="commandSelect">日期 <ChevronDown size={13}/></button></div><div className="commandList">{visible.map((item,index)=><article className="commandCard" key={item.title}><div className="commandCopy"><span>来源：<b>{item.source}</b></span><h3><i>{item.level}</i>{item.title}<em><u/>已下发</em></h3><p>{item.summary}</p><footer>指令要求：<b>{item.requirement}</b><small>下发时间 02-{6+index} {10+index}:20</small></footer></div><div className="commandMetrics">{[['视频',item.video,'最高播放'],['账号',item.account,'最高粉丝'],['直播间',item.live,'最高 PCU']].map(metric=><div key={metric[0]}><span>{metric[0]}</span><b>{metric[1]}</b><small>{metric[2]} -</small></div>)}</div><div className={'commandAttachments '+item.tone}>{item.attachments?Array.from({length:item.attachments}).map((_,i)=><button key={i} aria-label={'查看附件 '+(i+1)}><Play size={16} fill="currentColor"/><span>0:{8+i*4}</span></button>):<span>暂无附件</span>}</div></article>)}</div></section>
+ const opinionProfile=getOpinionFilterProfile(activeOpinion)
+ const filterSeed=opinionProfile.seed+(timeContext.index===null?0:(timeContext.index+1)*29)
+ const filteredCommands=(activeOpinion||timeContext.index!==null)
+  ?[...commands].sort((a,b)=>((a.video*11+filterSeed)%37)-((b.video*11+filterSeed)%37)).slice(0,3)
+  :commands
+ const visible=level==='全部'?filteredCommands:filteredCommands.filter(item=>item.level===level)
+ const summaryTitle=activeOpinion?`“${activeOpinion}”治理命中`:`${timeContext.date} 治理命中`
+ return <section className="relatedCommands">
+  {(activeOpinion||timeContext.index!==null)&&<FilterResultSummary title={summaryTitle} items={[
+   ['匹配指令',String(filteredCommands.length),activeOpinion?'观点条件命中':'时间窗口命中'],
+   ['待处置内容簇',String(3+filterSeed%4),`较全周期 -${2+filterSeed%3}`],
+   ['待关注账号簇',String(2+filterSeed%3),`策略命中 ${4+filterSeed%4} 个`],
+   ['优先级',opinionProfile.tone==='负向'?'高':'中',timeContext.index!==null?'当前拐点':'观点筛选']
+  ]}/>}
+  <div className="commandFilterBar"><label><Search size={15}/><input placeholder="搜索指令名称"/></label><div>{['全部','S级','A级','B级','C级'].map(item=><button key={item} className={level===item.replace('级','')||level===item?'active':''} onClick={()=>setLevel(item==='全部'?'全部':item.replace('级',''))}>{item}</button>)}</div><button className="commandSelect">指令类型 <ChevronDown size={13}/></button><button className="commandSelect">风险域 <ChevronDown size={13}/></button><button className="commandSelect">日期 <ChevronDown size={13}/></button></div><div className="commandList">{visible.map((item,index)=><article className="commandCard" key={item.title}><div className="commandCopy"><span>来源：<b>{item.source}</b></span><h3><i>{item.level}</i>{item.title}<em><u/>已下发</em></h3><p>{item.summary}</p><footer>指令要求：<b>{item.requirement}</b><small>下发时间 02-{6+index} {10+index}:20</small></footer></div><div className="commandMetrics">{[['视频',item.video,'最高播放'],['账号',item.account,'最高粉丝'],['直播间',item.live,'最高 PCU']].map(metric=><div key={metric[0]}><span>{metric[0]}</span><b>{metric[1]}</b><small>{metric[2]} -</small></div>)}</div><div className={'commandAttachments '+item.tone}>{item.attachments?Array.from({length:item.attachments}).map((_,i)=><button key={i} aria-label={'查看附件 '+(i+1)}><Play size={16} fill="currentColor"/><span>0:{8+i*4}</span></button>):<span>暂无附件</span>}</div></article>)}</div>
+ </section>
 }
 function Metrics(){return <div className="metrics">{[['关联视频','2,846','+18.6%'],['累计播放','6,328.4万','+12.3%'],['互动总量','384.7万','+8.2%'],['涉事账号','1,062','+63'],['风险内容','128','4.5%']].map((x,i)=><div key={x[0]}><span>{x[0]} {i===4&&<TriangleAlert size={12}/>}</span><b>{x[1]}</b><em className={i===4?'warn':''}>{x[2]}</em></div>)}</div>}
 function SourceBadge({type}:{type:'data'|'ai'}){return <small className={'sourceBadge '+type}>{type==='data'?'数据统计':'AI 研判'}</small>}
 const videoOpinionOptions=[['未成年人处罚力度过轻','31%','negative'],['未成年身份不应成为免责盾牌','24%','negative'],['应追究家长监护与教育责任','17%','neutral'],['亟需补齐反虐待动物立法空白','16%','positive'],['处置后讨论逐步回归理性','7%','positive'],['反对人肉未成年人及无关人员','5%','neutral']] as const
-function InsightCommandCenter({select,activeOpinion,onOpinionSelect}:{select:(type:string,item:any)=>void,activeOpinion:string|null,onOpinionSelect:(opinion:string|null)=>void}){
+function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSelect,onTimeWindowChange}:{select:(type:string,item:any)=>void,activeOpinion:string|null,timeFilterIndex:number|null,onOpinionSelect:(opinion:string|null)=>void,onTimeWindowChange:(index:number|null)=>void}){
  const [opinionScope,setOpinionScope]=useState<'视频'|'评论'>('视频')
- const [opinionSort,setOpinionSort]=useState<'share'|'growth'>('share')
+ const [rightPanelTab,setRightPanelTab]=useState<'opinion'|'ai'>('opinion')
  const [activeSentiment,setActiveSentiment]=useState<'negative'|'positive'|'neutral'|null>(null)
  const [hoverTimeIndex,setHoverTimeIndex]=useState<number|null>(null)
  const [selectedTimeIndex,setSelectedTimeIndex]=useState<number|null>(null)
  const [selectedInsight,setSelectedInsight]=useState<number|null>(null)
+ useEffect(()=>{setSelectedTimeIndex(timeFilterIndex);if(timeFilterIndex===null)setSelectedInsight(null)},[timeFilterIndex])
+ useEffect(()=>{if(!activeOpinion)setActiveSentiment(null)},[activeOpinion])
  const trendOpinionCatalog={
   视频:[
    ['未成年人处罚力度过轻','18%','negative'],
@@ -124,7 +215,7 @@ function InsightCommandCenter({select,activeOpinion,onOpinionSelect}:{select:(ty
  const selectedTone=selectedOpinion?.[2]
  const trendTimes=['06-29','06-30','07-01','07-02','07-03','07-04','07-05','07-06','07-07','07-08','07-09','07-10','07-11','07-12','07-13','07-14','07-15']
  const trendX=trendTimes.map((_,index)=>index*620/(trendTimes.length-1))
- const vvY=[185,176,164,146,112,137,119,82,48,96,122,105,120,92,110,139,161]
+ const vvY=[185,176,164,146,118,96,73,58,48,96,122,105,120,92,110,139,161]
  const commentY=[195,191,184,174,157,139,146,127,108,72,88,62,45,68,91,117,143]
  const mainY=opinionScope==='视频'?vvY:commentY
  const videoOpinionRawSeries=[
@@ -168,7 +259,7 @@ function InsightCommandCenter({select,activeOpinion,onOpinionSelect}:{select:(ty
  const makeArea=(top:number[],bottom:number[])=>`${makeLine(top)} ${bottom.map((y,reverseIndex)=>{const index=bottom.length-1-reverseIndex;return `L${trendX[index]} ${Math.round(bottom[index])}`}).join(' ')} Z`
  const insightSets={
   视频:[
-   {index:4,short:'新华社评论 · VV +68%',title:'新华社客户端发布评论《未成年人保护不是责任豁免》',detail:'07-03 09:20，新华社客户端发布事件评论，央视新闻随后转发相关解读，责任边界成为视频内容的主要议题。',impact:'传播 VV 较前日 +68%，正向解读占比 46%',evidence:'新华社发文后 2 小时，相关解读视频新增 VV 96.4 万，完播率 71.8%'},
+   {index:4,short:'新华社评论 · 传播加速',title:'新华社客户端发布评论《未成年人保护不是责任豁免》',detail:'07-03 09:20，新华社客户端发布事件评论；央视新闻、央广网随后跟进转载，权威解读连续进入推荐流，带动传播规模持续上升。',impact:'当日传播 VV 较前日 +68%，次日继续增长 37%',evidence:'发文后 2 小时新增 VV 96.4 万；此后 48 小时官媒解读视频累计新增 VV 286.7 万，推荐流贡献 64%'},
    {index:8,short:'抖音热榜第 3 · 负向反超',title:'“揭阳虐狗”升至抖音热榜第 3 位',detail:'07-07 10:10，事件词进入抖音热榜前三，大量用户通过热榜和搜索进入责任争议视频。',impact:'传播 VV 达到全周期峰值，负向观点升至 44%',evidence:'热榜入口带来搜索回流 +126%，争议解读视频新增 VV 186.7 万'},
    {index:13,short:'揭阳公安通报 · 二次扩散',title:'揭阳市公安局官方账号发布《情况通报》',detail:'07-12 08:30，揭阳公安公布阶段性调查与处置进展，人民日报客户端、南方日报等媒体跟进解读。',impact:'传播 VV 出现次高峰，制度讨论占比 +9pp',evidence:'通报相关视频 3 小时新增 VV 82.4 万，媒体账号贡献 61%'}
   ],
@@ -189,7 +280,7 @@ function InsightCommandCenter({select,activeOpinion,onOpinionSelect}:{select:(ty
   const sortShare=share
   const sortGrowth=growth
   return {name:item[0],share,tone:item[2],growth,comparison,sortShare,sortGrowth}
- }).sort((a,b)=>opinionSort==='share'?b.sortShare-a.sortShare:b.sortGrowth-a.sortGrowth).slice(0,5)
+ }).sort((a,b)=>b.sortShare-a.sortShare).slice(0,5)
  const selectedContribution=selectedOpinion?opinionSeries[selectedOpinion[0]]:null
  const selectedContributionPath=selectedContribution?.map((share,index)=>`${index?'L':'M'}${trendX[index]} ${Math.round(210-(210-mainY[index])*share/100)}`).join(' ')
  const selectedContributionY=guideTimeIndex!==null&&selectedContribution?Math.round(210-(210-mainY[guideTimeIndex])*selectedContribution[guideTimeIndex]/100):null
@@ -197,8 +288,8 @@ function InsightCommandCenter({select,activeOpinion,onOpinionSelect}:{select:(ty
  const metricRatio=selectedOpinion?(selectedTimeIndex===null?Number.parseFloat(selectedOpinion[1]):selectedContribution?.[selectedTimeIndex]||0)/100:activeSentiment?sentimentRatio[activeSentiment]:1
  const metricLabel=selectedOpinion?'观点相关':activeSentiment?'情绪汇总':'全量'
  const trendMetrics=[['视频量',Math.round(2846*metricRatio).toLocaleString(),metricLabel],['VV 量',(6328.4*metricRatio).toFixed(1)+'万',selectedOpinion?'观点贡献':activeSentiment?'情绪贡献':'累计播放'],['评论量',(72.1*metricRatio).toFixed(1)+'万',metricLabel],['点赞量',(248.6*metricRatio).toFixed(1)+'万',metricLabel],['关联账号',Math.round(1062*metricRatio).toLocaleString(),metricLabel]]
- const toggleSentiment=(tone:'negative'|'positive'|'neutral')=>{setActiveSentiment(current=>current===tone?null:tone);onOpinionSelect(null)}
- const changeScope=(scope:'视频'|'评论')=>{setOpinionScope(scope);setOpinionSort('share');setActiveSentiment(null);setHoverTimeIndex(null);setSelectedTimeIndex(null);setSelectedInsight(null);onOpinionSelect(null)}
+ const toggleSentiment=(tone:'negative'|'positive'|'neutral')=>{const next=activeSentiment===tone?null:tone;setActiveSentiment(next);onOpinionSelect(next?tone==='negative'?'负向观点':tone==='positive'?'正向观点':'中立观点':null)}
+ const changeScope=(scope:'视频'|'评论')=>{setOpinionScope(scope);setRightPanelTab('opinion');setActiveSentiment(null);setHoverTimeIndex(null);setSelectedTimeIndex(null);setSelectedInsight(null);onOpinionSelect(null);onTimeWindowChange(null)}
  const handleChartMove=(event:ReactMouseEvent<HTMLDivElement>)=>{const rect=event.currentTarget.getBoundingClientRect();const ratio=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));const nextIndex=Math.round(ratio*(trendTimes.length-1));setHoverTimeIndex(current=>current===nextIndex?current:nextIndex)}
  const selectedInsightItem=selectedInsight===null?null:activeInsights[selectedInsight]
  const selectedInsightNode=selectedInsight===null?null:peakNodes[selectedInsight]
@@ -220,9 +311,9 @@ function InsightCommandCenter({select,activeOpinion,onOpinionSelect}:{select:(ty
       {selectedContributionPath&&<path className={'line opinionLine contribution '+selectedTone} d={selectedContributionPath}/>}
       {guideTimeIndex!==null&&<line className={'hoverTimeGuide '+(hoverTimeIndex===null?'pinned':'preview')} x1={trendX[guideTimeIndex]} y1="28" x2={trendX[guideTimeIndex]} y2="198"/>}
      </svg>
-     {trendX.map((x,index)=><button key={trendTimes[index]} className={'timePointMarker'+(selectedTimeIndex===index?' selected':'')+(hoverTimeIndex===index?' hovering':'')} style={{left:(x/620*100)+'%',top:(mainY[index]/210*185)+'px'}} aria-label={`${trendTimes[index]}，${opinionScope==='视频'?'传播 VV':'评论量'}时间点${selectedTimeIndex===index?'，已定位':''}`} aria-pressed={selectedTimeIndex===index} onMouseEnter={()=>setHoverTimeIndex(index)} onFocus={()=>setHoverTimeIndex(index)} onBlur={()=>setHoverTimeIndex(null)} onClick={()=>{setHoverTimeIndex(null);setSelectedTimeIndex(current=>current===index?null:index);setSelectedInsight(null)}}/>)}
+     {trendX.map((x,index)=><button key={trendTimes[index]} className={'timePointMarker'+(selectedTimeIndex===index?' selected':'')+(hoverTimeIndex===index?' hovering':'')} style={{left:(x/620*100)+'%',top:(mainY[index]/210*185)+'px'}} aria-label={`${trendTimes[index]}，${opinionScope==='视频'?'传播 VV':'评论量'}时间点${selectedTimeIndex===index?'，已定位':''}`} aria-pressed={selectedTimeIndex===index} onMouseEnter={()=>setHoverTimeIndex(index)} onFocus={()=>setHoverTimeIndex(index)} onBlur={()=>setHoverTimeIndex(null)} onClick={()=>{const next=selectedTimeIndex===index?null:index;setHoverTimeIndex(null);setSelectedTimeIndex(next);setSelectedInsight(null);onTimeWindowChange(next)}}/>)}
      {selectedContributionY!==null&&guideTimeIndex!==null&&<i className={'opinionPointMarker '+selectedTone} style={{left:(trendX[guideTimeIndex]/620*100)+'%',top:(selectedContributionY/210*185)+'px'}}/>}
-     {peakNodes.map(({x,y,insight,peakIndex})=><button key={insight.short} className={'peakMarker signalMarker ai peak'+peakIndex+(selectedInsight===peakIndex?' active':'')} style={{left:(x/620*100)+'%',top:(y/210*185)+'px'}} aria-label={`AI 分析：${insight.title}`} aria-expanded={selectedInsight===peakIndex} onClick={()=>{setHoverTimeIndex(null);setSelectedTimeIndex(insight.index);setSelectedInsight(current=>current===peakIndex?null:peakIndex)}}><span><i/>AI · {insight.short}</span></button>)}
+     {peakNodes.map(({x,y,insight,peakIndex})=><button key={insight.short} className={'peakMarker signalMarker ai peak'+peakIndex+(selectedInsight===peakIndex?' active':'')} style={{left:(x/620*100)+'%',top:(y/210*185)+'px'}} aria-label={`AI 分析：${insight.title}`} aria-expanded={selectedInsight===peakIndex} onClick={()=>{setHoverTimeIndex(null);setSelectedTimeIndex(insight.index);setSelectedInsight(current=>current===peakIndex?null:peakIndex);onTimeWindowChange(insight.index)}}><span><i/>AI · {insight.short}</span></button>)}
      {selectedInsightItem&&selectedInsightNode&&<div className={'chartInsightPopover peak'+selectedInsight} style={{left:(selectedInsightNode.x/620*100)+'%',top:(selectedInsightNode.y/210*185)+'px'}} role="status" onMouseMove={event=>event.stopPropagation()}>
       <button className="chartInsightClose" aria-label="关闭 AI 分析" onClick={()=>setSelectedInsight(null)}><X size={12}/></button>
       <span>AI 分析 · {trendTimes[selectedInsightItem.index]} · 触发事件</span>
@@ -234,9 +325,9 @@ function InsightCommandCenter({select,activeOpinion,onOpinionSelect}:{select:(ty
     </div>
    </div>
    <aside className="coreOpinionPanel">
-    <div className="opinionPeriod"><span>{hoverTimeIndex!==null?'悬停时间':selectedTimeIndex!==null?'已定位时间':'时间周期'}</span><b>{guideTimeIndex===null?`${trendTimes[0]} — ${trendTimes[trendTimes.length-1]}`:trendTimes[guideTimeIndex]}</b>{selectedTimeIndex!==null&&<button onClick={()=>{setSelectedTimeIndex(null);setSelectedInsight(null)}}>恢复全周期</button>}</div>
-    <div className="coreOpinionPanelHead"><div><b>{opinionScope==='视频'?'视频内容观点':'评论观点'} <SourceBadge type="ai"/></b><span>Top {displayedOpinions.length} · {hoverTimeIndex!==null?`${trendTimes[hoverTimeIndex]} 预览，实时排序`:guideTimeIndex===null?'全周期占比':`${trendTimes[guideTimeIndex]} 已排序`}</span></div><div className="opinionSort"><button className={opinionSort==='share'?'selected':''} onClick={()=>setOpinionSort('share')}>按占比</button><button className={opinionSort==='growth'?'selected':''} onClick={()=>setOpinionSort('growth')}>按增速</button></div></div>
-    <div className="coreOpinionRows">{displayedOpinions.map((item,index)=>{const showComparison=guideTimeIndex!==null||opinionSort==='growth';return <button key={item.name} className={activeOpinion===item.name?'selected':''} onClick={()=>onOpinionSelect(activeOpinion===item.name?null:item.name)}><i>{index+1}</i><span>{item.name}</span><em className={item.tone}>{item.tone==='negative'?'负向':item.tone==='positive'?'正向':'中立'}</em><b><strong>{item.share}%</strong><small className={showComparison?'':'comparisonPlaceholder'}>{showComparison?`${item.comparison} ${item.growth>=0?'+':''}${item.growth}pp`:'占位'}</small></b></button>})}</div>
+    <div className="opinionPeriod"><span>{hoverTimeIndex!==null?'悬停时间':selectedTimeIndex!==null?'已定位时间':'时间周期'}</span><b>{guideTimeIndex===null?`${trendTimes[0]} — ${trendTimes[trendTimes.length-1]}`:trendTimes[guideTimeIndex]}</b>{selectedTimeIndex!==null&&<button onClick={()=>{setSelectedTimeIndex(null);setSelectedInsight(null);onTimeWindowChange(null)}}>恢复全周期</button>}</div>
+    <div className="coreOpinionPanelHead"><div><b>{rightPanelTab==='opinion'?(opinionScope==='视频'?'视频内容观点':'评论观点'):'AI 洞察'} <SourceBadge type="ai"/></b><span>{rightPanelTab==='opinion'?`Top ${displayedOpinions.length} · ${hoverTimeIndex!==null?`${trendTimes[hoverTimeIndex]} 预览，实时排序`:guideTimeIndex===null?'全周期占比':`${trendTimes[guideTimeIndex]} 已排序`}`:`与趋势图 ${activeInsights.length} 个 AI 节点联动`}</span></div><div className="opinionSort rightInsightTabs" role="tablist" aria-label="右侧分析类型"><button role="tab" aria-selected={rightPanelTab==='opinion'} className={rightPanelTab==='opinion'?'selected':''} onClick={()=>setRightPanelTab('opinion')}>观点</button><button role="tab" aria-selected={rightPanelTab==='ai'} className={rightPanelTab==='ai'?'selected':''} onClick={()=>setRightPanelTab('ai')}>AI 洞察</button></div></div>
+    {rightPanelTab==='opinion'?<div className="coreOpinionRows">{displayedOpinions.map((item,index)=>{const showComparison=guideTimeIndex!==null;return <button key={item.name} className={activeOpinion===item.name?'selected':''} onClick={()=>onOpinionSelect(activeOpinion===item.name?null:item.name)}><i>{index+1}</i><span>{item.name}</span><em className={item.tone}>{item.tone==='negative'?'负向':item.tone==='positive'?'正向':'中立'}</em><b><strong>{item.share}%</strong><small className={showComparison?'':'comparisonPlaceholder'}>{showComparison?`${item.comparison} ${item.growth>=0?'+':''}${item.growth}pp`:'占位'}</small></b></button>})}</div>:<div className="aiInsightRows">{activeInsights.map((insight,index)=><button key={insight.title} className={selectedInsight===index?'selected':''} onClick={()=>{const next=selectedInsight===index?null:index;setSelectedInsight(next);setSelectedTimeIndex(next===null?null:insight.index);onTimeWindowChange(next===null?null:insight.index)}}><i><Sparkles size={12}/></i><span><small>{trendTimes[insight.index]} · AI 节点 {index+1}</small><b>{insight.title}</b><em>{insight.impact}</em></span><ChevronRight size={13}/></button>)}</div>}
    </aside>
   </div>
   <div className="trendMetricCards">{trendMetrics.map(item=><article key={item[0]}><span>{item[0]}</span><b>{item[1]}</b><em>{item[2]}</em></article>)}</div>
@@ -272,8 +363,8 @@ const channelAnalysis:any={
  local:{title:'同城城市分布分析',dimension:'城市 / 同城场景',rows:[['北京','城市热点频道','58.6万','29.5%','互动率 6.9%'],['上海','附近内容流','44.2万','22.3%','收藏率 2.1%'],['成都','区域热榜','37.8万','19.1%','增速 +28%'],['杭州','城市频道','24.6万','12.4%','举报率 0.39%']],interactions:[['点赞','11.2万','5.6%'],['收藏','4.0万','2.0%'],['评论','5.9万','3.0%'],['举报','0.8万','0.40%']]},
  following:{title:'关注关系触达分析',dimension:'触达类型 / 关注场景',rows:[['关注流','最新发布','47.6万','29.8%','首屏曝光 61%'],['关注流','高互动内容','28.7万','17.9%','互动率 9.2%'],['特别关注','更新提醒','23.4万','14.6%','打开率 54%'],['朋友在看','好友点赞回流','13.9万','8.7%','信任转化高']],interactions:[['点赞','13.8万','8.6%'],['收藏','3.6万','2.3%'],['评论','5.1万','3.2%'],['举报','0.4万','0.25%']]}
 }
-function InteractiveSankey({select,onVideoFilter,activeVideoFilter,activeOpinion}:{select:(type:string,item:any)=>void,onVideoFilter:(keyword:string|null)=>void,activeVideoFilter:string|null,activeOpinion:string|null}){
- const [sourceId,setSourceId]=useState('feed')
+function InteractiveSankey({select,onVideoFilter,activeVideoFilter,activeOpinion,preferredSource}:{select:(type:string,item:any)=>void,onVideoFilter:(keyword:string|null)=>void,activeVideoFilter:string|null,activeOpinion:string|null,preferredSource:string}){
+ const [sourceId,setSourceId]=useState(preferredSource)
  const canvasRef=useRef<HTMLDivElement>(null)
  const [canvasWidth,setCanvasWidth]=useState(1000)
  const [linkGeometry,setLinkGeometry]=useState<any>(null)
@@ -281,6 +372,7 @@ function InteractiveSankey({select,onVideoFilter,activeVideoFilter,activeOpinion
  const analysisBase=channelAnalysis[source.id]
  const [feedLayerId,setFeedLayerId]=useState('m1')
  const chooseSource=(item)=>{setSourceId(item.id);setFeedLayerId('m1');onVideoFilter(null)}
+ useEffect(()=>{setSourceId(preferredSource);setFeedLayerId('m1');onVideoFilter(null)},[preferredSource])
  useEffect(()=>{
   if(!activeOpinion)return
   setSourceId('feed');setFeedLayerId('m1');onVideoFilter(null)
@@ -347,7 +439,7 @@ function OpinionDistribution({activeOpinion,onSelect}:{activeOpinion:string|null
  const opinions=datasets[scope]
  return <section className="opinionDistribution coreOpinions"><div className="opinionHead"><div><h2>核心观点 <SourceBadge type="ai"/></h2><p>观点色彩：负向 / 正向 / 中立；点击后渠道默认回到 Feed，并筛选下方代表视频</p></div><div className="opinionScope">{(['视频','评论'] as const).map(item=><button key={item} className={scope===item?'selected':''} onClick={()=>setScope(item)}>{item}观点</button>)}</div></div><div className="opinionLegend"><span className="negative">负向</span><span className="positive">正向</span><span className="neutral">中立</span></div><div className="coreOpinionGrid">{opinions.map(item=><button key={item[0]} className={`${item[4]} ${activeOpinion===item[0]?'selected':''}`} onClick={()=>onSelect(item[0])}><span>{item[0]}</span><b>{item[1]}</b><small>{item[2]} 条{scope==='视频'?'视频':'评论'}</small><p>{item[3]}</p><em>筛选代表视频 <ChevronRight size={12}/></em></button>)}</div></section>
 }
-function Stats({open,setOpen,select,addToChat,activeOpinion,onOpinionChange}){
+function Stats({open,setOpen,select,addToChat,activeOpinion,onOpinionChange,timeContext}){
  const [activeKeyword,setActiveKeyword]=useState('揭阳虐狗事件')
  const [period,setPeriod]=useState('近 7 天')
  const [videoFilter,setVideoFilter]=useState<string|null>(null)
@@ -379,18 +471,35 @@ function Stats({open,setOpen,select,addToChat,activeOpinion,onOpinionChange}){
  const effectiveVideoIds=activeOpinion?(opinionVideoIds[activeOpinion]||selectedVideoIds):selectedVideoIds
  const opinionFilteredVideos=(videoFilter||activeOpinion)?displayVideos.filter(video=>effectiveVideoIds.includes(video.id)):displayVideos
  const filteredVideos=accountType==='全部'?opinionFilteredVideos:opinionFilteredVideos.filter(video=>accountType==='B号'?['民生视角','动物保护观察','事实核验站'].includes(video.author):!['民生视角','动物保护观察','事实核验站'].includes(video.author))
- return <><InteractiveSankey select={select} activeVideoFilter={videoFilter} onVideoFilter={setVideoFilter} activeOpinion={activeOpinion}/>
+ const opinionProfile=getOpinionFilterProfile(activeOpinion)
+ const timeSeed=timeContext.index===null?0:timeContext.index+1
+ const hasAnalysisFilter=Boolean(activeOpinion)||timeContext.index!==null
+ const summaryTitle=activeOpinion?`“${activeOpinion}”传播结果`:`${timeContext.date} 窗口结果`
+ return <>{hasAnalysisFilter&&<FilterResultSummary title={summaryTitle} items={[
+  ['命中视频',String(activeOpinion?opinionProfile.matchedVideos:184+timeSeed*17),`代表视频 ${filteredVideos.length} 条`],
+  ['贡献 VV',activeOpinion?opinionProfile.vv:`${(82.6+timeSeed*18.7).toFixed(1)}万`,timeContext.index!==null?'当前窗口增量':'观点贡献'],
+  ['关联账号',String(activeOpinion?opinionProfile.accounts:21+timeSeed*4),`较全周期 -${38-timeSeed}`],
+  ['风险内容占比',activeOpinion?opinionProfile.risk:`${12+timeSeed*2.4}%`,opinionProfile.tone]
+ ]}/>}<InteractiveSankey select={select} activeVideoFilter={videoFilter} onVideoFilter={setVideoFilter} activeOpinion={activeOpinion} preferredSource={timeContext.sourceId}/>
  <div className="dataToolbar"><div>{['近 24 小时','近 7 天','全部周期'].map(item=><button key={item} className={period===item?'selected':''} onClick={()=>setPeriod(item)}>{item}</button>)}</div></div><div className="sankey"><div className="sLabels"><span>内容发布</span><span>主要入口</span><span>细分场景</span><span>用户行为</span></div><div className="chart"><svg viewBox="0 0 1000 230" preserveAspectRatio="none"><path className="p1" d="M82 24 C210 24 230 24 314 24 L314 100 C220 96 188 86 82 76Z"/><path className="p2" d="M82 82 C210 94 236 110 314 110 L314 153 C210 149 184 137 82 120Z"/><path className="p3" d="M82 128 C210 145 240 161 314 165 L314 196 C210 191 190 180 82 164Z"/><path className="p4" d="M82 173 C210 191 240 202 314 204 L314 224 C200 218 180 210 82 205Z"/><path className="p1" d="M365 24 C480 24 500 24 600 24 L600 82 C490 76 450 85 365 100Z"/><path className="p1 low" d="M365 51 C480 67 500 104 600 105 L600 135 C490 130 442 118 365 100Z"/><path className="p2" d="M365 110 C490 113 520 124 600 125 L600 159 C490 159 440 154 365 153Z"/><path className="p3" d="M365 165 C490 168 520 178 600 180 L600 205 C490 204 440 201 365 196Z"/><path className="p1" d="M650 24 C750 24 790 26 913 26 L913 75 C780 74 730 70 650 82Z"/><path className="p2" d="M650 105 C750 108 790 112 913 112 L913 149 C780 145 725 139 650 135Z"/><path className="p3" d="M650 125 C750 134 790 165 913 165 L913 194 C780 188 725 170 650 159Z"/></svg><span className="node origin">关联视频<b>2,846</b></span><button className="node feed" onClick={()=>select('path',{name:'Feed 推荐'})}>Feed 推荐<b>60.3%</b></button><span className="node search">站内搜索<b>19.1%</b></span><span className="node profile">个人主页<b>12.6%</b></span><span className="node share">分享回流<b>8.0%</b></span><span className="node rec">推荐页<b>41.7%</b></span><span className="node local">同城页<b>18.6%</b></span><span className="node hot">热榜<b>13.9%</b></span><span className="node key">关键词<b>8.2%</b></span><span className="node views">有效播放<b>6,328.4万</b></span><span className="node acts">互动行为<b>384.7万</b></span><span className="node trans">转发传播<b>58.2万</b></span></div></div>
  <div className="paths">{paths.map((p,i)=><div key={p.id} className={open.includes(p.id)?'open':''}><button className="pathTrigger" aria-expanded={open.includes(p.id)} onClick={()=>togglePath(p.id)}><i className={'pathIcon pi'+i}><Play size={13}/></i><b>{p.name}</b><span>{p.plays}</span><em>{p.ratio}</em><u><i style={{width:p.ratio}}/></u><ChevronDown size={16}/></button>{open.includes(p.id)&&<article className="pathExpanded"><div className="pathSummary"><p>细分流量场景 <b>{p.scenes}</b></p><p>路径洞察 <b>{p.insight}</b></p></div><div className="pathDetailGrid"><section><h4>流量场景明细</h4>{p.breakdown.map(row=><div className="breakdown" key={row[0]}><span>{row[0]}</span><b>{row[1]}</b><em>{row[2]}</em></div>)}</section><section><h4>观点聚合</h4><p className="viewMix">{p.views}</p>{p.id==='search'&&<><h4 className="keywordTitle">相关搜索词</h4><div className="keywords">{Object.keys(searchResults).map(word=><button key={word} className={activeKeyword===word?'selected':''} onClick={()=>setActiveKeyword(word)}>{word}</button>)}</div></>}<div className="related"><h4>{p.id==='search'?'“'+activeKeyword+'”关联内容':'关联站内内容'}</h4>{(p.id==='search'?searchResults[activeKeyword]:p.contents).map((content,index)=><button key={content} onClick={()=>select('path',{name:content})}><span>{index+1}</span>{content}<ChevronRight size={13}/></button>)}</div></section></div><button className="insightButton" onClick={()=>select('path',{name:p.name})}>查看路径洞察<ChevronRight size={14}/></button></article>}</div>)}</div>
  <div id="filtered-video-results" className={(videoFilter||activeOpinion||accountType!=='全部')?'isFiltered':''}><Section title="热点观点与代表视频" desc={activeOpinion?`已按观点“${activeOpinion}”筛选，当前展示 ${filteredVideos.length} 条代表视频`:videoFilter?`已按分析项“${videoFilter}”筛选，共 ${filteredVideos.length} 条代表视频`:accountType!=='全部'?`已筛选 ${accountType}，当前展示 ${filteredVideos.length} 条代表视频`:'基于统计数据汇总代表视频，AI 辅助完成文案、OCR 和 ASR 语义聚合'} action={(videoFilter||activeOpinion)?<button className="videoFilterChip" onClick={()=>{setVideoFilter(null);onOpinionChange(null)}}><ScanLine size={12}/>{activeOpinion||videoFilter}<X size={12}/></button>:null} source="data"/><div className="videoOpinionFilters"><span>观点筛选</span>{videoOpinionOptions.map(item=><button key={item[0]} className={`${item[2]} ${activeOpinion===item[0]?'selected':''}`} onClick={()=>onOpinionChange(activeOpinion===item[0]?null:item[0])}>{item[0]} <b>{item[1]}</b></button>)}</div><div className="videoAccountFilters"><span>账号类型</span>{['全部','B号','C号'].map(item=><button key={item} className={accountType===item?'selected':''} onClick={()=>setAccountType(item)}>{item}</button>)}</div><div className="cards videoListGrid">{filteredVideos.map((v,i)=><VideoCard key={v.id} v={v} i={i} select={select} addToChat={addToChat}/>)}</div></div></>
 }
 function Section({title,desc,action,source}:{title:string,desc:string,action:any,source?:'data'|'ai'}){return <div className="section"><div><h2>{title}{source&&<SourceBadge type={source}/>}</h2><p>{desc}</p></div>{action}</div>}
+function FilterResultSummary({title,items}:{title:string,items:[string,string,string][]}){
+ return <div className="filterResultSummary" aria-live="polite">
+  <div><ScanLine size={14}/><span><small>筛选结果</small><b>{title}</b></span></div>
+  {items.map(([label,value,change])=><p key={label}><span>{label}</span><b>{value}</b><em>{change}</em></p>)}
+ </div>
+}
 function ChainTimeline({value,onChange,total,label}:{value:number,onChange:(value:number)=>void,total:number,label:string}){
- const points=['02-05 15:45','02-05 18:00','02-06 10:00','02-07 12:00','02-08 20:00','02-10 09:00','02-12 18:00']
+ const points=analysisDates
+ const stageDates=[0,2,4,6,8,11,16]
+ const displayValue=stageDates[value]??value
  const [playing,setPlaying]=useState(false)
- useEffect(()=>{if(!playing)return;if(value>=points.length-1){setPlaying(false);return}const timer=window.setTimeout(()=>onChange(value+1),900);return()=>window.clearTimeout(timer)},[playing,value,onChange])
- const togglePlay=()=>{if(playing){setPlaying(false);return}if(value>=points.length-1)onChange(0);setPlaying(true)}
- return <div className="chainTimeline"><div className="timelineMeta"><span><Clock3 size={13}/>{label}</span><b>{points[value]}</b><em>已出现 {total} 个实体</em><button className={playing?'timelinePlay playing':'timelinePlay'} onClick={togglePlay} aria-label={playing?'暂停时间轴':'播放时间轴'}>{playing?<Pause size={13} fill="currentColor"/>:<Play size={13} fill="currentColor"/>}<span>{playing?'暂停':'播放'}</span></button></div><div className="timelineTrack"><input type="range" min="0" max="6" step="1" value={value} onChange={event=>{setPlaying(false);onChange(Number(event.target.value))}}/><div className="timelineTicks">{points.map((point,index)=><button key={point} className={index<=value?'reached':''} onClick={()=>{setPlaying(false);onChange(index)}}><i/><span>{point.slice(0,5)}</span></button>)}</div></div><small>拖拽时间轴查看传播链在不同时间点的状态</small></div>
+ useEffect(()=>{if(!playing)return;if(displayValue>=points.length-1){setPlaying(false);return}const timer=window.setTimeout(()=>onChange(displayValue+1),900);return()=>window.clearTimeout(timer)},[playing,displayValue,onChange])
+ const togglePlay=()=>{if(playing){setPlaying(false);return}if(displayValue>=points.length-1)onChange(0);setPlaying(true)}
+ return <div className="chainTimeline"><div className="timelineMeta"><span><Clock3 size={13}/>{label}</span><b>{points[displayValue]}</b><em>已出现 {total} 个实体</em><button className={playing?'timelinePlay playing':'timelinePlay'} onClick={togglePlay} aria-label={playing?'暂停时间轴':'播放时间轴'}>{playing?<Pause size={13} fill="currentColor"/>:<Play size={13} fill="currentColor"/>}<span>{playing?'暂停':'播放'}</span></button></div><div className="timelineTrack"><input type="range" min="0" max={points.length-1} step="1" value={displayValue} onChange={event=>{setPlaying(false);onChange(Number(event.target.value))}}/><div className="timelineTicks">{points.map((point,index)=><button key={point} className={index<=displayValue?'reached':''} onClick={()=>{setPlaying(false);onChange(index)}}><i/><span>{point}</span></button>)}</div></div><small>与上方趋势图使用同一日期轴；选择日期后自动定位链路扩散状态</small></div>
 }
 function useCanvasPan(){
  const [pan,setPan]=useState({x:0,y:0}),dragging=useRef(false),origin=useRef({x:0,y:0,px:0,py:0})
@@ -416,29 +525,79 @@ function VideoDynamicLinks({pos,arrival,timeIndex,cluster}:{pos:number[][],arriv
  return <svg className="links dynamicVideoLinks" viewBox="0 0 1200 720">{edges.filter(([from,to])=>allowed(from)&&allowed(to)).map(([from,to,type])=>{const fromPoint=point(from),toPoint=point(to),mx=(fromPoint.x+toPoint.x)/2;return <path key={from+'-'+to} className={type} d={`M${fromPoint.x} ${fromPoint.y} C${mx} ${fromPoint.y} ${mx} ${toPoint.y} ${toPoint.x} ${toPoint.y}`}/>})}</svg>
 }
 function VideoCard({v,i,select,addToChat}){return <button className="vcard" onClick={()=>select('video',v)}><div className={'thumb th'+i}><span>{v.tone}</span><i><Play size={15} fill="currentColor"/></i><b>00:{36+i*11}</b><span role="button" tabIndex={0} className="addVideoToChat" onClick={event=>{event.stopPropagation();addToChat(v,i)}} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.stopPropagation();addToChat(v,i)}}}><Sparkles size={11}/>添加到 Chat</span></div><h3>{v.title}</h3><p>{v.author} · {v.time}</p><footer><span><Eye size={12}/>{v.play}</span><span><MessageCircle size={12}/>{v.interaction}</span><em>{v.grade}</em></footer></button>}
-function VideoChain({select}){
+function EventMainChain(){
+ const views=['内容','账号','互动','风险'],turns=['站内首发','风险首发','Feed 起量','评论放大','群聊外溢']
+ const [view,setView]=useState('内容'),[focusTurn,setFocusTurn]=useState<number|null>(null),[selectedNode,setSelectedNode]=useState<string|null>(null),[detailTab,setDetailTab]=useState('视频列表')
+ const [detailVideo,setDetailVideo]=useState<any>(null)
+ const nodes:any[]=[
+  {id:'source',kind:'实体对象',title:'站内首发视频',attr:'现场原始画面 · VID 824913',risk:42,metrics:['VV 18.6万','账号 1','转载 0'],reason:'提供事件原始素材，暂未形成明确风险表达。',action:'保全原始证据'},
+  {id:'riskVideo',kind:'实体对象',title:'风险首发视频',attr:'“救援不及时” · VID 825074',risk:91,metrics:['VV 286万','完播 78%','互动 12%'],reason:'首次将现场画面解释为“救援不及时”，成为风险叙事源头。',action:'切断推荐'},
+  {id:'feed',kind:'归因对象',title:'Feed 推荐起量',attr:'冷启动 → 二轮扩量',risk:86,metrics:['增量 +180%','TOP 0.3%','曝光 168万'],reason:'冷启动数据超过同档位 P90，触发连续扩量。',action:'回滚推荐流量'},
+  {id:'opinion',kind:'归因对象',title:'指责型观点簇',attr:'“救援不及时”语义簇',risk:89,metrics:['视频 84','评论 326','覆盖 61%'],reason:'指责表达被视频标题、字幕与评论反复复述。',action:'召回视频 · 定位评论'},
+  {id:'comment',kind:'集合对象',title:'高赞评论簇',attr:'37 条核心评论',risk:88,metrics:['点赞 12.6万','增长 +370%','回访 4.8万'],reason:'高赞排序让风险表达持续占据评论区首屏。',action:'折叠高赞评论'},
+  {id:'search',kind:'集合对象',title:'搜索词簇',attr:'“揭阳 救援不及时”',risk:82,metrics:['搜索 8.2万','涨幅 +46%','视频 126'],reason:'评论表达转化为搜索需求并产生持续回流。',action:'干预搜索词'},
+  {id:'remix',kind:'集合对象',title:'同画面二创内容簇',attr:'126 个相似视频',risk:84,metrics:['相似度 91%','VV 98.4万','账号 73'],reason:'原画面被裁剪、配音和字幕改写后批量复用。',action:'批量召回相似视频'},
+  {id:'group',kind:'集合对象',title:'群聊承接簇',attr:'17 个风险群',risk:87,metrics:['桥接用户 9','分享 8.4K','回流 23.6万'],reason:'桥接用户把二创内容带入多个群聊并形成回流。',action:'定位桥接用户'},
+  {id:'riskSurface',kind:'归因对象',title:'外溢风险面',attr:'推荐 × 搜索 × 社交',risk:93,metrics:['覆盖 412.8万','残余 VV 30%','对象 382'],reason:'风险扩散为跨内容、互动和社交场景的复合风险。',action:'生成联合处置单'}
+ ]
+ const edges:any[]=[
+  ['风险演化','原始现场画面被加入指责性解释','语义风险 +49分','风险表达首次出现时召回'],
+  ['推荐放量','冷启动数据超过 P90，进入连续推荐','VV 增量 +180%','切断推荐并冻结扩量'],
+  ['观点扩散','推荐曝光把视频叙事转化为稳定观点','观点覆盖 61%','生成语义规则定位承载视频'],
+  ['观点传导','相同观点进入高赞区并获得排序优势','重合度 78% · 高赞 37条 · 评论 +370%','折叠评论并召回承载视频'],
+  ['搜索回流','评论表达被用户转化为主动搜索','搜索 8.2w · 涨幅 46%','干预风险搜索词'],
+  ['内容相似','风险首发画面被裁剪配音再次投稿','画面相似 91% · 下游 126个视频','批量召回相似内容'],
+  ['群聊桥接','二创视频通过桥接用户进入群聊','17个风险群 · 9个桥接用户 · 分享 8.4k','定位桥接用户和供货账号'],
+  ['风险汇聚','推荐、搜索与群聊共同形成残余传播','残余 VV 30%','执行跨场景联合处置']
+ ]
+ const turnSegments=[[0,1],[1,2],[2,3],[3,5],[6,8]]
+ const videosMock=[{title:'现场视频：救援人员迟迟未到？',id:'825074',time:'06-29 16:18',account:'揭阳现场',vv:'286万',risk:91,match:'96%',role:'风险首发',stage:'二轮扩量',status:'推荐已切断'},{title:'同一现场多角度记录，救援是否及时',id:'825311',time:'06-29 17:02',account:'民生视角',vv:'96.4万',risk:86,match:'91%',role:'核心二创',stage:'主池放量',status:'待召回'},{title:'“救援不及时”说法引发争议',id:'825842',time:'06-29 18:26',account:'本地热讯',vv:'82.7万',risk:84,match:'88%',role:'观点放大',stage:'二轮扩量',status:'审核中'}]
+ const commentsMock=[['救援这么久都没来，谁负责？','VID 825074','3.8万','89','94%','已折叠'],['不是没人救，是根本不重视','VID 825311','2.6万','86','91%','待处置'],['现场这么多人为什么没人管','VID 825842','1.9万','82','87%','审核中']]
+ const searchMock=[['揭阳 救援不及时','8.2万','+46%','126','88','已干预'],['揭阳现场视频','5.6万','+32%','84','76','监控中'],['救援人员为什么没到','3.1万','+28%','51','81','待干预']]
+ const viewCopy:any={内容:{metric:'相似度 91%',reason:'关注画面复用、字幕改写和二创扩散',action:'召回相似视频'},账号:{metric:'关联账号 73',reason:'关注供货账号、桥接账号和共设备关系',action:'封禁供货账号'},互动:{metric:'集中度 68%',reason:'关注完播、互动率和异常账号集中度',action:'清理异常互动'},风险:{metric:'传导层级 5',reason:'关注风险分、传导层级和下游覆盖',action:'生成联合处置单'}}
+ const tabs=['视频列表','评论列表','搜索词','关联账号','处置建议'],nodeIndex=selectedNode?nodes.findIndex(node=>node.id===selectedNode):-1
+ const focused=(index:number)=>focusTurn===null||turnSegments[focusTurn].includes(index)||turnSegments[focusTurn].includes(index-1)
+ const openNode=(node:any)=>{setSelectedNode(node.id);setDetailVideo(null);setDetailTab(node.id==='comment'?'评论列表':node.id==='search'?'搜索词':'视频列表')}
+ return <div className="eventMainChain"><Section title="事件传播主链路图" desc="默认展示站内扩散全景；点击拐点聚焦放大机制，点击关键簇下钻承载对象" action={<div className="mainChainViewSwitch">{views.map(item=><button key={item} className={view===item?'selected':''} onClick={()=>setView(item)}>{item}视角</button>)}</div>}/>
+  <div className="mainChainTimeline"><header><b>VV 趋势与关键拐点</b><span>{focusTurn===null?'全景主链路':'聚焦：'+turns[focusTurn]}</span><button className={focusTurn===null?'selected':''} onClick={()=>setFocusTurn(null)}>查看全景</button></header><div className="miniVvTrend"><svg viewBox="0 0 1000 72" preserveAspectRatio="none"><path className="area" d="M20 62 C120 61 155 57 220 49 S310 15 390 29 S505 10 590 17 S690 39 755 31 S870 51 980 56 L980 68 L20 68Z"/><path d="M20 62 C120 61 155 57 220 49 S310 15 390 29 S505 10 590 17 S690 39 755 31 S870 51 980 56"/></svg>{turns.map((item,index)=><button key={item} className={focusTurn===index?'selected':''} style={{left:`${[8,27,48,69,89][index]}%`,top:`${[48,28,13,31,47][index]}px`}} onClick={()=>setFocusTurn(focusTurn===index?null:index)}><i/><span>{item}</span></button>)}</div></div>
+  <div className="mainChainWorkbench"><div className="mainChainCanvas"><div className="mainChainPath">{nodes.map((node,index)=><div key={node.id} className={'chainStep '+(!focused(index)?'dimmed ':'')+(selectedNode===node.id?'selected ':'')+(node.id==='riskSurface'?'riskSurface ':'')}><button className="chainObjectCard" onClick={()=>openNode(node)}><header><span>{node.kind}</span><em>风险 {node.risk}</em></header><b>{node.title}</b><small>{node.attr}</small><div className="chainMetrics"><span>{node.metrics[0]}</span><span>{node.metrics[1]}</span><span>{viewCopy[view].metric}</span></div><p>{view==='内容'?node.reason:viewCopy[view].reason}</p><footer>{node.kind==='归因对象'&&node.id==='opinion'?'召回承载视频 · 定位高赞评论 · 生成语义规则':view==='内容'?node.action:viewCopy[view].action}</footer></button>{index<edges.length&&<button className="chainMechanism" onClick={()=>setFocusTurn(Math.min(4,Math.floor(index/2)))}><b>{edges[index][0]}</b><span>{view==='内容'?edges[index][1]:viewCopy[view].reason}</span><em>{edges[index][2]}</em><small>{edges[index][3]}</small><i>→</i></button>}</div>)}</div></div>
+   <aside className="mainChainInspector">{detailVideo?<SingleVideoWhyHot video={detailVideo} onBack={()=>setDetailVideo(null)}/>:selectedNode?<><header><span>{nodes[nodeIndex].kind}</span><b>{nodes[nodeIndex].title}</b><small>{nodes[nodeIndex].attr} · 风险 {nodes[nodeIndex].risk}</small></header>{nodes[nodeIndex].id==='riskSurface'?<RiskSurfaceReport/>:<><nav>{tabs.map(tab=><button key={tab} className={detailTab===tab?'selected':''} onClick={()=>setDetailTab(tab)}>{tab}</button>)}</nav><CarrierObjectsTable tab={detailTab} videos={videosMock} comments={commentsMock} searches={searchMock} onVideo={setDetailVideo}/></>}</>:focusTurn!==null?<TurningPointInsight name={turns[focusTurn]} index={focusTurn}/>:<MainChainOverview/>}</aside>
+  </div>
+ </div>
+}
+function MainChainOverview(){return <div className="mainOverview"><header><span>全景研判</span><b>风险由推荐起量，经评论与搜索放大，最终向群聊外溢</b></header><dl><div><dt>核心风险源</dt><dd>VID 825074</dd></div><div><dt>累计覆盖</dt><dd>412.8万 VV</dd></div><div><dt>关键拐点</dt><dd>5 个</dd></div><div><dt>可处置对象</dt><dd>382 个</dd></div></dl><h4>建议处置顺序</h4><ol><li>切断风险首发视频推荐</li><li>批量召回 126 个相似视频</li><li>折叠 37 条高赞风险评论</li><li>干预 3 个风险搜索词</li><li>定位 9 个群聊桥接用户</li></ol></div>}
+function TurningPointInsight({name,index}:{name:string,index:number}){const data=[['风险叙事尚未形成，是最低成本的证据保全窗口','在首次风险表达前拦截可减少 94% 后续曝光'],['“救援不及时”首次绑定现场画面并成为传播母本','此处召回预计减少 86% 后续曝光'],['完播率 78%、互动率 12%，超过同档位 P90，触发推荐扩量','冷启动结束前切断可减少 72% 曝光'],['观点重合度 78%，37 条高赞评论推动评论增长 370%','排序形成前干预可减少 48% 搜索回流'],['17 个风险群由 9 个桥接用户连接，站内回流持续','群聊外溢前拦截可减少 30% 残余 VV']][index];return <div className="turnInsight"><header><span>关键拐点</span><b>{name}</b></header><section><h4>为什么重要</h4><p>{data[0]}</p></section><section><h4>为什么放大</h4><p>{index<2?'风险解释改变了原始内容的传播性质。':'分发与互动信号叠加，使风险进入下一传播阶段。'}</p></section><strong>{data[1]}</strong><button>生成拐点处置方案</button></div>}
+function CarrierObjectsTable({tab,videos,comments,searches,onVideo}:{tab:string,videos:any[],comments:any[],searches:any[],onVideo:(video:any)=>void}){if(tab==='视频列表')return <div className="carrierTable"><div className="tableTitle"><b>承载视频</b><span>共 84 条 · 展示风险贡献 Top 3</span></div>{videos.map(v=><button key={v.id} onClick={()=>onVideo(v)}><b>{v.title}</b><small>{v.id} · {v.time} · @{v.account}</small><span>{v.vv} VV</span><em>风险 {v.risk} · 匹配 {v.match}</em><u>{v.role} · {v.stage} · {v.status}</u></button>)}</div>;if(tab==='评论列表')return <div className="denseDataTable"><header><span>评论内容 / 承载视频</span><span>指标</span><span>状态</span></header>{comments.map((r:any)=><div key={r[0]}><span><b>{r[0]}</b><small>{r[1]}</small></span><span>{r[2]}赞<br/>风险 {r[3]} · 匹配 {r[4]}</span><em>{r[5]}</em></div>)}</div>;if(tab==='搜索词')return <div className="denseDataTable"><header><span>搜索词</span><span>流量 / 风险</span><span>状态</span></header>{searches.map((r:any)=><div key={r[0]}><span><b>{r[0]}</b><small>点击视频 {r[3]} 个</small></span><span>{r[1]} · {r[2]}<br/>风险 {r[4]}</span><em>{r[5]}</em></div>)}</div>;if(tab==='关联账号')return <div className="actionList"><h4>关联账号 Top 3</h4><p><b>@揭阳现场</b><span>风险首发 · 供货账号 · 风险 91</span></p><p><b>@本地热讯</b><span>二创扩散 · 共设备 D-07 · 风险 86</span></p><p><b>@群聊搬运站</b><span>桥接用户 · 连接 7 个群 · 风险 88</span></p></div>;return <div className="actionList"><h4>可执行处置</h4>{['切断风险首发视频推荐','批量召回相似视频','折叠高赞评论','干预风险搜索词','封禁供货账号','定位群聊桥接用户'].map(item=><p key={item}><b>{item}</b><button>生成指令</button></p>)}</div>}
+function SingleVideoWhyHot({video,onBack}:{video:any,onBack:()=>void}){return <div className="singleWhyHot"><button className="back" onClick={onBack}>← 返回承载对象</button><header><span>单视频为什么火</span><b>{video.title}</b><small>VID {video.id} · @{video.account} · 风险 {video.risk}</small></header><div className="videoSpark"><i/><i/><i/><i/><i/><i/><span>发布</span><span>冷启动</span><span>首轮</span><span>二轮</span><span>主池</span><span>长尾</span></div><dl><div><dt>风险检出</dt><dd>06-29 17:32</dd></div><div><dt>处置生效</dt><dd>06-29 20:18</dd></div><div><dt>门槛依据</dt><dd>完播 78% · 互动 12% · TOP 0.3%</dd></div><div><dt>后续放大</dt><dd>搜索热度 +320% · 触发热榜收录</dd></div></dl><p>处置生效时已进入二轮扩量；推荐切断后，搜索和社交仍贡献 30% 残余 VV。</p><strong>建议拦截阶段：冷启动试投结束前</strong><button className="primaryAction">生成单视频处置单</button></div>}
+function RiskSurfaceReport(){return <div className="riskReport"><header><span>风险面报告</span><b>推荐、搜索与社交共同形成外溢风险</b></header><dl><div><dt>形成路径</dt><dd>风险视频 → 评论 → 搜索 / 二创 → 群聊</dd></div><div><dt>覆盖对象</dt><dd>382 个视频 · 96 个账号 · 17 个群</dd></div><div><dt>风险解释</dt><dd>单点召回无法消除搜索和群聊带来的残余传播</dd></div><div><dt>可处置对象</dt><dd>视频 126 · 评论 37 · 搜索词 3 · 账号 12</dd></div></dl><h4>建议动作</h4>{['切断推荐','批量召回相似视频','折叠高赞评论','干预搜索词','封禁供货账号','定位桥接用户'].map(item=><button key={item}>{item}<span>生成指令 →</span></button>)}</div>}
+
+function VideoChain({select,timeContext,activeOpinion,onTimeChange}:{select:(type:string,item:any)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onTimeChange:(value:number)=>void}){
  const [zoom,setZoom]=useState(.78),[relations,setRelations]=useState(['文本相似','OCR 相似','ASR 相似'])
  const [selectedEntities,setSelectedEntities]=useState<string[]>([])
  const [timeIndex,setTimeIndex]=useState(6)
  const [expandedCluster,setExpandedCluster]=useState<string|null>(null)
  const boardRef=useRef<HTMLDivElement>(null)
  const {pan,setPan,handlers:panHandlers}=useCanvasPan()
+ useEffect(()=>{setTimeIndex(timeContext.chainTime);setExpandedCluster(null);setSelectedEntities([])},[timeContext.index,timeContext.chainTime])
  const relationOptions=['文本相似','OCR 相似','ASR 相似','同作者投稿','互粉作者','相同话题']
  const clusterThemes=[
-  ['热点档案室','“身居高位却名不副实”：热议观点梳理'],['职场观察局','能力与职位不匹配为何引发共鸣'],['公共议题社','评论区围绕任用标准展开讨论'],['理性讨论组','从个体能力看职位责任与评价'],['城市显微镜','高位与能力争议的传播语境'],
-  ['隐喻研究所','“乌龟上杆”俗语的来源与变体'],['语言观察站','动物隐喻如何成为网络表达'],['文化档案馆','民间俗语进入短视频后的演变'],['语义分析室','未点名表达为何更容易扩散'],['热梗研究社','同类隐喻在评论区持续发酵'],['网络文化志','从画面符号到公共议题的转译'],['表达研究所','隐喻内容的多义性与误读风险'],
-  ['同城观察员','从首发到对号入座的扩散时间线'],['事实核验站','评论区猜测对象缺乏事实依据'],['舆情瞭望塔','影射对象猜测形成多个分支'],['热点追踪号','高赞评论推动猜测进一步扩散'],['信息核查局','网传关联说法的证据核验'],
-  ['权力观察室','谁把它推上去：推举关系讨论'],['深度议题社','职位、能力与权力来源的关系'],['观察者笔记','利益网络猜想在二创中扩散'],['社会切片','评论观点聚焦责任与任用机制'],['公共表达课','从一句俗语看推举者角色'],['理性发声','隐喻批评与不实指控的边界'],['议题研究社','权力来源讨论的主要观点分布']
+  ['揭阳现场','疑似虐狗原视频，涉事情况待核实'],['事实核验站','原视频剪辑痕迹与完整语境核验'],['城市观察站','多平台搬运版本的时间线对照'],['民生视角','涉事行为责任如何认定'],['本地资讯台','属地回应与事件进展汇总'],
+  ['动物保护观察','反虐待动物立法讨论升温'],['法律观察室','未成年人责任与监护边界'],['公共议题社','处罚尺度是否符合公众预期'],['新华社客户端','未成年人保护不是责任豁免'],['央视新闻','事件责任讨论与事实边界'],['理性讨论组','反对网络暴力与身份曝光'],['制度观察','从个案讨论动物保护机制'],
+  ['音频核验室','原视频环境音与发布时间核验'],['同音频聚合','相同音轨带动批量二创'],['热点搬运号','情绪化配乐放大处罚争议'],['二创观察站','字幕改写推动观点再传播'],['信息核查局','网传音频与原始素材比对'],
+  ['高赞评论观察','处罚过轻观点进入高赞区'],['责任讨论组','家长与学校教育责任讨论'],['动物保护倡议','完善动物保护立法的呼声'],['反网暴观察','反对人肉未成年人及无关人员'],['通报解读社','官方通报发布后的观点转向'],['舆情观察团','评论区负向观点持续扩散'],['制度建设组','讨论逐步回归长期制度建设']
  ]
  const chainVideos=clusterThemes.map(([author,title],index)=>({...videos[index%videos.length],id:'chain-'+index,author,title,play:(328.6-index*9.7).toFixed(1)+'万'}))
  const videoClusters=[
-  {id:'position',name:'名不副实者身居高位',summary:'围绕能力与职位不匹配展开讽刺和质疑',indices:[1,2,3,4],plays:'531.1万',risk:'高争议',x:715,y:35,w:450,h:285,c:'violet'},
-  {id:'metaphor',name:'“乌龟上杆”隐喻解读',summary:'解释俗语来源、寓意及网络语境变化',indices:[5,6,7,8,9,10,11],plays:'335.5万',risk:'语义解读',x:35,y:35,w:450,h:295,c:'blue'},
-  {id:'target',name:'影射对象猜测',summary:'评论区对号入座并猜测具体影射对象',indices:[12,13,14,15,16],plays:'227.8万',risk:'风险聚集',x:715,y:390,w:450,h:290,c:'orange'},
-  {id:'power',name:'权力来源与推举关系',summary:'讨论谁将其推上高位及背后的利益网络',indices:[17,18,19,20,21,22,23],plays:'173.5万',risk:'观点发散',x:35,y:390,w:470,h:290,c:'cyan'}
+  {id:'source',name:'风险首发与相似视频簇',summary:'首发内容及文本、OCR 相似搬运版本',indices:[1,2,3,4],plays:'531.1万',risk:'风险分 86',x:715,y:35,w:450,h:285,c:'violet'},
+  {id:'topic',name:'题材 / 话题内容簇',summary:'责任、处罚尺度和动物保护议题',indices:[5,6,7,8,9,10,11],plays:'335.5万',risk:'贡献 31.7%',x:35,y:35,w:450,h:295,c:'blue'},
+  {id:'audio',name:'音频 / 二创内容簇',summary:'同音频、改写字幕与情绪化二创',indices:[12,13,14,15,16],plays:'227.8万',risk:'相似度 91%',x:715,y:390,w:450,h:290,c:'orange'},
+  {id:'opinion',name:'风险观点簇',summary:'处罚争议、高赞评论与制度讨论',indices:[17,18,19,20,21,22,23],plays:'173.5万',risk:'风险分 78',x:35,y:390,w:470,h:290,c:'cyan'}
  ]
  const videoArrival=[0,2,1,4,3,1,5,2,6,4,3,6,2,5,3,6,4,1,4,2,6,3,5,6]
  const activeCluster=videoClusters.find(cluster=>cluster.id===expandedCluster)
+ const opinionProfile=getOpinionFilterProfile(activeOpinion)
+ const opinionFilterCluster=activeOpinion?videoClusters.find(cluster=>cluster.id===opinionProfile.clusterId):null
+ const opinionVideoSet=new Set<number>(activeOpinion?[0,...(opinionFilterCluster?.indices||[])]:chainVideos.map((_,index)=>index))
  const clusterOverviewPos=[
   [552,306],[760,105],[900,72],[1025,145],[850,215],
   [75,108],[190,70],[325,112],[105,205],[225,180],[365,220],[300,252],
@@ -456,18 +615,27 @@ function VideoChain({select}){
  const toggleRelation=(item:string)=>setRelations(current=>current.includes(item)?current.filter(x=>x!==item):[...current,item])
  const toggleEntity=(id:string)=>setSelectedEntities(current=>current.includes(id)?current.filter(x=>x!==id):[...current,id])
  const analyze=()=>{const items=chainVideos.filter(item=>selectedEntities.includes(item.id));select('analysis',{entityType:'video',items,name:'视频传播链路分析'})}
- const visibleVideoCount=videoArrival.filter(arrival=>arrival<=timeIndex).length
+ const visibleVideoCount=videoArrival.filter((arrival,index)=>arrival<=timeIndex&&opinionVideoSet.has(index)).length
  const openCluster=(id:string)=>{
   const viewportWidth=boardRef.current?.clientWidth||920
   const fittedZoom=Math.max(.58,Math.min(.74,(viewportWidth-36)/1100))
   setExpandedCluster(id);setSelectedEntities([]);setZoom(Number(fittedZoom.toFixed(2)))
   setPan({x:Math.max(18,(viewportWidth-1100*fittedZoom)/2),y:4})
  }
- return <><Section title="视频传播链路" desc="以首发视频为中心，展示视频与视频之间的相似、引用和二次传播关系" action={<div className="tools"><button><Search size={14}/>查找视频</button><button onClick={()=>changeZoom(-.1)} aria-label="缩小画布"><ZoomOut size={15}/></button><button onClick={()=>changeZoom(.1)} aria-label="放大画布"><ZoomIn size={15}/></button></div>}/><div className="chips">关系筛选：{relationOptions.map(item=><button key={item} className={relations.includes(item)?'on':''} onClick={()=>toggleRelation(item)}>{item}</button>)}</div>{selectedEntities.length>=2&&<div className="entityAnalysisBar"><span>已选择 <b>{selectedEntities.length}</b> 个视频</span><button onClick={analyze}><Network size={14}/>传播链路分析</button><button className="clearSelection" onClick={()=>setSelectedEntities([])}>清空</button></div>}<div className="canvas boardCanvas videoRelationshipBoard pannableCanvas" ref={boardRef} {...panHandlers}><div className="zoomHud"><span>缩放 {Math.round(zoom*100)}%</span><button onClick={()=>{setZoom(.78);setPan({x:0,y:0})}}>重置视图</button></div><div className="boardScene" style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`}}><div className="stages"><span>首发视频</span><i/><span>直接衍生视频</span><i/><span>二次传播视频</span></div>{!activeCluster&&<div className="videoOpinionSurfaces">{videoClusters.map(cluster=><div key={cluster.id} className={'opinionClusterSurface '+cluster.c} style={{left:cluster.x,top:cluster.y,width:cluster.w,height:cluster.h}}><span>{cluster.name}</span><small>{cluster.indices.length} 个视频 · {cluster.plays}</small><em>{cluster.risk}</em></div>)}</div>}<VideoDynamicLinks pos={pos} arrival={videoArrival} timeIndex={timeIndex} cluster={null}/>{chainVideos.map((v,i)=><button key={v.id} className={'videoNode relationVideoNode'+(i===0?' originVideo':'')+(selectedEntities.includes(v.id)?' entitySelected':'')+(videoArrival[i]>timeIndex?' entityFuture':'')} style={{left:pos[i][0],top:pos[i][1]}} onClick={()=>select('video',v)}><i className={'miniThumb m'+(i%4)}><Play size={12} fill="currentColor"/></i><span><b>{v.author}</b><em>{v.title.slice(0,16)}…</em><small>{v.play} 播放</small></span><i className="entityCheck" role="checkbox" aria-checked={selectedEntities.includes(v.id)} onClick={event=>{event.stopPropagation();toggleEntity(v.id)}}>{selectedEntities.includes(v.id)?'✓':''}</i>{i===0?<u>首发中心</u>:<u>{i%3===0?'同话题':i%3===1?'OCR 相似 '+(90-i)+'%':'文本相似 '+(95-i)+'%'}</u>}</button>)}</div><div className="miniMap"/><p className="canvasTip">首发视频位于画布中心 · 每个视频严格归入对应观点簇 · 连线从中心向四周放射</p></div><ChainTimeline value={timeIndex} onChange={setTimeIndex} total={visibleVideoCount} label="视频扩散时间"/><div className="legend">观点簇：紫 · 职位争议　蓝 · 隐喻解读　橙 · 对象猜测　青 · 权力来源　　━ 强关联　┅ 弱关联</div></>}
-function AccountChain({select,highlight,setHighlight}){
+ return <><Section title="视频传播链路" desc="以首发视频为中心，展示视频与视频之间的相似、引用和二次传播关系" action={<div className="tools"><button><Search size={14}/>查找视频</button><button onClick={()=>changeZoom(-.1)} aria-label="缩小画布"><ZoomOut size={15}/></button><button onClick={()=>changeZoom(.1)} aria-label="放大画布"><ZoomIn size={15}/></button></div>}/>
+ {(activeOpinion||timeContext.index!==null)&&<FilterResultSummary title={activeOpinion?`“${activeOpinion}”内容承接链`:`${timeContext.date} 内容承接链`} items={[
+  ['命中内容簇',activeOpinion?'1':String(Math.max(1,Math.min(videoClusters.length,timeIndex-1))),activeOpinion?(opinionFilterCluster?.name||'风险观点簇'):'当前时间窗口'],
+  ['命中视频',String(activeOpinion?(opinionFilterCluster?.indices.length||0):visibleVideoCount),`当前可见 ${visibleVideoCount} 个`],
+  ['贡献 VV',activeOpinion?(opinionFilterCluster?.plays||opinionProfile.vv):`${(46.8+timeIndex*37.4).toFixed(1)}万`,`传播贡献 ${activeOpinion?26+opinionProfile.seed%18:18+timeIndex*7}%`],
+  ['风险分',String(activeOpinion?64+opinionProfile.seed%25:42+timeIndex*6),activeOpinion?`${opinionProfile.tone}观点`:'当前窗口']
+ ]}/>}
+ <div className="chainTimelineTop"><ChainTimeline value={timeIndex} onChange={value=>{setTimeIndex(value);onTimeChange(value)}} total={visibleVideoCount} label="视频扩散时间"/></div><div className="chips">关系筛选：{relationOptions.map(item=><button key={item} className={relations.includes(item)?'on':''} onClick={()=>toggleRelation(item)}>{item}</button>)}</div>{selectedEntities.length>=2&&<div className="entityAnalysisBar"><span>已选择 <b>{selectedEntities.length}</b> 个视频</span><button onClick={analyze}><Network size={14}/>传播链路分析</button><button className="clearSelection" onClick={()=>setSelectedEntities([])}>清空</button></div>}<div className="canvas boardCanvas videoRelationshipBoard pannableCanvas" ref={boardRef} {...panHandlers}><div className="zoomHud"><span>缩放 {Math.round(zoom*100)}%</span><button onClick={()=>{setZoom(.78);setPan({x:0,y:0})}}>重置视图</button></div><div className="boardScene" style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`}}><div className="stages"><span>首发视频</span><i/><span>直接衍生视频</span><i/><span>二次传播视频</span></div>{!activeCluster&&<div className="videoOpinionSurfaces">{videoClusters.map(cluster=><div key={cluster.id} className={'opinionClusterSurface '+cluster.c+(activeOpinion&&cluster.id!==opinionFilterCluster?.id?' filterDimmed':'')} style={{left:cluster.x,top:cluster.y,width:cluster.w,height:cluster.h}}><span>{cluster.name}</span><small>{cluster.indices.length} 个视频 · {cluster.plays}</small><em>{cluster.risk}</em></div>)}</div>}<VideoDynamicLinks pos={pos} arrival={videoArrival} timeIndex={timeIndex} cluster={opinionFilterCluster?{...opinionFilterCluster,indices:[0,...opinionFilterCluster.indices]}:null}/>{chainVideos.map((v,i)=><button key={v.id} className={'videoNode relationVideoNode'+(i===0?' originVideo':'')+(selectedEntities.includes(v.id)?' entitySelected':'')+(videoArrival[i]>timeIndex?' entityFuture':'')+(activeOpinion&&!opinionVideoSet.has(i)?' filterDimmed':'')} style={{left:pos[i][0],top:pos[i][1]}} onClick={()=>select('video',v)}><i className={'miniThumb m'+(i%4)}><Play size={12} fill="currentColor"/></i><span><b>{v.author}</b><em>{v.title.slice(0,16)}…</em><small>{v.play} 播放</small></span><i className="entityCheck" role="checkbox" aria-checked={selectedEntities.includes(v.id)} onClick={event=>{event.stopPropagation();toggleEntity(v.id)}}>{selectedEntities.includes(v.id)?'✓':''}</i>{i===0?<u>首发中心</u>:<u>{i%3===0?'同话题':i%3===1?'OCR 相似 '+(90-i)+'%':'文本相似 '+(95-i)+'%'}</u>}</button>)}</div><div className="miniMap"/><p className="canvasTip">{activeOpinion?`已聚焦“${activeOpinion}”：仅高亮承接该观点的内容簇与传播连线`:'首发视频位于画布中心 · 每个视频严格归入对应观点簇 · 连线从中心向四周放射'}</p></div><div className="legend">观点簇：紫 · 职位争议　蓝 · 隐喻解读　橙 · 对象猜测　青 · 权力来源　　━ 强关联　┅ 弱关联</div></>}
+function AccountChain({select,highlight,setHighlight,timeContext,activeOpinion,onTimeChange}:{select:(type:string,item:any)=>void,highlight:boolean,setHighlight:(value:boolean)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onTimeChange:(value:number)=>void}){
  const [focusTier,setFocusTier]=useState('全部'),[showEvidence,setShowEvidence]=useState(true)
  const [selectedEntities,setSelectedEntities]=useState<string[]>([])
- const [timeIndex,setTimeIndex]=useState(6)
+ const [timeIndex,setTimeIndexState]=useState(6)
+ const setTimeIndex=(value:number)=>onTimeChange(value)
+ useEffect(()=>{setTimeIndexState(timeContext.chainTime);setSelectedEntities([])},[timeContext.index,timeContext.chainTime])
  const {pan:accountPan,handlers:accountPanHandlers}=useCanvasPan()
  useEffect(()=>{const board=document.querySelector<HTMLElement>('.intelBoard');if(!board)return;board.classList.add('pannableCanvas');board.style.setProperty('--pan-x',accountPan.x+'px');board.style.setProperty('--pan-y',accountPan.y+'px');const down=(event:MouseEvent)=>accountPanHandlers.onMouseDown(event),move=(event:MouseEvent)=>accountPanHandlers.onMouseMove(event),up=(event:MouseEvent)=>accountPanHandlers.onMouseUp(event),leave=(event:MouseEvent)=>accountPanHandlers.onMouseLeave(event);board.addEventListener('mousedown',down);board.addEventListener('mousemove',move);board.addEventListener('mouseup',up);board.addEventListener('mouseleave',leave);return()=>{board.removeEventListener('mousedown',down);board.removeEventListener('mousemove',move);board.removeEventListener('mouseup',up);board.removeEventListener('mouseleave',leave)}},[accountPan.x,accountPan.y])
  useEffect(()=>{const board=document.querySelector<HTMLElement>('.intelBoard');if(!board)return;const buttons=Array.from(board.querySelectorAll<HTMLButtonElement>('.account'));const svg=board.querySelector<SVGSVGElement>('.accountLinks');if(!svg)return;const clear=()=>{buttons.forEach(button=>button.classList.remove('relationOrigin','relationHit'));svg.querySelector('.hoverLinks')?.remove()};const showRelations=(origin:HTMLButtonElement)=>{clear();origin.classList.add('relationOrigin');const targets=buttons.filter(button=>button!==origin&&!button.classList.contains('dimmed')).sort(()=>Math.random()-.5).slice(0,2+Math.floor(Math.random()*3));targets.forEach(button=>button.classList.add('relationHit'));const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.setAttribute('class','hoverLinks');const boardRect=board.getBoundingClientRect();const scale=Math.min(boardRect.width/800,boardRect.height/500);const offsetX=(boardRect.width-800*scale)/2;const offsetY=(boardRect.height-500*scale)/2;const point=(button:HTMLButtonElement)=>{const rect=button.getBoundingClientRect();return{x:(rect.left+rect.width/2-boardRect.left-offsetX)/scale,y:(rect.top+rect.height/2-boardRect.top-offsetY)/scale}};const from=point(origin);targets.forEach(target=>{const to=point(target);const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',String(from.x));line.setAttribute('y1',String(from.y));line.setAttribute('x2',String(to.x));line.setAttribute('y2',String(to.y));group.appendChild(line)});svg.appendChild(group)};const handlers=buttons.map(button=>({button,handler:()=>showRelations(button)}));handlers.forEach(({button,handler})=>button.addEventListener('mouseenter',handler));board.addEventListener('mouseleave',clear);return()=>{handlers.forEach(({button,handler})=>button.removeEventListener('mouseenter',handler));board.removeEventListener('mouseleave',clear);clear()}},[focusTier,showEvidence])
@@ -475,12 +643,33 @@ function AccountChain({select,highlight,setHighlight}){
  const secondary=[{id:'b0',name:'城市记录者',handle:'@city-log',risk:'低风险',fans:'6.8万',auth:'普通用户',c:'blue',edge:'互粉关系'},{id:'b1',name:'俗语档案馆',handle:'@idiom-file',risk:'低风险',fans:'9.4万',auth:'文化作者',c:'green',edge:'内容共现'},{id:'b2',name:'公共表达课',handle:'@public-talk',risk:'低风险',fans:'14.6万',auth:'知识作者',c:'violet',edge:'话题共现'},{id:'b3',name:'热点追踪号',handle:'@hot-track',risk:'需关注',fans:'7.1万',auth:'普通用户',c:'pink',edge:'频繁互动'},{id:'b4',name:'本地见闻',handle:'@local-view',risk:'低风险',fans:'5.6万',auth:'本地资讯',c:'cyan',edge:'互粉关系'},{id:'b5',name:'冷知识放映厅',handle:'@cold-facts',risk:'低风险',fans:'18.2万',auth:'知识作者',c:'green',edge:'内容共现'},{id:'b6',name:'晚间速报',handle:'@night-news',risk:'需关注',fans:'8.9万',auth:'普通用户',c:'orange',edge:'话题共现'},{id:'b7',name:'舆情观察团',handle:'@opinion-group',risk:'需关注',fans:'12.7万',auth:'时事作者',c:'blue',edge:'高频互动'},{id:'b8',name:'事实核验',handle:'@fact-check',risk:'低风险',fans:'10.3万',auth:'优质作者',c:'violet',edge:'互粉关系'},{id:'b9',name:'同城消息',handle:'@city-news',risk:'需关注',fans:'6.1万',auth:'本地资讯',c:'pink',edge:'内容共现'}]
  const network=[{...accounts[0],tier:'origin',edge:'首发作者'},...direct.map(a=>({...a,tier:'direct',edge:'互动关联'})),...secondary.map(a=>({...a,tier:'secondary',edge:'内容共现'}))]
  const pos=[[400,255],[358,69],[437,76],[402,133],[542,116],[620,128],[580,187],[568,286],[642,300],[608,360],[378,378],[460,388],[424,448],[184,292],[264,307],[221,367],[166,137],[241,181]]
- const clusters=[{name:'核心解读群',x:400,y:104,w:176,h:128,tone:'violet',indices:[1,2,3]},{name:'专业观点群',x:574,y:160,w:226,h:174,tone:'blue',indices:[4,5,6]},{name:'本地传播群',x:610,y:338,w:248,h:206,tone:'cyan',indices:[7,8,9]},{name:'夜间扩散群',x:414,y:420,w:202,h:136,tone:'violet',indices:[10,11,12]},{name:'同城互动群',x:215,y:333,w:236,h:188,tone:'orange',indices:[13,14,15]},{name:'事实核验群',x:184,y:166,w:142,h:118,tone:'green',indices:[16,17]}]
+ const clusters=[{name:'政媒号 · 3号 / 贡献VV 26%',x:400,y:104,w:176,h:128,tone:'violet',indices:[1,2,3]},{name:'专业创作者 · 3号 / 风险率 4%',x:574,y:160,w:226,h:174,tone:'blue',indices:[4,5,6]},{name:'搬运账号簇 · 3号 / 投稿 18条',x:610,y:338,w:248,h:206,tone:'cyan',indices:[7,8,9]},{name:'营销号 · 3号 / 策略命中',x:414,y:420,w:202,h:136,tone:'violet',indices:[10,11,12]},{name:'同城账号簇 · 3号 / 贡献VV 11%',x:215,y:333,w:236,h:188,tone:'orange',indices:[13,14,15]},{name:'共设备账号簇 · 2号 / 风险率 23%',x:184,y:166,w:142,h:118,tone:'green',indices:[16,17]}]
  const accountArrival=[0,2,1,4,2,5,3,1,6,4,2,5,3,6,4,1,5,3]
+ const opinionProfile=getOpinionFilterProfile(activeOpinion)
+ const opinionAccountMap:any={
+  source:[0,1,2,3,13,14,15],
+  topic:[0,1,2,3,4,5,6],
+  audio:[0,7,8,9,10,11,12],
+  opinion:[0,4,5,6,7,8,9,16,17]
+ }
+ const opinionAccountSet=new Set<number>(activeOpinion?(opinionAccountMap[opinionProfile.clusterId]||opinionAccountMap.opinion):network.map((_,index)=>index))
  const toggleEntity=(id:string)=>setSelectedEntities(current=>current.includes(id)?current.filter(x=>x!==id):[...current,id])
  const analyze=()=>{const items=network.filter(item=>selectedEntities.includes(item.id));select('analysis',{entityType:'account',items,name:'账号传播链路分析'})}
- const visibleAccountCount=accountArrival.filter(arrival=>arrival<=timeIndex).length
- return <><Section title="账号关联网络" desc="首发账号居中，圈层大小按群体规模与关系强度分布，相邻传播群允许重叠" action={<div className="switcher">账号关系高亮 <button className={highlight?'switch on':'switch'} onClick={()=>setHighlight(!highlight)}><i/></button><HelpCircle size={14}/></div>}/><div className="caseFilters"><span>调查视图</span>{['全部','直接关联','二度关联'].map(item=><button key={item} className={focusTier===item?'selected':''} onClick={()=>setFocusTier(item)}>{item}</button>)}<button className={showEvidence?'selected':''} onClick={()=>setShowEvidence(!showEvidence)}>{showEvidence?'隐藏证据标签':'显示证据标签'}</button></div>{selectedEntities.length>=2&&<div className="entityAnalysisBar"><span>已选择 <b>{selectedEntities.length}</b> 个账号</span><button onClick={analyze}><Network size={14}/>传播链路分析</button><button className="clearSelection" onClick={()=>setSelectedEntities([])}>清空</button></div>}<div className="accountCanvas intelBoard"><div className="boardHud"><span>案件板 · 圈层研判</span><b>{clusters.filter(cluster=>cluster.indices.some(i=>accountArrival[i]<=timeIndex)).length} 个圈层 · 当前可见 {visibleAccountCount} 个账号</b></div><div className="rings"><i/><i/><i/></div>{clusters.map((cluster,index)=><div key={cluster.name} className={'accountCluster cluster'+index+' '+cluster.tone+(cluster.indices.some(i=>accountArrival[i]<=timeIndex)?'':' entityFuture')} style={{left:'calc(50% + '+(cluster.x-400)+'px)',top:'calc(50% + '+(cluster.y-255)+'px)',width:cluster.w,height:cluster.h}}><span>{cluster.name}</span></div>)}<span className="layer l1">首发账号</span><span className="layer l2">直接关联 · 18</span><span className="layer l3">二度关联 · 64</span><svg className="accountLinks" viewBox="0 0 800 500"><circle cx="400" cy="255" r="138"/><circle className="muted" cx="400" cy="255" r="208"/></svg>{network.map((a,i)=><button key={a.id} className={'account '+a.tier+(accountArrival[i]>timeIndex?' entityFuture dimmed':'')+(selectedEntities.includes(a.id)?' entitySelected':'')+(highlight&&a.tier!=='origin'?' hi':'')+(focusTier!=='全部'&&a.tier!==(focusTier==='直接关联'?'direct':focusTier==='二度关联'?'secondary':'origin')?' dimmed':'')} style={{left:'calc(50% + '+(pos[i][0]-400)+'px)',top:'calc(50% + '+(pos[i][1]-255)+'px)'}} onClick={()=>select('account',a)}><i className={'avatar '+a.c}>{a.name[0]}</i><i className="entityCheck" role="checkbox" aria-checked={selectedEntities.includes(a.id)} onClick={event=>{event.stopPropagation();toggleEntity(a.id)}}>{selectedEntities.includes(a.id)?'✓':''}</i><b>{a.name}</b><span>{a.tier==='origin'?'首发作者':a.tier==='direct'?'直接关联':'二度关联'}</span>{showEvidence&&a.tier!=='origin'&&<em>{a.edge}</em>}</button>)}<div className="boardHint">拖动下方时间轴查看账号圈层形成过程 · 悬停头像查看关系</div></div><ChainTimeline value={timeIndex} onChange={setTimeIndex} total={visibleAccountCount} label="账号扩散时间"/>{highlight&&<div className="highlight"><ShieldAlert size={16}/><b>已高亮 17 个关联账号</b><span>直接关联 7 · 二度关联 10 · 高频互动 4</span><button>查看证据链 <ChevronRight size={14}/></button></div>}<div className="evidenceGrid">{[['关联账号','82','直接关系 18'],['异常设备聚类','3','涉及账号 7'],['高频互动群组','5','近 7 日内'],['关系置信度','87.4%','综合评分']].map(x=><div key={x[0]}><span>{x[0]}</span><b>{x[1]}</b><em>{x[2]}</em></div>)}</div></>}
+ const visibleAccountCount=accountArrival.filter((arrival,index)=>arrival<=timeIndex&&opinionAccountSet.has(index)).length
+ const visibleClusterCount=clusters.filter(cluster=>cluster.indices.some(index=>accountArrival[index]<=timeIndex&&opinionAccountSet.has(index))).length
+ const evidenceData=activeOpinion
+  ?[['关联账号',String(opinionProfile.accounts),`当前可见 ${visibleAccountCount}`],['异常设备聚类',String(1+opinionProfile.seed%3),`涉及账号 ${4+opinionProfile.seed%5}`],['高频互动群组',String(2+opinionProfile.seed%4),`${opinionProfile.tone}观点`],['关系置信度',`${82+opinionProfile.seed%15}.4%`,'筛选后评分']]
+  :timeContext.index!==null
+  ?[['关联账号',String(visibleAccountCount*4+7),`当前可见 ${visibleAccountCount}`],['异常设备聚类',String(Math.max(1,Math.ceil(timeIndex/2))),`涉及账号 ${Math.max(2,timeIndex+1)}`],['高频互动群组',String(Math.max(1,timeIndex-1)),timeContext.date],['关系置信度',`${74+timeIndex*3}.4%`,'窗口内评分']]
+  :[['关联账号','82','直接关系 18'],['异常设备聚类','3','涉及账号 7'],['高频互动群组','5','近 7 日内'],['关系置信度','87.4%','综合评分']]
+ return <><Section title="账号关联网络" desc="首发账号居中，圈层大小按群体规模与关系强度分布，相邻传播群允许重叠" action={<div className="switcher">账号关系高亮 <button className={highlight?'switch on':'switch'} onClick={()=>setHighlight(!highlight)}><i/></button><HelpCircle size={14}/></div>}/>
+ {(activeOpinion||timeContext.index!==null)&&<FilterResultSummary title={activeOpinion?`“${activeOpinion}”推动主体`:`${timeContext.date} 推动主体`} items={[
+  ['命中账号',String(activeOpinion?opinionProfile.accounts:visibleAccountCount*4+7),`画布核心 ${visibleAccountCount} 个`],
+  ['账号圈层',String(visibleClusterCount),`全量 ${clusters.length} 个`],
+  ['贡献 VV',activeOpinion?opinionProfile.vv:`${(35.7+timeIndex*29.6).toFixed(1)}万`,activeOpinion?`占筛选观点 ${54+opinionProfile.seed%27}%`:'当前窗口贡献'],
+  ['历史风险率',activeOpinion?opinionProfile.risk:`${(9.8+timeIndex*2.3).toFixed(1)}%`,activeOpinion?`${opinionProfile.tone}传播主体`:'窗口内账号']
+ ]}/>}
+ <div className="caseFilters"><span>调查视图</span>{['全部','直接关联','二度关联'].map(item=><button key={item} className={focusTier===item?'selected':''} onClick={()=>setFocusTier(item)}>{item}</button>)}<button className={showEvidence?'selected':''} onClick={()=>setShowEvidence(!showEvidence)}>{showEvidence?'隐藏证据标签':'显示证据标签'}</button></div>{selectedEntities.length>=2&&<div className="entityAnalysisBar"><span>已选择 <b>{selectedEntities.length}</b> 个账号</span><button onClick={analyze}><Network size={14}/>传播链路分析</button><button className="clearSelection" onClick={()=>setSelectedEntities([])}>清空</button></div>}<div className="accountCanvas intelBoard"><div className="boardHud"><span>案件板 · 圈层研判</span><b>{visibleClusterCount} 个圈层 · 当前可见 {visibleAccountCount} 个账号</b></div><div className="rings"><i/><i/><i/></div>{clusters.map((cluster,index)=>{const clusterMatched=cluster.indices.some(i=>opinionAccountSet.has(i));return <div key={cluster.name} className={'accountCluster cluster'+index+' '+cluster.tone+(cluster.indices.some(i=>accountArrival[i]<=timeIndex)?'':' entityFuture')+(activeOpinion&&!clusterMatched?' filterDimmed':'')} style={{left:'calc(50% + '+(cluster.x-400)+'px)',top:'calc(50% + '+(cluster.y-255)+'px)',width:cluster.w,height:cluster.h}}><span>{cluster.name}</span></div>})}<span className="layer l1">首发账号</span><span className="layer l2">直接关联 · {activeOpinion?Math.max(2,visibleAccountCount-3):18}</span><span className="layer l3">二度关联 · {activeOpinion?Math.max(1,visibleAccountCount-5):64}</span><svg className="accountLinks" viewBox="0 0 800 500"><circle cx="400" cy="255" r="138"/><circle className="muted" cx="400" cy="255" r="208"/></svg>{network.map((a,i)=><button key={a.id} className={'account '+a.tier+(accountArrival[i]>timeIndex?' entityFuture dimmed':'')+(selectedEntities.includes(a.id)?' entitySelected':'')+(highlight&&a.tier!=='origin'?' hi':'')+(focusTier!=='全部'&&a.tier!==(focusTier==='直接关联'?'direct':focusTier==='二度关联'?'secondary':'origin')?' dimmed':'')+(activeOpinion&&!opinionAccountSet.has(i)?' filterDimmed dimmed':'')} style={{left:'calc(50% + '+(pos[i][0]-400)+'px)',top:'calc(50% + '+(pos[i][1]-255)+'px)'}} onClick={()=>select('account',a)}><i className={'avatar '+a.c}>{a.name[0]}</i><i className="entityCheck" role="checkbox" aria-checked={selectedEntities.includes(a.id)} onClick={event=>{event.stopPropagation();toggleEntity(a.id)}}>{selectedEntities.includes(a.id)?'✓':''}</i><b>{a.name}</b><span>{a.tier==='origin'?'首发作者':a.tier==='direct'?'直接关联':'二度关联'}</span>{showEvidence&&a.tier!=='origin'&&<em>{a.edge}</em>}</button>)}<div className="boardHint">{activeOpinion?`已聚焦“${activeOpinion}”：仅高亮推动该观点扩散的账号与圈层`:'拖动下方时间轴查看账号圈层形成过程 · 悬停头像查看关系'}</div></div><ChainTimeline value={timeIndex} onChange={setTimeIndex} total={visibleAccountCount} label="账号扩散时间"/>{highlight&&<div className="highlight"><ShieldAlert size={16}/><b>已高亮 {activeOpinion?visibleAccountCount:17} 个关联账号</b><span>直接关联 {activeOpinion?Math.max(2,visibleAccountCount-3):7} · 二度关联 {activeOpinion?Math.max(1,visibleAccountCount-5):10} · 高频互动 {activeOpinion?Math.max(1,visibleClusterCount-1):4}</span><button>查看证据链 <ChevronRight size={14}/></button></div>}<div className="evidenceGrid">{evidenceData.map(x=><div key={x[0]}><span>{x[0]}</span><b>{x[1]}</b><em>{x[2]}</em></div>)}</div></>}
 function RelationAnalysis({data}){
  const isVideo=data.entityType==='video',items=data.items||[]
  const names=items.map(item=>isVideo?item.author:item.name)
@@ -498,7 +687,180 @@ function RelationAnalysis({data}){
 function Detail({state,close}){let {type,item}=state;return <div className="detailModal" role="dialog" aria-modal="true" aria-label={type==='video'?'视频详情':'分析详情'} onMouseDown={event=>{if(event.target===event.currentTarget)close()}}><aside><div className="detailHead"><button className="detailBack" onClick={close}>← 返回</button><div><span>{type==='analysis'?'关系分析':type==='account'?'账号详情':type==='path'?'路径洞察':'视频详情'}</span><h2>{type==='analysis'?item.name:type==='account'?item.name:type==='path'?item.name:item.title}</h2></div><button className="detailClose" onClick={close} aria-label="关闭详情"><X size={18}/></button></div><div className="detailBody">{type==='analysis'?<RelationAnalysis data={item}/>:type==='account'?<AccountDetail a={item}/>:type==='path'?<PathDetail p={item}/>:<VideoDetail v={item}/>}</div></aside></div>}
 function Info({n,v,c=''}){return <p className="info"><span>{n}</span><b className={c}>{v}</b></p>}
 function Box({title,children}){return <section className="box"><h3>{title}</h3>{children}</section>}
+function RecommendationDecisionAnalysis(){
+ const stages=[
+  {name:'发布入库',start:0,end:.5,color:'#525861',total:'0',share:'0%',metrics:'内容理解完成 · 机器审核通过',cause:'现场视频完成内容理解与安全审核，进入投稿库。'},
+  {name:'冷启动试投',start:.5,end:2,color:'#39757b',total:'1.5K',share:'0.3%',metrics:'完播率 78% · 点赞率 8.2% · TOP 0.3%',cause:'10 个关联账号在冷启动期间快速点赞、分享，综合分被推至同档位 TOP 0.3%。'},
+  {name:'首轮推荐',start:2,end:4,color:'#4f9784',total:'21K',share:'5.1%',metrics:'完播率 76% · 分享率 3.1% · 评论率 3%',cause:'高完播与集中互动共同触发自动 boost，视频进入事件兴趣队列。'},
+  {name:'二轮扩量',start:4,end:5.5,color:'#b18336',total:'78K',share:'18.9%',metrics:'点赞率 8.7% · 分享率 3.4% · P90',cause:'互动持续优于同档位 P90，系统扩大事件与同城人群覆盖。'},
+  {name:'主池放量',start:5.5,end:8,color:'#bd5c45',total:'238K',share:'57.7%',metrics:'评论率 11% · 搜索热度 +320% · 热榜收录',cause:'搜索热度飙升并触发热榜收录，热推队列追加 boost；18:42 大 V 转发再带来 15K VV。'},
+  {name:'长尾推荐',start:8,end:168,color:'#6f655c',total:'412.8K',share:'18.0%',metrics:'搜索 22% · 社交 3% · 残余高度 30%',cause:'精准分发已切断，但搜索回流与社交分享继续贡献残余曝光并缓慢衰减。'}
+ ]
+ const vv48=[.3,.6,1.2,4.5,15,28,42,34,28,22,18,15,12,9,7,5.5,4.5,3.8,3.2,2.8,2.5,2.1,1.7,1.3,1,.9,.78,.69,.61,.55,.49,.44,.4,.36,.33,.3,.28,.26,.24,.22,.2,.18,.16,.14,.12,.1,.09,.08,.07]
+ const vv=[...vv48,...Array.from({length:120},(_,index)=>{
+  const hour=index+49
+  return Math.max(.01,.07*Math.exp(-(hour-48)/30)+.06*Math.exp(-Math.pow((hour-72)/18,2))+.035*Math.exp(-Math.pow((hour-120)/24,2)))
+ })]
+ const metrics:any={
+  completion:{label:'完播率',color:'#6ba47d',values:vv.map((_,i)=>Math.max(48,78-i*.38+(i<6?i*1.3:0)))},
+  like:{label:'点赞率',color:'#5b9ea6',values:vv.map((_,i)=>Math.max(2.4,8.2-i*.11+(i<7?i*.08:0)))},
+  comment:{label:'评论率',color:'#d4a347',values:vv.map((_,i)=>i===6?11:i===7?8.4:Math.max(1.1,2.2+i*.09-(i>10?(i-10)*.07:0)))},
+  share:{label:'分享率',color:'#c7644f',values:vv.map((_,i)=>Math.max(.7,1.2+(i<9?i*.25:(17-i)*.08)))}
+ }
+ const transitions=[
+  {hour:0,stageIndex:0,time:'06-29 15:45',label:'发布',title:'发布入库',vv:'0',comments:'0',likes:'0',shares:'0',completion:'—',interaction:'—',rank:'待评估',detail:'内容理解完成 · 机器审核通过',reasons:['内容理解与机器审核均已完成','未命中内容安全与推荐限制项'],outcome:'视频进入投稿库，开始冷启动测试。'},
+  {hour:2,stageIndex:2,time:'06-29 17:45',label:'冷启动通过',title:'首轮推荐',vv:'21K',comments:'860',likes:'1.72K',shares:'651',completion:'78%',interaction:'12%',rank:'TOP 0.3%',detail:'完播率 78% · 互动率 12% · 分享 651',reasons:['完播率 78%、互动率 12%，持续高于冷启动基线','10 个关联账号集中点赞与分享，形成首轮扩散信号'],outcome:'视频通过冷启动，进入首轮推荐。'},
+  {hour:4,stageIndex:3,time:'06-29 19:45',label:'持续优于 P90',title:'二轮扩量',vv:'78K',comments:'3.4K',likes:'6.8K',shares:'2.4K',completion:'76%',interaction:'11.4%',rank:'同档位 P90',detail:'完播率 76% · 互动率 11.4% · 持续优于同档位 P90',reasons:['完播率 76%、互动率 11.4%，连续优于同档位 P90','同城互动同步上升，事件兴趣人群仍在扩大'],outcome:'系统扩大事件兴趣与同城覆盖，进入二轮扩量。'},
+  {hour:5.5,stageIndex:4,time:'06-29 21:15',label:'热榜收录',title:'主池放量',vv:'238K',comments:'18.6K',likes:'21.2K',shares:'8.7K',completion:'72%',interaction:'13.8%',rank:'TOP 0.1%',detail:'完播率 72% · 互动率 13.8% · 搜索热度飙升 320%',reasons:['搜索热度上涨 320%，触发热榜收录','完播率 72%、互动率 13.8%，能够承接新增流量'],outcome:'热推队列追加分发，视频进入主推荐池。'},
+  {hour:6.8,stageIndex:4,time:'06-29 22:33',label:'大 V 转发',title:'主池放量',vv:'286K',comments:'24.3K',likes:'27.9K',shares:'15.2K',completion:'69%',interaction:'14.2%',rank:'分享增量 TOP 1%',detail:'完播率 69% · 互动率 14.2% · 分享 15.2K',reasons:['大 V 转发带来 15.2K 分享，互动率升至 14.2%','社交分享与站外回流持续补充 VV'],outcome:'主池放量周期因此被延长。'}
+ ]
+ const singleChannelTotals=[239.4,90.8,28.1,20.2,13.6,12.8,7.9]
+ const singleChannelRanges:any={feed:[2,8],search:[5.5,16],message:[6,18],profile:[8,24],otherProfile:[8,24],local:[4,12],following:[8,24]}
+ const channels=trafficTree.map((source,index)=>{
+  const total=singleChannelTotals[index]
+  const scale=total/source.value
+  return {...source,value:total,share:total/412.8*100,range:singleChannelRanges[source.id],children:source.children.map(child=>({...child,value:child.value*scale,children:child.children.map(item=>[String(item[0]),Number(item[1])*scale] as [string,number])}))}
+ })
+ const intercepts=[
+  {name:'冷启动试投阶段拦截',reduce:'82%',difficulty:'高',detail:'需前置风险识别能力',range:[0,2]},
+  {name:'首轮推荐前拦截',reduce:'65%',difficulty:'中',detail:'已有冷启动数据可判断',range:[.5,2]},
+  {name:'二轮扩量前拦截',reduce:'34%',difficulty:'低',detail:'已有处置能力但时效不足',range:[2,4]}
+ ]
+ const [selectedTransition,setSelectedTransition]=useState<number|null>(1)
+ const [activeChannelIndex,setActiveChannelIndex]=useState(0)
+ const [activeChannelLayerIndex,setActiveChannelLayerIndex]=useState(0)
+ const singleFlowRef=useRef<HTMLDivElement>(null)
+ const chartRef=useRef<HTMLDivElement>(null)
+ const [singleFlowGeometry,setSingleFlowGeometry]=useState<any>(null)
+ const [singleFlowSize,setSingleFlowSize]=useState({width:960,height:380})
+ const [chartWidth,setChartWidth]=useState(760)
+ const [metricVisibility,setMetricVisibility]=useState<any>({completion:false,like:false,comment:false,share:false})
+ const width=chartWidth,height=270,plotTop=30,plotBottom=206,chartRenderHeight=270
+ const plotLeft=40,plotRight=width-20,plotWidth=plotRight-plotLeft
+ const timelineAnchors:[number,number][]=[[0,plotLeft],[12,plotLeft+plotWidth*.58],[24,plotLeft+plotWidth*.67],[48,plotLeft+plotWidth*.75],[72,plotLeft+plotWidth*.82],[120,plotLeft+plotWidth*.91],[168,plotRight]]
+ const xForHour=(hour:number)=>{
+  const endIndex=Math.max(1,timelineAnchors.findIndex(anchor=>hour<=anchor[0]))
+  const [startHour,startX]=timelineAnchors[endIndex-1]
+  const [endHour,endX]=timelineAnchors[endIndex]
+  return startX+(hour-startHour)/(endHour-startHour)*(endX-startX)
+ }
+ const xTicks=[{hour:0,date:'06-29',time:'15:45'},{hour:4,date:'06-29',time:'19:45'},{hour:8,date:'06-29',time:'23:45'},{hour:12,date:'06-30',time:'03:45'},{hour:24,date:'06-30',time:'15:45'},{hour:48,date:'07-01',time:'15:45'},{hour:72,date:'07-02',time:'15:45'},{hour:120,date:'07-04',time:'15:45'},{hour:168,date:'07-06',time:'15:45'}]
+ const yForVv=(value:number)=>plotBottom-value/45*(plotBottom-plotTop)
+ const metricY=(value:number)=>plotBottom-value/100*(plotBottom-plotTop)
+ const curveYForHour=(hour:number)=>{
+  const start=Math.floor(hour),end=Math.min(Math.ceil(hour),vv.length-1)
+  if(start===end)return yForVv(vv[start])
+  const fraction=hour-start
+  let t=fraction
+  for(let iteration=0;iteration<6;iteration++){
+   const x=1.5*t-1.5*t*t+t*t*t
+   const derivative=1.5-3*t+3*t*t
+   t=Math.max(0,Math.min(1,t-(x-fraction)/derivative))
+  }
+  const eased=3*t*t-2*t*t*t
+  return yForVv(vv[start]+(vv[end]-vv[start])*eased)
+ }
+ const smoothPath=(values:number[],y:(value:number)=>number)=>{
+  const points=values.map((value,index)=>[xForHour(index),y(value)])
+  return points.reduce((path,point,index)=>{
+   if(index===0)return `M${point[0]} ${point[1]}`
+   const previous=points[index-1],midX=(previous[0]+point[0])/2
+   return `${path} C${midX} ${previous[1]} ${midX} ${point[1]} ${point[0]} ${point[1]}`
+  },'')
+ }
+ const vvPath=smoothPath(vv,yForVv)
+ const areaPath=`${vvPath} L${xForHour(168)} ${plotBottom} L${xForHour(0)} ${plotBottom} Z`
+ const activeTransition=transitions[selectedTransition??0]
+ const activeChannel=channels[activeChannelIndex]
+ const activeChannelLayer=activeChannel.children[activeChannelLayerIndex]||activeChannel.children[0]
+ const singleDimensionLabel=activeChannel.id==='feed'?'内容 / 广告 / 交易流量':activeChannel.id==='search'?'搜索词':activeChannel.id==='message'?'群聊 / 私聊':activeChannel.id==='local'?'同城城市':'入口场景'
+ const singleThirdLabel=activeChannel.id==='feed'?'业务归属':activeChannel.id==='search'?'搜索结果类型':activeChannel.id==='message'?'会话内入口':activeChannel.id==='local'?'同城场景':'内容入口'
+ const formatSingleVv=(value:number)=>`${value>=100?value.toFixed(1):value.toFixed(2)}K`
+ useEffect(()=>{
+  const chart=chartRef.current
+  if(!chart)return
+  const update=()=>setChartWidth(Math.max(520,Math.round(chart.clientWidth-24)))
+  update()
+  const observer=new ResizeObserver(update)
+  observer.observe(chart)
+  return ()=>observer.disconnect()
+ },[])
+ useEffect(()=>{
+  const canvas=singleFlowRef.current
+  if(!canvas)return
+  const update=()=>{
+   const canvasRect=canvas.getBoundingClientRect()
+   const point=(element:Element|null,edge:'left'|'right')=>{
+    if(!element)return null
+    const rect=element.getBoundingClientRect()
+    return {x:(edge==='right'?rect.right:rect.left)-canvasRect.left,y:rect.top+rect.height/2-canvasRect.top}
+   }
+   const selectedSource=canvas.querySelector('.levelOne button[aria-pressed="true"]')
+   const secondButtons=Array.from(canvas.querySelectorAll('.levelTwo button'))
+   const selectedSecond=canvas.querySelector('.levelTwo button[aria-pressed="true"]')
+   const thirdButtons=Array.from(canvas.querySelectorAll('.levelThree button'))
+   setSingleFlowSize({width:canvas.clientWidth||960,height:canvas.clientHeight||380})
+   setSingleFlowGeometry({
+    source:point(selectedSource,'right'),
+    second:secondButtons.map(item=>point(item,'left')),
+    selectedSecond:point(selectedSecond,'right'),
+    third:thirdButtons.map(item=>point(item,'left'))
+   })
+  }
+  update()
+  const observer=new ResizeObserver(update)
+  observer.observe(canvas)
+  return ()=>observer.disconnect()
+ },[activeChannelIndex,activeChannelLayerIndex])
+ const singleCurve=(start:any,end:any)=>{
+  const firstControl=start.x+(end.x-start.x)*.42
+  const secondControl=start.x+(end.x-start.x)*.58
+  return `M${start.x} ${start.y} C${firstControl} ${start.y} ${secondControl} ${end.y} ${end.x} ${end.y}`
+ }
+  return <div className="recommendationDecisionAnalysis recommendationForensics">
+  <section className="recommendationHero">
+   <header><div><h3>视频推荐链路</h3></div></header>
+   <div className="forensicLegend"><span className="vvLegend"><i/>VV 增量（K/h）</span>{Object.entries(metrics).map(([key,item]:any)=><button key={key} className={metricVisibility[key]?'on':''} onClick={()=>setMetricVisibility((current:any)=>({...current,[key]:!current[key]}))}><i style={{background:item.color}}/>{item.label}</button>)}<small>左轴 VV 增量 · 右轴互动率</small></div>
+   <div className="forensicWorkbench">
+    <div ref={chartRef} className="forensicChart">
+     <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMinYMin meet" aria-label="发布后一周 VV 增量与互动指标趋势">
+     {[0,10,20,30,40].map(value=><g key={value}><line className="forensicGrid" x1={plotLeft} x2={plotRight} y1={yForVv(value)} y2={yForVv(value)}/><text className="axisText" x="4" y={yForVv(value)+3}>{value}K</text></g>)}
+     {xTicks.map(tick=><g key={tick.hour}><line className="xTickGuide" x1={xForHour(tick.hour)} x2={xForHour(tick.hour)} y1={plotBottom} y2={plotBottom+5}/><text className="axisText xLabel" x={xForHour(tick.hour)} y="229"><tspan x={xForHour(tick.hour)}>{tick.date}</tspan><tspan className="xTime" x={xForHour(tick.hour)} dy="10">{tick.time}</tspan></text></g>)}
+     <text className="axisText axisTitle" x={plotLeft} y="16">VV 增量（K/h）</text><text className="axisText axisTitle right" x={plotRight} y="16">互动率（%）</text>
+     {stages.slice(1).map(stage=><line key={stage.name} className="stageSeparator" x1={xForHour(stage.start)} x2={xForHour(stage.start)} y1={plotTop} y2={plotBottom}/>)}
+     <path className="forensicArea" d={areaPath}/><path className="forensicVvLine" d={vvPath}/>
+     {Object.entries(metrics).map(([key,item]:any)=>metricVisibility[key]&&<path key={key} className="metricLine" style={{stroke:item.color}} d={smoothPath(item.values,metricY)}/>)}
+     </svg>
+     <div className="transitionPointLayer">{transitions.map((transition,index)=>{const top=curveYForHour(transition.hour);return <button key={transition.label} aria-label={`${transition.label}，查看阶段概述`} className={'transitionPoint'+(selectedTransition===index?' selected':'')} style={{left:`${xForHour(transition.hour)/width*100}%`,top:`${top/height*chartRenderHeight}px`}} onClick={()=>setSelectedTransition(index)}><i/><span className="transitionLabel">{transition.label}</span><span className="transitionTooltip"><b>{transition.title}</b>{transition.detail}</span></button>})}</div>
+    </div>
+    <aside className="forensicAttribution" aria-live="polite">
+     <header><h3>{activeTransition.title}</h3><p>{activeTransition.time} · {activeTransition.label}</p></header>
+     <div className="attributionCause"><div className="reasonList"><b>原因：</b><ol>{activeTransition.reasons.map(reason=><li key={reason}>{reason}</li>)}</ol></div><p className="reasonOutcome"><b>结果：</b><span>{activeTransition.outcome}</span></p></div>
+     <div className="attributionMetricMatrix">
+      <strong>阶段指标</strong>
+      <div><span>当前 VV</span><b>{activeTransition.vv}</b><span>完播率</span><b>{activeTransition.completion}</b></div>
+      <div><span>评论</span><b>{activeTransition.comments}</b><span>互动率</span><b>{activeTransition.interaction}</b></div>
+      <div><span>点赞</span><b>{activeTransition.likes}</b><span>分享</span><b>{activeTransition.shares}</b></div>
+     </div>
+    </aside>
+   </div>
+   <div className="singleChannelSankey hierSankey">
+    <div className="sankeyHead"><div><b>渠道传播路径</b><span>当前视频口径 · 总 VV 412.8K；层级定义与事件渠道分析一致</span></div><div className="pathCrumb"><span>{activeChannel.name}</span><ChevronRight/><b>{singleDimensionLabel}</b></div></div>
+    <div ref={singleFlowRef} className="singleChannelFlow">
+     <svg viewBox={`0 0 ${singleFlowSize.width} ${singleFlowSize.height}`} preserveAspectRatio="none">{activeChannel.children.map((item,index)=>{const start=singleFlowGeometry?.source||{x:230,y:58+activeChannelIndex*39};const end=singleFlowGeometry?.second?.[index]||{x:385,y:92+index*76};return <path key={'c'+item.id} className="active" d={singleCurve(start,end)} style={{strokeWidth:Math.max(5,item.value/activeChannel.value*24)}}/>})}{activeChannelLayer.children.map((item,index)=>{const start=singleFlowGeometry?.selectedSecond||{x:575,y:92+activeChannelLayerIndex*76};const end=singleFlowGeometry?.third?.[index]||{x:730,y:58+index*37};return <path key={'r'+item[0]} className="tertiary" d={singleCurve(start,end)} style={{strokeWidth:Math.max(2,item[1]/activeChannel.value*16)}}/>})}</svg>
+     <div className="singleFlowColumn levelOne"><h4>一级 · 流量渠道（单选）</h4>{channels.map((channel,index)=><button key={channel.name} className={activeChannelIndex===index?'selected':''} aria-pressed={activeChannelIndex===index} onClick={()=>{setActiveChannelIndex(index);setActiveChannelLayerIndex(0)}}><span>{channel.name}<small>{channel.share.toFixed(1)}%</small></span><b>{formatSingleVv(channel.value)}</b></button>)}</div>
+     <div className="singleFlowColumn levelTwo"><h4>二级 · {singleDimensionLabel}</h4>{activeChannel.children.map((item,index)=><button key={item.id} className={activeChannelLayerIndex===index?'selected':''} aria-pressed={activeChannelLayerIndex===index} onClick={()=>setActiveChannelLayerIndex(index)}><span>{item.name}<small>{(item.value/activeChannel.value*100).toFixed(1)}%</small></span><b>{formatSingleVv(item.value)}</b></button>)}</div>
+     <div className="singleFlowColumn levelThree"><h4>三级 · {singleThirdLabel}</h4>{activeChannelLayer.children.map(item=><button key={item[0]}><span>{item[0]}<small>{(item[1]/activeChannelLayer.value*100).toFixed(1)}%</small></span><b>{formatSingleVv(item[1])}</b></button>)}</div>
+    </div>
+   </div>
+  </section>
+ </div>
+}
 function VideoDetail({v}){
+ const [detailTab,setDetailTab]=useState<'投稿信息'|'流量分析'|'治理信息'>('流量分析')
+ return <><div className="videoTop videoDetailHero"><div className="bigThumb"><Play size={24} fill="currentColor"/><b>00:36</b></div><div><em>{v.grade} · 单视频下钻</em><h3>{v.title}</h3><p>{v.author} <span>{v.handle}</span></p><footer><b><Eye size={13}/>{v.play}</b><b><MessageCircle size={13}/>{v.interaction}</b><b><Clock3 size={13}/>发布于 06-29 15:45</b></footer></div></div><nav className="videoDetailTabs">{(['投稿信息','流量分析','治理信息'] as const).map(tab=><button key={tab} className={detailTab===tab?'selected':''} onClick={()=>setDetailTab(tab)}>{tab}</button>)}</nav>{detailTab==='投稿信息'?<><Box title="内容信息"><Info n="发布时间" v="2026-06-29 15:45:12"/><Info n="内容状态" v="持续扩散" c="safe"/><Info n="内容标签" v="社会事件 / 动物保护"/><Info n="传播层级" v={v.grade}/></Box><Box title="视频原文"><blockquote>“{v.title}。相关现场信息仍在核实，请理性讨论并避免传播未经证实的细节。”</blockquote></Box><Box title="AI 内容解析"><div className="parse"><span>OCR 文本</span><p>揭阳 · 动物保护 · 现场核实 · 理性讨论</p><span>ASR 摘要</span><p>视频记录疑似虐待动物场景，围绕涉事者责任与动物保护立法形成讨论。</p></div></Box></>:detailTab==='流量分析'?<RecommendationDecisionAnalysis/>:<><Box title="治理状态"><Info n="审核结果" v="通过"/><Info n="推荐状态" v="限制长尾推荐" c="risk"/><Info n="风险标签" v="争议事件 / 负向评论聚集" c="risk"/><Info n="处置策略" v="二轮扩量前增加风险观点复核"/></Box><Box title="治理记录"><div className="timeline"><i/><p><b>机器审核通过</b><span>06-29 15:45:16 · 未命中明确违规</span></p><i/><p><b>首轮推荐后风险分上升</b><span>06-29 15:56:32 · 负向评论开始聚集</span></p><i/><p><b>人工复核触发</b><span>06-29 17:20:11 · 主池放量后触发，介入偏晚</span></p></div></Box></>}</>
+}
+function LegacyVideoDetail({v}){
  const [detailTab,setDetailTab]=useState<'投稿信息'|'流量分析'|'治理信息'>('流量分析')
  const replay=[
   ['发布入库','15:45:12','完成内容理解与安全审核','0','原创度 96%'],
