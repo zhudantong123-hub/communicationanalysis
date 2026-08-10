@@ -606,17 +606,11 @@ function SingleVideoWhyHot({video,onBack}:{video:any,onBack:()=>void}){return <d
 function RiskSurfaceReport(){return <div className="riskReport"><header><span>风险面报告</span><b>推荐、搜索与社交共同形成外溢风险</b></header><dl><div><dt>形成路径</dt><dd>风险视频 → 评论 → 搜索 / 二创 → 群聊</dd></div><div><dt>覆盖对象</dt><dd>382 个视频 · 96 个账号 · 17 个群</dd></div><div><dt>风险解释</dt><dd>单点召回无法消除搜索和群聊带来的残余传播</dd></div><div><dt>可处置对象</dt><dd>视频 126 · 评论 37 · 搜索词 3 · 账号 12</dd></div></dl><h4>建议动作</h4>{['切断推荐','批量召回相似视频','折叠高赞评论','干预搜索词','封禁供货账号','定位桥接用户'].map(item=><button key={item}>{item}<span>生成指令 →</span></button>)}</div>}
 
 function LinkedPropagationViews({select,highlight,setHighlight,timeContext,activeOpinion,onTimeChange}:{select:(type:string,item:any)=>void,highlight:boolean,setHighlight:(value:boolean)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onTimeChange:(value:number)=>void}){
- const [view,setView]=useState<'综合传播链'|'视频传播链'|'账号关联链'>('综合传播链')
- const relationshipTabs=<div className="linkedViewTabs" role="tablist" aria-label="传播关系视图"><button role="tab" aria-selected={view==='综合传播链'} className={view==='综合传播链'?'selected':''} onClick={()=>setView('综合传播链')}><Network size={13}/>综合传播链</button><button role="tab" aria-selected={view==='视频传播链'} className={view==='视频传播链'?'selected':''} onClick={()=>setView('视频传播链')}><GitBranch size={13}/>视频传播链</button><button role="tab" aria-selected={view==='账号关联链'} className={view==='账号关联链'?'selected':''} onClick={()=>setView('账号关联链')}><Users size={13}/>账号关联链</button></div>
- return <div className="linkedPropagationViews">
-  <div className={view==='综合传播链'?'linkedViewPane active overviewPane':'linkedViewPane overviewPane'} aria-hidden={view!=='综合传播链'}><CombinedChain select={select} timeContext={timeContext} activeOpinion={activeOpinion} onTimeChange={onTimeChange} relationshipTabs={relationshipTabs}/></div>
-  <div className={view==='视频传播链'?'linkedViewPane active videoPane':'linkedViewPane videoPane'} aria-hidden={view!=='视频传播链'}><VideoChain select={select} timeContext={timeContext} activeOpinion={activeOpinion} onTimeChange={onTimeChange} relationshipTabs={relationshipTabs}/></div>
-  <div className={view==='账号关联链'?'linkedViewPane active accountPane':'linkedViewPane accountPane'} aria-hidden={view!=='账号关联链'}><AccountChain select={select} highlight={highlight} setHighlight={setHighlight} timeContext={timeContext} activeOpinion={activeOpinion} onTimeChange={onTimeChange} relationshipTabs={relationshipTabs}/></div>
- </div>
+ return <div className="linkedPropagationViews"><RelationDecisionExplorer select={select} timeContext={timeContext} activeOpinion={activeOpinion} onTimeChange={onTimeChange}/></div>
 }
 
 function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange}:{select:(type:string,item:any)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onTimeChange:(value:number)=>void}){
- type RelationView='传播承接'|'内容演化'|'主体协同'|'圈层扩散'
+ type RelationView='传播承接'|'设备聚合'|'群聊聚合'
  const [view,setView]=useState<RelationView>('传播承接')
  const [timeIndex,setTimeIndex]=useState(timeContext.chainTime)
  const [nodeTypes,setNodeTypes]=useState<string[]>(['全部'])
@@ -626,51 +620,63 @@ function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange
  useEffect(()=>setTimeIndex(timeContext.chainTime),[timeContext.index,timeContext.chainTime])
  const viewConfig:any={
   传播承接:{question:'内容从哪里来，经过谁，传到哪里？',decision:'优先切断“搜索回流 → 搬运账号群”路径，可减少约 31% 后续风险曝光。',tags:['全部','首发','推荐放大','搜索回流','分享扩散','跨圈','长尾']},
-  内容演化:{question:'原始内容如何被搬运、改写并形成风险叙事？',decision:'风险叙事首次形成于责任猜测二创簇，建议召回母本并批量核查相似内容。',tags:['全部','文本相似','OCR相似','ASR相似','画面相似','同音频','引用','二创','同观点']},
-  主体协同:{question:'哪些账号共同推动传播，是否存在异常关联？',decision:'搬运账号群存在高频互动和内容共现，建议先核查 6 个桥接账号。',tags:['全部','评论互动','互粉','共同设备','共同机构','内容共现','高频协同','直接关联','二度关联']},
-  圈层扩散:{question:'观点如何跨圈传播，风险首先在哪里形成？',decision:'风险由本地资讯圈进入社会热点圈后成形，当前仍由泛娱乐圈承接长尾扩散。',tags:['全部','观点圈层','地域圈层','媒体圈层','身份圈层','跨圈节点','高风险圈层']}
+  设备聚合:{question:'是否存在同设备、多账号协同投稿或跨账号发评？',decision:'D-07 关联 10 个账号，43 分钟内连续发布 28 条相似内容，建议优先核查 6 个供货账号。',tags:['全部','同设备多账号','短时切换','连续投稿','跨账号发评','新注册账号','高裂变设备']},
+  群聊聚合:{question:'哪些群聊推动传播，谁在连接多个群并造成站内回流？',decision:'G-8F21 通过 4 个桥接用户连接 7 个群，贡献 148.7 万回流 VV，需优先定位桥接用户。',tags:['全部','首发群','高频分享群','跨群账号','高风险群','负向评论集中','站内回流异常']}
  }
  const nodes:any[]=[
-  {id:'source',kind:'视频',title:'首发现场视频',meta:'13:46 · 328.6万 VV',role:'传播源头',x:75,y:255,tone:'normal',arrival:0,tags:['首发','文本相似','画面相似','直接关联'],item:videos[0]},
-  {id:'local',kind:'账号',title:'本地资讯号',meta:'事实补充 · 68.4万 VV',role:'直接承接',x:260,y:400,tone:'normal',arrival:1,tags:['首发','引用','内容共现','直接关联'],item:accounts[3]},
-  {id:'head',kind:'账号',title:'头部解读账号',meta:'责任猜测 · 风险 82',role:'观点放大',x:265,y:125,tone:'warning',arrival:2,tags:['推荐放大','评论互动','互粉','直接关联'],item:accounts[1]},
-  {id:'recommend',kind:'渠道',title:'Feed 推荐扩量',meta:'T+20 · 高于P90',role:'最早拐点',x:455,y:245,tone:'warning',arrival:2,tags:['推荐放大','高频协同','跨圈节点']},
-  {id:'search',kind:'渠道',title:'搜索热榜回流',meta:'占比31% · 基线12%',role:'异常渠道',x:455,y:390,tone:'risk',arrival:3,tags:['搜索回流','同观点','跨圈节点','高风险圈层']},
-  {id:'localCircle',kind:'圈层',title:'本地资讯圈',meta:'7个内容簇 · 事实为主',role:'起始圈层',x:660,y:90,tone:'normal',arrival:3,tags:['地域圈层','媒体圈层','内容共现']},
-  {id:'opinion',kind:'观点',title:'责任处罚争议',meta:'视频18% / 评论36%',role:'评论放大',x:655,y:245,tone:'risk',arrival:4,tags:['同观点','二创','观点圈层','高风险圈层']},
-  {id:'hotCircle',kind:'圈层',title:'社会热点圈',meta:'风险观点覆盖61%',role:'风险成形',x:655,y:405,tone:'risk',arrival:4,tags:['观点圈层','跨圈节点','高风险圈层']},
-  {id:'repostVideo',kind:'视频',title:'责任猜测二创簇',meta:'84条视频 · OCR 91%',role:'风险母本',x:840,y:125,tone:'risk',arrival:4,tags:['OCR相似','ASR相似','同音频','二创','同观点'],item:videos[1]},
-  {id:'repost',kind:'账号',title:'搬运账号群',meta:'18个账号 · 投稿42条',role:'风险承接',x:850,y:285,tone:'risk',arrival:5,tags:['分享扩散','共同设备','内容共现','高频协同','二度关联'],item:accounts[4]},
-  {id:'bridge',kind:'账号',title:'跨圈桥接账号',meta:'连接4个圈层',role:'跨圈传播',x:840,y:435,tone:'warning',arrival:5,tags:['跨圈','分享扩散','评论互动','二度关联','跨圈节点'],item:accounts[5]},
-  {id:'longTail',kind:'圈层',title:'泛娱乐长尾圈',meta:'仍贡献14%新增VV',role:'长尾扩散',x:1010,y:350,tone:'warning',arrival:6,tags:['长尾','身份圈层','跨圈节点']}
+  {id:'source',kind:'视频',title:'首发现场视频',meta:'13:46 · 328.6万 VV',role:'传播源头',x:80,y:250,tone:'normal',arrival:0,views:['传播承接'],tags:['首发'],item:videos[0]},
+  {id:'head',kind:'账号',title:'头部解读账号',meta:'责任猜测 · 风险 82',role:'首次放大',x:285,y:115,tone:'warning',arrival:2,views:['传播承接'],tags:['推荐放大'],item:accounts[1]},
+  {id:'recommend',kind:'渠道',title:'Feed 推荐扩量',meta:'T+20 · 高于 P90',role:'关键拐点',x:475,y:245,tone:'warning',arrival:2,views:['传播承接'],tags:['推荐放大']},
+  {id:'search',kind:'渠道',title:'搜索热榜回流',meta:'占比 31% · 基线 12%',role:'异常渠道',x:665,y:385,tone:'risk',arrival:3,views:['传播承接'],tags:['搜索回流']},
+  {id:'repost',kind:'账号',title:'搬运账号群',meta:'18个账号 · 投稿42条',role:'风险承接',x:845,y:250,tone:'risk',arrival:5,views:['传播承接'],tags:['分享扩散','跨圈'],item:accounts[4]},
+  {id:'longTail',kind:'账号',title:'长尾账号群',meta:'仍贡献14%新增 VV',role:'长尾扩散',x:1030,y:360,tone:'warning',arrival:6,views:['传播承接'],tags:['长尾'],item:accounts[5]},
+
+  {id:'deviceD07',kind:'设备',title:'异常设备簇 D-07',meta:'10个账号 · 风险 91',role:'疑似供货中心',x:125,y:250,tone:'risk',arrival:1,views:['设备聚合'],tags:['同设备多账号','短时切换','连续投稿','高裂变设备']},
+  {id:'deviceAccounts',kind:'账号',title:'关联账号簇',meta:'10个账号 · 6个高风险',role:'同主体疑似',x:390,y:130,tone:'risk',arrival:2,views:['设备聚合'],tags:['同设备多账号','新注册账号'],item:accounts[4]},
+  {id:'devicePosts',kind:'视频',title:'连续投稿内容簇',meta:'43分钟 · 28条视频',role:'批量供货',x:390,y:375,tone:'warning',arrival:3,views:['设备聚合'],tags:['连续投稿','高裂变设备'],item:videos[1]},
+  {id:'crossComment',kind:'账号',title:'跨账号发评簇',meta:'涉及16条高热视频',role:'互动助推',x:685,y:130,tone:'warning',arrival:4,views:['设备聚合'],tags:['跨账号发评','短时切换'],item:accounts[2]},
+  {id:'deviceSpread',kind:'视频',title:'相似内容扩散簇',meta:'OCR 91% · 186.4万 VV',role:'裂变结果',x:685,y:375,tone:'risk',arrival:4,views:['设备聚合'],tags:['连续投稿','高裂变设备'],item:videos[2]},
+  {id:'deviceTail',kind:'账号',title:'外围承接账号',meta:'+22个关联账号',role:'二度扩散',x:990,y:250,tone:'warning',arrival:5,views:['设备聚合'],tags:['同设备多账号','新注册账号'],item:accounts[5]},
+
+  {id:'sharedVideo',kind:'视频',title:'高频分享视频簇',meta:'12条视频 · 93.6万 VV',role:'群聊输入',x:110,y:250,tone:'warning',arrival:1,views:['群聊聚合'],tags:['首发群','高频分享群'],item:videos[0]},
+  {id:'groupA',kind:'群聊',title:'群聊 G-8F21',meta:'148.7万回流 VV · 风险 88',role:'核心扩散群',x:390,y:130,tone:'risk',arrival:2,views:['群聊聚合'],tags:['首发群','高频分享群','高风险群']},
+  {id:'groupB',kind:'群聊',title:'群聊 G-3C09',meta:'94.9万回流 VV · 负向 82%',role:'风险讨论群',x:390,y:380,tone:'risk',arrival:3,views:['群聊聚合'],tags:['高风险群','负向评论集中']},
+  {id:'groupBridge',kind:'账号',title:'跨群桥接用户',meta:'4人 · 连接7个群',role:'群间桥梁',x:690,y:250,tone:'risk',arrival:4,views:['群聊聚合'],tags:['跨群账号','站内回流异常'],item:accounts[5]},
+  {id:'groupNetwork',kind:'群聊',title:'外围群聊网络',meta:'7个群 · 继续转发126次',role:'群间裂变',x:920,y:120,tone:'warning',arrival:5,views:['群聊聚合'],tags:['高频分享群','跨群账号']},
+  {id:'groupReturn',kind:'渠道',title:'站内搜索回流',meta:'回流占比 34.6%',role:'二次放大',x:975,y:385,tone:'risk',arrival:5,views:['群聊聚合'],tags:['站内回流异常','负向评论集中']}
  ]
  const edges:any[]=[
-  {from:'source',to:'head',views:['传播承接','内容演化'],tag:'引用',tone:'warning'},
-  {from:'source',to:'local',views:['传播承接','内容演化'],tag:'文本相似',tone:'normal'},
+  {from:'source',to:'head',views:['传播承接'],tag:'内容转述',tone:'warning'},
   {from:'source',to:'recommend',views:['传播承接'],tag:'推荐放大',tone:'warning'},
-  {from:'head',to:'recommend',views:['传播承接','主体协同'],tag:'高频协同',tone:'warning'},
-  {from:'recommend',to:'localCircle',views:['传播承接','圈层扩散'],tag:'跨圈节点',tone:'normal'},
-  {from:'recommend',to:'opinion',views:['传播承接','内容演化'],tag:'同观点',tone:'risk'},
-  {from:'local',to:'search',views:['传播承接'],tag:'搜索回流',tone:'risk'},
-  {from:'search',to:'hotCircle',views:['传播承接','圈层扩散'],tag:'高风险圈层',tone:'risk'},
-  {from:'localCircle',to:'hotCircle',views:['圈层扩散'],tag:'跨圈节点',tone:'warning'},
-  {from:'opinion',to:'repostVideo',views:['内容演化'],tag:'OCR相似',tone:'risk'},
-  {from:'repostVideo',to:'repost',views:['内容演化','主体协同'],tag:'内容共现',tone:'risk'},
-  {from:'head',to:'repost',views:['主体协同'],tag:'评论互动',tone:'risk'},
-  {from:'repost',to:'bridge',views:['主体协同'],tag:'共同设备',tone:'warning'},
-  {from:'hotCircle',to:'bridge',views:['圈层扩散'],tag:'跨圈节点',tone:'risk'},
-  {from:'bridge',to:'longTail',views:['传播承接','圈层扩散'],tag:'长尾',tone:'warning'}
+  {from:'head',to:'recommend',views:['传播承接'],tag:'热度触发',tone:'warning'},
+  {from:'recommend',to:'search',views:['传播承接'],tag:'搜索回流',tone:'risk'},
+  {from:'search',to:'repost',views:['传播承接'],tag:'分享扩散',tone:'risk'},
+  {from:'repost',to:'longTail',views:['传播承接'],tag:'长尾',tone:'warning'},
+  {from:'deviceD07',to:'deviceAccounts',views:['设备聚合'],tag:'共同设备',tone:'risk'},
+  {from:'deviceD07',to:'devicePosts',views:['设备聚合'],tag:'连续投稿',tone:'warning'},
+  {from:'deviceAccounts',to:'crossComment',views:['设备聚合'],tag:'跨账号发评',tone:'warning'},
+  {from:'devicePosts',to:'deviceSpread',views:['设备聚合'],tag:'相似裂变',tone:'risk'},
+  {from:'crossComment',to:'deviceTail',views:['设备聚合'],tag:'互动承接',tone:'warning'},
+  {from:'deviceSpread',to:'deviceTail',views:['设备聚合'],tag:'二度扩散',tone:'risk'},
+  {from:'sharedVideo',to:'groupA',views:['群聊聚合'],tag:'首次分享',tone:'warning'},
+  {from:'sharedVideo',to:'groupB',views:['群聊聚合'],tag:'群内转发',tone:'risk'},
+  {from:'groupA',to:'groupBridge',views:['群聊聚合'],tag:'跨群分享',tone:'risk'},
+  {from:'groupB',to:'groupBridge',views:['群聊聚合'],tag:'桥接用户',tone:'risk'},
+  {from:'groupBridge',to:'groupNetwork',views:['群聊聚合'],tag:'群间裂变',tone:'warning'},
+  {from:'groupBridge',to:'groupReturn',views:['群聊聚合'],tag:'站内回流',tone:'risk'},
+  {from:'groupNetwork',to:'groupReturn',views:['群聊聚合'],tag:'搜索回流',tone:'risk'}
  ]
- const typeOptions=['全部','视频','账号','观点','渠道','圈层']
+ const typeOptions=['全部','视频','账号','设备','群聊','渠道']
  const toggleType=(type:string)=>setNodeTypes(current=>type==='全部'?['全部']:current.includes(type)?(current.filter(item=>item!==type).length?current.filter(item=>item!==type):['全部']):[...current.filter(item=>item!=='全部'),type])
- const visibleNodes=nodes.filter(node=>node.arrival<=timeIndex&&(nodeTypes.includes('全部')||nodeTypes.includes(node.kind))&&(knowledgeTag==='全部'||node.tags.includes(knowledgeTag)))
+ const visibleNodes=nodes.filter(node=>node.views.includes(view)&&node.arrival<=timeIndex&&(nodeTypes.includes('全部')||nodeTypes.includes(node.kind))&&(knowledgeTag==='全部'||node.tags.includes(knowledgeTag)))
  const visibleIds=new Set(visibleNodes.map(node=>node.id))
  const visibleEdges=edges.filter(edge=>edge.views.includes(view)&&visibleIds.has(edge.from)&&visibleIds.has(edge.to)&&(knowledgeTag==='全部'||edge.tag===knowledgeTag||nodes.find(node=>node.id===edge.from)?.tags.includes(knowledgeTag)||nodes.find(node=>node.id===edge.to)?.tags.includes(knowledgeTag)))
  const points=Object.fromEntries(nodes.map(node=>[node.id,[node.x,node.y]]))
  const selected=nodes.find(node=>node.id===selectedId)||nodes[0]
- const chooseView=(next:RelationView)=>{setView(next);setKnowledgeTag('全部');setNodeTypes(['全部']);setSelectedId(next==='内容演化'?'opinion':next==='主体协同'?'repost':next==='圈层扩散'?'hotCircle':'recommend')}
+ const chooseView=(next:RelationView)=>{setView(next);setKnowledgeTag('全部');setNodeTypes(['全部']);setSelectedId(next==='设备聚合'?'deviceD07':next==='群聊聚合'?'groupA':'recommend')}
  const openNode=(node:any)=>{setSelectedId(node.id);if(node.item)select(node.kind==='视频'?'video':'account',node.item)}
  const current=viewConfig[view]
+ const stageLabels=view==='设备聚合'?['设备中心','关联账号','异常行为','扩散结果']:view==='群聊聚合'?['内容输入','核心群聊','桥接用户','站内回流']:['传播源头','首次放大','异常承接','长尾扩散']
  return <div className="relationDecisionExplorer">
   <div className="relationDecisionHead"><div><b>传播关系链 <SourceBadge type="ai"/></b><span>{current.question}</span></div><div className="relationDecisionSummary"><Sparkles size={14}/><span><small>当前决策</small><b>{current.decision}</b></span></div></div>
   <ChainTimeline value={timeIndex} onChange={value=>{setTimeIndex(value);onTimeChange(value)}} total={visibleNodes.length} label="关系形成时间"/>
@@ -678,7 +684,7 @@ function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange
   <div className="relationTags"><div><span>节点类型</span>{typeOptions.map(item=><button key={item} className={nodeTypes.includes(item)?'selected':''} onClick={()=>toggleType(item)}>{item}</button>)}</div><div><span>知识下钻</span>{current.tags.map((item:string)=><button key={item} className={knowledgeTag===item?'selected':''} onClick={()=>setKnowledgeTag(item)}>{item}</button>)}</div></div>
   <div className="relationBreadcrumb"><span>事件全景</span><ChevronRight size={12}/><span>{view}</span>{knowledgeTag!=='全部'&&<><ChevronRight size={12}/><b>{knowledgeTag}</b></>}<em>显示 {visibleNodes.length} 个节点 · {visibleEdges.length} 条高置信关系</em></div>
   <div className="relationWorkspace">
-   <div className="relationMap"><div className="relationStageLabels"><span>源头</span><span>关键放大</span><span>跨圈传播</span><span>长尾扩散</span></div><div className="relationMapScene" style={{transform:`scale(${zoom})`}}><svg viewBox="0 0 1100 520" preserveAspectRatio="none">{visibleEdges.map(edge=>{const a=points[edge.from],b=points[edge.to];return <g key={edge.from+edge.to}><path className={edge.tone+(selectedId===edge.from||selectedId===edge.to?' active':'')} d={`M${a[0]} ${a[1]} C${(a[0]+b[0])/2} ${a[1]},${(a[0]+b[0])/2} ${b[1]},${b[0]} ${b[1]}`}/><text x={(a[0]+b[0])/2} y={(a[1]+b[1])/2-5}>{edge.tag}</text></g>})}</svg>{nodes.map(node=><button key={node.id} className={'relationMapNode '+node.kind+' '+node.tone+(visibleIds.has(node.id)?'':' hidden')+(selectedId===node.id?' selected':'')} style={{left:node.x,top:node.y}} onClick={()=>openNode(node)}><i>{node.kind==='视频'?<Play size={14}/>:node.kind==='账号'?<Users size={14}/>:node.kind==='观点'?<MessageCircle size={14}/>:node.kind==='渠道'?<Zap size={14}/>:<Network size={14}/>}</i><span><b>{node.title}</b><small>{node.meta}</small><em>{node.role}</em></span></button>)}</div><div className="relationMapLegend"><span><i/>确定关系</span><span><i/>辅助关系</span><small>点击节点查看依据；Tag用于筛选，不改变全局层级</small></div></div>
+   <div className="relationMap"><div className="relationStageLabels">{stageLabels.map(item=><span key={item}>{item}</span>)}</div><div className="relationMapScene" style={{transform:`scale(${zoom})`}}><svg viewBox="0 0 1100 520" preserveAspectRatio="none">{visibleEdges.map(edge=>{const a=points[edge.from],b=points[edge.to];return <g key={edge.from+edge.to}><path className={edge.tone+(selectedId===edge.from||selectedId===edge.to?' active':'')} d={`M${a[0]} ${a[1]} C${(a[0]+b[0])/2} ${a[1]},${(a[0]+b[0])/2} ${b[1]},${b[0]} ${b[1]}`}/><text x={(a[0]+b[0])/2} y={(a[1]+b[1])/2-5}>{edge.tag}</text></g>})}</svg>{nodes.map(node=><button key={node.id} className={'relationMapNode '+node.kind+' '+node.tone+(visibleIds.has(node.id)?'':' hidden')+(selectedId===node.id?' selected':'')} style={{left:node.x,top:node.y}} onClick={()=>openNode(node)}><i>{node.kind==='视频'?<Play size={14}/>:node.kind==='账号'?<Users size={14}/>:node.kind==='设备'?<ScanLine size={14}/>:node.kind==='群聊'?<MessageCircle size={14}/>:node.kind==='渠道'?<Zap size={14}/>:<Network size={14}/>}</i><span><b>{node.title}</b><small>{node.meta}</small><em>{node.role}</em></span></button>)}</div><div className="relationMapLegend"><span><i/>确定关系</span><span><i/>辅助关系</span><small>点击节点查看证据；Tag 只点亮命中异常，不会丢失底层实体</small></div></div>
    <aside className="relationInspector"><div className="relationMiniMap"><span>全景位置</span><i className={'p '+selected.tone} style={{left:(selected.x/1100*100)+'%',top:(selected.y/520*100)+'%'}}/></div><header><small>{selected.kind} · {selected.role}</small><b>{selected.title}</b><span>{selected.meta}</span></header><dl><div><dt>判断依据</dt><dd>{selected.tags.slice(0,3).join(' · ')}</dd></div><div><dt>全局关系</dt><dd>输入 {edges.filter(edge=>edge.to===selected.id).length} 条 · 输出 {edges.filter(edge=>edge.from===selected.id).length} 条</dd></div><div><dt>风险状态</dt><dd>{selected.tone==='risk'?'高风险，建议优先核查':selected.tone==='warning'?'传播异常，需持续观察':'正常承接关系'}</dd></div></dl><section><b>跨层关系摘要</b><p>当前节点仍保留在事件全景中的位置，与其他关系簇的输入、输出关系不会因下钻而丢失。</p></section><button onClick={()=>setKnowledgeTag(selected.tags[0])}>按“{selected.tags[0]}”继续下钻</button></aside>
   </div>
  </div>
