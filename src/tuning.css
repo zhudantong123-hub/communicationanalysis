@@ -1227,3 +1227,18 @@ html,body,#root{height:auto;min-height:100%}.app{height:auto!important;min-heigh
 .relationExpansionMembers>button{animation:relationMemberIn .2s ease both}
 .relationExpansionMembers>button:nth-child(2){animation-delay:.03s}.relationExpansionMembers>button:nth-child(3){animation-delay:.06s}.relationExpansionMembers>button:nth-child(4){animation-delay:.09s}.relationExpansionMembers>button:nth-child(5){animation-delay:.12s}.relationExpansionMembers>button:nth-child(6){animation-delay:.15s}.relationExpansionMembers>button:nth-child(7){animation-delay:.18s}
 @keyframes relationMemberIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Relation tags are clustering features: rebuild visible communities without filtering context. */
+.relationAutoCluster{position:absolute;z-index:0;border:1px dashed #526077;border-radius:42% 38% 40% 36%;background:#26304438;box-shadow:inset 0 0 36px #0d101a66;transition:.25s ease}
+.relationAutoCluster>span{position:absolute;top:10px;left:14px;display:flex;flex-direction:column;gap:2px;padding:5px 7px;border:1px solid #4b556a;border-radius:5px;background:#1b2130e8}.relationAutoCluster b{color:#c8d0df;font-size:8px}.relationAutoCluster small{color:#7f8ba1;font-size:7px}
+.relationAutoCluster.context{top:9%;left:1.5%;width:26%;height:79%;border-color:#465064;background:#242b3830}.relationAutoCluster.primary{top:6%;left:29%;width:40%;height:84%;border-color:#8e76df;background:#6551a424;box-shadow:inset 0 0 46px #7058c42e,0 0 24px #7b61d21a}.relationAutoCluster.related{top:9%;right:1.5%;width:27%;height:79%;border-color:#4e829d;background:#315b7024}
+.relationAutoCluster.primary>span{border-color:#806bcc;background:#2c2846}.relationAutoCluster.primary b{color:#e4ddff}.relationAutoCluster.related>span{border-color:#46748d;background:#203441}
+.relationMap.reclustered .relationMapNode.cluster-primary{z-index:4;border-color:#b49cf8;background:#2b2945;box-shadow:0 0 0 3px #8b6fe43d,0 12px 28px #0009}
+.relationMap.reclustered .relationMapNode.cluster-related{border-color:#679bb6;background:#202f3c}.relationMap.reclustered .relationMapNode.cluster-context{opacity:.72;filter:saturate(.65)}
+.relationMap.reclustered .relationMapNode.cluster-context:hover,.relationMap.reclustered .relationMapNode.cluster-context.selected{opacity:1;filter:none}
+.relationMapScene svg g{transition:opacity .22s ease}
+.relationMapScene svg g.clusterFocused path{stroke-width:3;opacity:1}
+.relationMapScene svg g.clusterFocused text{fill:#e3dcff}
+.relationMapScene svg g.clusterContext{opacity:.2}
+.relationMap.reclustered .relationStageLabels{grid-template-columns:28% 43% 29%;color:#9f94c8}
+.relationTags>div:last-child button.selected{box-shadow:0 0 0 2px #8b6fe41f}
