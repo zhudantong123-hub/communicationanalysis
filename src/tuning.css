@@ -1207,3 +1207,23 @@ html,body,#root{height:auto;min-height:100%}.app{height:auto!important;min-heigh
   .forensicChart{height:270px}
   .transitionCard{width:260px}
 }
+
+/* Relation investigation: responsive full-size canvas with in-place cluster expansion. */
+.relationWorkspace{position:relative;display:block;height:650px;min-height:650px}
+.relationWorkspace>.relationMap{width:100%;height:100%}
+.relationMapScene{top:42px;width:100%;height:calc(100% - 36px);transform-origin:50% 45%}
+.relationMapScene>svg{width:100%;height:100%}
+.relationMapNode{width:132px;min-height:58px;padding:7px}
+.relationMapNode>i{width:31px;height:31px}
+.relationWorkspace>.relationInspector{position:absolute;z-index:9;top:53px;right:10px;width:210px;height:calc(100% - 66px);border:1px solid #3d4558;border-radius:7px;box-shadow:0 12px 30px #0007}
+.relationMap.hasExpansion .relationMapScene{opacity:.28;filter:saturate(.65)}
+.relationClusterExpansion{position:absolute;z-index:8;top:56px;right:12px;bottom:43px;left:12px;display:flex;min-width:0;flex-direction:column;overflow:hidden;border:1px solid #7766b8;border-radius:9px;background:#191e2deF;box-shadow:0 18px 42px #000a;backdrop-filter:blur(4px)}
+.relationClusterExpansion>header{display:flex;height:auto;min-height:49px;align-items:center;justify-content:space-between;padding:8px 11px;border:0;border-bottom:1px solid #384054;background:#22283a}
+.relationClusterExpansion>header span{display:flex;flex-direction:column;gap:2px}.relationClusterExpansion>header small{color:#9c8ddd;font-size:7px}.relationClusterExpansion>header b{color:#f0eef8;font-size:11px}.relationClusterExpansion>header button{display:flex;align-items:center;gap:3px;padding:4px 7px;border:1px solid #4a5369;border-radius:5px;color:#aab4c8;font-size:8px}
+.relationExpansionMembers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;overflow:auto;padding:9px}
+.relationExpansionMembers>button{display:grid;grid-template-columns:30px minmax(0,1fr) 15px;min-height:59px;align-items:center;gap:7px;padding:7px;border:1px solid #3b4357;border-radius:7px;background:#242a3b;color:#dce3ee;text-align:left}.relationExpansionMembers>button:hover,.relationExpansionMembers>button.selected{border-color:#927de2;background:#302b49;box-shadow:0 0 0 2px #8068d92e}.relationExpansionMembers>button.risk{border-left:3px solid #d86b72}.relationExpansionMembers>button.warning{border-left:3px solid #629dca}.relationExpansionMembers>button>i{display:grid;width:27px;height:27px;place-items:center;border-radius:50%;background:#443966;color:#dcd4fa;font-style:normal}.relationExpansionMembers>button span{display:flex;min-width:0;flex-direction:column;gap:2px}.relationExpansionMembers small{color:#8d98ad;font-size:7px}.relationExpansionMembers b,.relationExpansionMembers em{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.relationExpansionMembers b{font-size:9px}.relationExpansionMembers em{color:#a9b1bf;font-size:7px;font-style:normal}.relationExpansionMembers>button>svg{color:#8e7cd2}
+.relationClusterExpansion>footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding:7px 10px;border-top:1px solid #384054;background:#202638;color:#8995a9;font-size:7px}.relationClusterExpansion>footer b{color:#b8aedf;font-size:7px}
+@media(max-width:900px){.relationWorkspace{height:600px;min-height:600px}.relationWorkspace>.relationInspector{width:190px}.relationExpansionMembers{grid-template-columns:1fr}.relationMapNode{width:118px}}
+.relationExpansionMembers>button{animation:relationMemberIn .2s ease both}
+.relationExpansionMembers>button:nth-child(2){animation-delay:.03s}.relationExpansionMembers>button:nth-child(3){animation-delay:.06s}.relationExpansionMembers>button:nth-child(4){animation-delay:.09s}.relationExpansionMembers>button:nth-child(5){animation-delay:.12s}.relationExpansionMembers>button:nth-child(6){animation-delay:.15s}.relationExpansionMembers>button:nth-child(7){animation-delay:.18s}
+@keyframes relationMemberIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
