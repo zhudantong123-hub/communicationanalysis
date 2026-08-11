@@ -629,17 +629,17 @@ function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange
   {id:'head',kind:'账号',title:'头部解读账号',meta:'责任猜测 · 风险 82',role:'首次放大',x:285,y:115,tone:'warning',arrival:2,views:['传播承接'],tags:['推荐放大'],item:accounts[1]},
   {id:'recommend',kind:'渠道',title:'Feed 推荐扩量',meta:'T+20 · 高于 P90',role:'关键拐点',x:475,y:245,tone:'warning',arrival:2,views:['传播承接'],tags:['推荐放大']},
   {id:'search',kind:'渠道',title:'搜索热榜回流',meta:'占比 31% · 基线 12%',role:'异常渠道',x:665,y:385,tone:'risk',arrival:3,views:['传播承接'],tags:['搜索回流']},
-  {id:'repost',kind:'账号',title:'搬运账号群',meta:'18个账号 · 投稿42条',role:'风险承接',x:845,y:250,tone:'risk',arrival:5,views:['传播承接'],tags:['分享扩散','跨圈'],item:accounts[4]},
-  {id:'longTail',kind:'账号',title:'长尾账号群',meta:'仍贡献14%新增 VV',role:'长尾扩散',x:1030,y:360,tone:'warning',arrival:6,views:['传播承接'],tags:['长尾'],item:accounts[5]},
+  {id:'repost',kind:'账号',title:'搬运账号簇',meta:'18个账号 · 投稿42条',role:'风险承接',x:845,y:250,tone:'risk',arrival:5,views:['传播承接'],tags:['分享扩散','跨圈'],drillKey:'repost'},
+  {id:'longTail',kind:'账号',title:'长尾账号簇',meta:'仍贡献14%新增 VV',role:'长尾扩散',x:1030,y:360,tone:'warning',arrival:6,views:['传播承接'],tags:['长尾'],drillKey:'longTail'},
 
   {id:'deviceD07',kind:'设备',title:'异常设备簇 D-07',meta:'10个账号 · 风险 91',role:'疑似供货中心',x:125,y:250,tone:'risk',arrival:1,views:['设备聚合'],tags:['同设备多账号','短时切换','连续投稿','高裂变设备'],drillKey:'deviceD07'},
-  {id:'deviceAccounts',kind:'账号',title:'关联账号簇',meta:'10个账号 · 6个高风险',role:'同主体疑似',x:390,y:130,tone:'risk',arrival:2,views:['设备聚合'],tags:['同设备多账号','新注册账号'],item:accounts[4]},
-  {id:'devicePosts',kind:'视频',title:'连续投稿内容簇',meta:'43分钟 · 28条视频',role:'批量供货',x:390,y:375,tone:'warning',arrival:3,views:['设备聚合'],tags:['连续投稿','高裂变设备'],item:videos[1]},
-  {id:'crossComment',kind:'账号',title:'跨账号发评簇',meta:'涉及16条高热视频',role:'互动助推',x:685,y:130,tone:'warning',arrival:4,views:['设备聚合'],tags:['跨账号发评','短时切换'],item:accounts[2]},
-  {id:'deviceSpread',kind:'视频',title:'相似内容扩散簇',meta:'OCR 91% · 186.4万 VV',role:'裂变结果',x:685,y:375,tone:'risk',arrival:4,views:['设备聚合'],tags:['连续投稿','高裂变设备'],item:videos[2]},
+  {id:'deviceAccounts',kind:'账号',title:'关联账号簇',meta:'10个账号 · 6个高风险',role:'同主体疑似',x:390,y:130,tone:'risk',arrival:2,views:['设备聚合'],tags:['同设备多账号','新注册账号'],drillKey:'deviceAccounts'},
+  {id:'devicePosts',kind:'视频',title:'连续投稿内容簇',meta:'43分钟 · 28条视频',role:'批量供货',x:390,y:375,tone:'warning',arrival:3,views:['设备聚合'],tags:['连续投稿','高裂变设备'],drillKey:'devicePosts'},
+  {id:'crossComment',kind:'账号',title:'跨账号发评簇',meta:'涉及16条高热视频',role:'互动助推',x:685,y:130,tone:'warning',arrival:4,views:['设备聚合'],tags:['跨账号发评','短时切换'],drillKey:'crossComment'},
+  {id:'deviceSpread',kind:'视频',title:'相似内容扩散簇',meta:'OCR 91% · 186.4万 VV',role:'裂变结果',x:685,y:375,tone:'risk',arrival:4,views:['设备聚合'],tags:['连续投稿','高裂变设备'],drillKey:'deviceSpread'},
   {id:'deviceTail',kind:'账号',title:'外围承接账号',meta:'+22个关联账号',role:'二度扩散',x:990,y:250,tone:'warning',arrival:5,views:['设备聚合'],tags:['同设备多账号','新注册账号'],item:accounts[5]},
 
-  {id:'sharedVideo',kind:'视频',title:'高频分享视频簇',meta:'12条视频 · 93.6万 VV',role:'群聊输入',x:110,y:250,tone:'warning',arrival:1,views:['群聊聚合'],tags:['首发群','高频分享群'],item:videos[0]},
+  {id:'sharedVideo',kind:'视频',title:'高频分享视频簇',meta:'12条视频 · 93.6万 VV',role:'群聊输入',x:110,y:250,tone:'warning',arrival:1,views:['群聊聚合'],tags:['首发群','高频分享群'],drillKey:'sharedVideo'},
   {id:'groupA',kind:'群聊',title:'群聊 G-8F21',meta:'148.7万回流 VV · 风险 88',role:'核心扩散群',x:390,y:130,tone:'risk',arrival:2,views:['群聊聚合'],tags:['首发群','高频分享群','高风险群'],drillKey:'groupA'},
   {id:'groupB',kind:'群聊',title:'群聊 G-3C09',meta:'94.9万回流 VV · 负向 82%',role:'风险讨论群',x:390,y:380,tone:'risk',arrival:3,views:['群聊聚合'],tags:['高风险群','负向评论集中'],drillKey:'groupB'},
   {id:'groupBridge',kind:'账号',title:'跨群桥接用户',meta:'4人 · 连接7个群',role:'群间桥梁',x:690,y:250,tone:'risk',arrival:4,views:['群聊聚合'],tags:['跨群账号','站内回流异常'],item:accounts[5]},
@@ -667,7 +667,21 @@ function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange
   {from:'groupBridge',to:'groupReturn',views:['群聊聚合'],tag:'站内回流',tone:'risk'},
   {from:'groupNetwork',to:'groupReturn',views:['群聊聚合'],tag:'搜索回流',tone:'risk'}
  ]
+ const makeClusterDrill=(rootId:string,memberKind:'账号'|'视频',members:any[])=>{
+  const root=nodes.find(node=>node.id===rootId)
+  const positions=[[350,80],[350,250],[350,420],[720,145],[720,355]]
+  const {item:_item,drillKey:_drillKey,views:_views,arrival:_arrival,...rootNode}=root
+  const memberNodes=members.map((item,index)=>({id:`${rootId}-member-${index}`,kind:memberKind,title:memberKind==='账号'?`@${item.name}`:item.title,meta:memberKind==='账号'?`${item.handle} · 粉丝 ${item.fans}`:`${item.time} · ${item.play} VV`,role:memberKind==='账号'?'簇内账号':'命中视频',x:positions[index][0],y:positions[index][1],tone:index===0?'risk':'warning',tags:root.tags,item}))
+  return {title:root.title,stages:memberKind==='账号'?['聚合簇','核心账号','关联账号','扩散出口']:['内容簇','高风险视频','相似视频','传播结果'],nodes:[{...rootNode,x:85,y:250,role:`${root.role} · 已展开`},...memberNodes],edges:memberNodes.map(node=>({from:rootId,to:node.id,tag:memberKind==='账号'?'簇内账号':'相似内容',tone:node.tone}))}
+ }
  const drillData:any={
+  repost:makeClusterDrill('repost','账号',accounts.slice(0,5)),
+  longTail:makeClusterDrill('longTail','账号',accounts.slice(1,6)),
+  deviceAccounts:makeClusterDrill('deviceAccounts','账号',accounts.slice(0,5)),
+  devicePosts:makeClusterDrill('devicePosts','视频',videos),
+  crossComment:makeClusterDrill('crossComment','账号',accounts.slice(1,6)),
+  deviceSpread:makeClusterDrill('deviceSpread','视频',videos),
+  sharedVideo:makeClusterDrill('sharedVideo','视频',videos),
   deviceD07:{title:'异常设备簇 D-07',stages:['设备证据','关联账号','异常行为','外部扩散'],nodes:[
    {id:'deviceD07',kind:'设备',title:'异常设备簇 D-07',meta:'首次活跃 02-05 13:41 · 10个账号',role:'设备中心 · 已展开',x:85,y:250,tone:'risk',tags:['同设备多账号','短时切换']},
    {id:'dAcc1',kind:'账号',title:'@民生视角',meta:'登录 16 次 · 投稿 9 条',role:'主要供货账号',x:320,y:85,tone:'risk',tags:['同设备多账号','连续投稿'],item:accounts[1]},
@@ -719,7 +733,7 @@ function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange
  const selectedEdges=currentDrill?.edges||displayEdges
  const chooseView=(next:RelationView)=>{setView(next);setDrilledId(null);setKnowledgeTag('全部');setNodeTypes(['全部']);setSelectedId(next==='设备聚合'?'deviceD07':next==='群聊聚合'?'groupA':'recommend')}
  const drillInto=(node:any)=>{const next=drillData[node.drillKey];if(!next)return;setDrilledId(node.drillKey);setSelectedId(next.nodes[0].id)}
- const openNode=(node:any)=>{if(node.drillKey){drillInto(node);return}setSelectedId(node.id);if(node.item)select(node.kind==='视频'?'video':'account',node.item)}
+ const openNode=(node:any)=>{if(node.drillKey){drillInto(node);return}setSelectedId(node.id);if(node.item&&node.kind==='视频')select('video',node.item);if(node.item&&node.kind==='账号')select('account',node.item)}
  const applyTag=(tag:string)=>{setDrilledId(null);setKnowledgeTag(tag);setSelectedId(view==='设备聚合'?'deviceD07':view==='群聊聚合'?'groupA':'recommend')}
  const current=viewConfig[view]
  const stageLabels=view==='设备聚合'?['设备中心','关联账号','异常行为','扩散结果']:view==='群聊聚合'?['内容输入','核心群聊','桥接用户','站内回流']:['传播源头','首次放大','异常承接','长尾扩散']
@@ -731,7 +745,7 @@ function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange
   <div className="relationBreadcrumb"><button onClick={()=>{setDrilledId(null);setKnowledgeTag('全部')}}>事件全景</button><ChevronRight size={12}/><button onClick={()=>setDrilledId(null)}>{view}</button>{knowledgeTag!=='全部'&&!currentDrill&&<><ChevronRight size={12}/><b>{knowledgeTag}</b></>}{currentDrill&&<><ChevronRight size={12}/><b>{currentDrill.title}</b><button className="relationBack" onClick={()=>setDrilledId(null)}>返回上一级</button></>}<em>显示 {displayNodes.length} 个节点 · {displayEdges.length} 条高置信关系</em></div>
   <div className="relationWorkspace">
    <div className={'relationMap'+(currentDrill?' hasExpansion':'')}><div className="relationStageLabels">{stageLabels.map((item:string)=><span key={item}>{item}</span>)}</div><div className="relationMapScene" style={{transform:`scale(${zoom})`}}><svg viewBox="0 0 1100 520" preserveAspectRatio="none">{displayEdges.map((edge:any)=>{const a=points[edge.from],b=points[edge.to];return <g key={edge.from+edge.to}><path className={edge.tone+(selectedId===edge.from||selectedId===edge.to?' active':'')} d={`M${a[0]} ${a[1]} C${(a[0]+b[0])/2} ${a[1]},${(a[0]+b[0])/2} ${b[1]},${b[0]} ${b[1]}`}/><text x={(a[0]+b[0])/2} y={(a[1]+b[1])/2-5}>{edge.tag}</text></g>})}</svg>{displayNodes.map((node:any)=><button key={node.id} className={'relationMapNode '+node.kind+' '+node.tone+(selectedId===node.id?' selected':'')+(node.drillKey?' drillable':'')} style={{left:`${node.x/11}%`,top:`${node.y/5.2}%`}} onClick={()=>openNode(node)}><i>{node.kind==='视频'?<Play size={14}/>:node.kind==='账号'?<Users size={14}/>:node.kind==='设备'?<ScanLine size={14}/>:node.kind==='群聊'?<MessageCircle size={14}/>:node.kind==='渠道'?<Zap size={14}/>:<Network size={14}/>}</i><span><b>{node.title}</b><small>{node.meta}</small><em>{node.role}{node.drillKey?' · 可展开':''}</em></span></button>)}</div>{currentDrill&&<div className="relationClusterExpansion"><header><span><small>簇内展开 · {view}</small><b>{currentDrill.title}</b></span><button onClick={()=>setDrilledId(null)}><X size={13}/>收起</button></header><div className="relationExpansionMembers">{currentDrill.nodes.map((node:any)=><button key={node.id} className={node.tone+(selectedId===node.id?' selected':'')} onClick={()=>openNode(node)}><i>{node.kind==='视频'?<Play size={13}/>:node.kind==='账号'?<Users size={13}/>:node.kind==='设备'?<ScanLine size={13}/>:node.kind==='群聊'?<MessageCircle size={13}/>:<Zap size={13}/>}</i><span><small>{node.kind} · {node.role}</small><b>{node.title}</b><em>{node.meta}</em></span>{node.drillKey?<ChevronRight size={13}/>:node.item?<FileText size={12}/>:null}</button>)}</div><footer><span>簇内 {currentDrill.nodes.length} 个节点 · {currentDrill.edges.length} 条关系</span><b>点击实体查看证据；点击跨簇出口继续穿透</b></footer></div>}<div className="relationMapLegend"><span><i/>确定关系</span><span><i/>辅助关系</span><small>{currentDrill?'已在原图内展开成员，背景保留全局位置与上下游关系':'点击“可展开”节点在原图内查看成员；Tag 用于快速定位异常'}</small></div></div>
-   <aside className="relationInspector"><div className="relationMiniMap"><span>{currentDrill?'簇内位置':'全景位置'}</span><i className={'p '+selected.tone} style={{left:(selected.x/1100*100)+'%',top:(selected.y/520*100)+'%'}}/></div><header><small>{selected.kind} · {selected.role}</small><b>{selected.title}</b><span>{selected.meta}</span></header><dl><div><dt>判断依据</dt><dd>{selected.tags.slice(0,3).join(' · ')}</dd></div><div><dt>{currentDrill?'簇内关系':'全局关系'}</dt><dd>输入 {selectedEdges.filter((edge:any)=>edge.to===selected.id).length} 条 · 输出 {selectedEdges.filter((edge:any)=>edge.from===selected.id).length} 条</dd></div><div><dt>风险状态</dt><dd>{selected.tone==='risk'?'高风险，建议优先核查':selected.tone==='warning'?'传播异常，需持续观察':'正常承接关系'}</dd></div></dl><section><b>{currentDrill?'跨簇关系摘要':'聚合节点说明'}</b><p>{currentDrill?'成员在原图内展开，全局节点和关系仍保留在背景；跨簇出口可以继续进入相邻聚合簇。':'带“可展开”标识的节点包含下一层成员与关系；实体节点可继续进入账号或视频证据。'}</p></section>{selected.drillKey?<button onClick={()=>drillInto(selected)}>展开“{selected.title}”成员网络</button>:selected.item?<button onClick={()=>select(selected.kind==='视频'?'video':'account',selected.item)}>查看{selected.kind}详情与证据</button>:<button onClick={()=>applyTag(selected.tags[0])}>按“{selected.tags[0]}”定位同类节点</button>}</aside>
+   <aside className="relationInspector"><div className="relationMiniMap"><span>{currentDrill?'簇内位置':'全景位置'}</span><i className={'p '+selected.tone} style={{left:(selected.x/1100*100)+'%',top:(selected.y/520*100)+'%'}}/></div><header><small>{selected.kind} · {selected.role}</small><b>{selected.title}</b><span>{selected.meta}</span></header><dl><div><dt>判断依据</dt><dd>{selected.tags.slice(0,3).join(' · ')}</dd></div><div><dt>{currentDrill?'簇内关系':'全局关系'}</dt><dd>输入 {selectedEdges.filter((edge:any)=>edge.to===selected.id).length} 条 · 输出 {selectedEdges.filter((edge:any)=>edge.from===selected.id).length} 条</dd></div><div><dt>风险状态</dt><dd>{selected.tone==='risk'?'高风险，建议优先核查':selected.tone==='warning'?'传播异常，需持续观察':'正常承接关系'}</dd></div></dl><section><b>{currentDrill?'跨簇关系摘要':'聚合节点说明'}</b><p>{currentDrill?'成员在原图内展开，全局节点和关系仍保留在背景；跨簇出口可以继续进入相邻聚合簇。':'带“可展开”标识的节点包含下一层成员与关系；实体节点可继续进入账号或视频证据。'}</p></section>{selected.drillKey?<button onClick={()=>drillInto(selected)}>展开“{selected.title}”成员网络</button>:selected.item&&selected.kind==='视频'?<button onClick={()=>select('video',selected.item)}>查看视频详情与证据</button>:selected.item&&selected.kind==='账号'?<button onClick={()=>select('account',selected.item)}>查看账号详情与证据</button>:<button onClick={()=>applyTag(selected.tags[0])}>按“{selected.tags[0]}”定位同类节点</button>}</aside>
   </div>
  </div>
 }
