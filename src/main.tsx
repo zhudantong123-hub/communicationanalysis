@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { createRoot } from 'react-dom/client'
+import * as echarts from 'echarts'
 import { ChevronDown, ChevronRight, Clock3, Eye, FileText, Flag, GitBranch, Headphones, HelpCircle, MessageCircle, MonitorUp, Network, Pause, Play, RotateCcw, ScanLine, Search, ShieldAlert, Sparkles, TriangleAlert, Users, X, Zap, ZoomIn, ZoomOut } from 'lucide-react'
 import './styles.css'
 import './tuning.css'
@@ -606,7 +607,65 @@ function SingleVideoWhyHot({video,onBack}:{video:any,onBack:()=>void}){return <d
 function RiskSurfaceReport(){return <div className="riskReport"><header><span>风险面报告</span><b>推荐、搜索与社交共同形成外溢风险</b></header><dl><div><dt>形成路径</dt><dd>风险视频 → 评论 → 搜索 / 二创 → 群聊</dd></div><div><dt>覆盖对象</dt><dd>382 个视频 · 96 个账号 · 17 个群</dd></div><div><dt>风险解释</dt><dd>单点召回无法消除搜索和群聊带来的残余传播</dd></div><div><dt>可处置对象</dt><dd>视频 126 · 评论 37 · 搜索词 3 · 账号 12</dd></div></dl><h4>建议动作</h4>{['切断推荐','批量召回相似视频','折叠高赞评论','干预搜索词','封禁供货账号','定位桥接用户'].map(item=><button key={item}>{item}<span>生成指令 →</span></button>)}</div>}
 
 function LinkedPropagationViews({select,highlight,setHighlight,timeContext,activeOpinion,onTimeChange}:{select:(type:string,item:any)=>void,highlight:boolean,setHighlight:(value:boolean)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onTimeChange:(value:number)=>void}){
- return <div className="linkedPropagationViews"><RelationDecisionExplorer select={select} timeContext={timeContext} activeOpinion={activeOpinion} onTimeChange={onTimeChange}/></div>
+ return <div className="linkedPropagationViews"><SemanticVideoPropagationGraph select={select} timeContext={timeContext} activeOpinion={activeOpinion} onTimeChange={onTimeChange}/></div>
+}
+
+type SemanticRelation='明确引用'|'画面搬运'|'剪辑二创'|'事件转述'|'观点回应'|'进展跟进'
+const semanticVideoNodes=[
+ {id:'origin',name:'现场原始视频',author:'@揭阳现场',time:'02-05 15:45',vv:'328.6万',role:'源头视频',category:0,stage:0,item:videos[0]},
+ {id:'explain',name:'事件经过解读',author:'@民生视角',time:'02-05 16:12',vv:'156.3万',role:'首轮解读',category:1,stage:1,item:videos[1]},
+ {id:'repost',name:'多平台画面搬运',author:'@城市观察站',time:'02-05 16:38',vv:'118.4万',role:'画面扩散',category:2,stage:1,item:videos[3]},
+ {id:'law',name:'法律责任如何认定',author:'@法度说事',time:'02-05 18:27',vv:'97.1万',role:'专业回应',category:1,stage:2,item:videos[2]},
+ {id:'verify',name:'完整经过与事实核验',author:'@事实核验',time:'02-06 09:13',vv:'68.4万',role:'事实校正',category:3,stage:2,item:videos[3]},
+ {id:'opinion',name:'动物保护立法讨论',author:'@动物保护观察',time:'02-06 10:40',vv:'51.6万',role:'议题延伸',category:1,stage:3,item:videos[2]},
+ {id:'media',name:'媒体梳理事件时间线',author:'@南方观察',time:'02-07 08:20',vv:'44.8万',role:'媒体跟进',category:3,stage:3,item:videos[4]},
+ {id:'notice',name:'警方发布情况通报',author:'@揭阳公安',time:'02-07 16:30',vv:'82.4万',role:'权威进展',category:4,stage:4,item:videos[4]}
+]
+const semanticVideoEdges:{source:string,target:string,relation:SemanticRelation,confidence:number,evidence:string,time:string}[]=[
+ {source:'origin',target:'explain',relation:'事件转述',confidence:96,evidence:'口播复述现场经过；标题包含事件主体',time:'发布后 27 分钟'},
+ {source:'origin',target:'repost',relation:'画面搬运',confidence:98,evidence:'关键帧匹配 98%；原声音轨连续复用 21 秒',time:'发布后 53 分钟'},
+ {source:'explain',target:'law',relation:'观点回应',confidence:91,evidence:'正文明确回应“是否构成虐待动物”；ASR 语义相似 89%',time:'间隔 2 小时 15 分'},
+ {source:'repost',target:'verify',relation:'剪辑二创',confidence:94,evidence:'复用 3 段现场画面；新增事实核验字幕',time:'间隔 16 小时 35 分'},
+ {source:'law',target:'opinion',relation:'观点回应',confidence:87,evidence:'共同讨论法律边界；核心观点存在承接与扩展',time:'间隔 16 小时 13 分'},
+ {source:'verify',target:'media',relation:'明确引用',confidence:99,evidence:'视频文案标注来源；引用核验结论与时间线',time:'间隔 23 小时 7 分'},
+ {source:'opinion',target:'media',relation:'事件转述',confidence:84,evidence:'事件实体一致；议题从个案延伸至公共讨论',time:'间隔 21 小时 40 分'},
+ {source:'media',target:'notice',relation:'进展跟进',confidence:100,evidence:'官方通报更新前序报道；事件主体与处置进展一致',time:'间隔 8 小时 10 分'},
+ {source:'origin',target:'verify',relation:'明确引用',confidence:97,evidence:'核验视频展示原视频片段并标注首发来源',time:'间隔 17 小时 28 分'}
+]
+function SemanticVideoPropagationGraph({select,timeContext,activeOpinion,onTimeChange}:{select:(type:string,item:any)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onTimeChange:(value:number)=>void}){
+ const chartRef=useRef<HTMLDivElement>(null)
+ const [timeIndex,setTimeIndex]=useState(timeContext.chainTime)
+ const [selectedNode,setSelectedNode]=useState<any>(semanticVideoNodes[0])
+ const [selectedEdge,setSelectedEdge]=useState<any>(semanticVideoEdges[0])
+ const [minConfidence,setMinConfidence]=useState(80)
+ useEffect(()=>setTimeIndex(timeContext.chainTime),[timeContext.chainTime])
+ const visibleNodes=semanticVideoNodes.filter(node=>node.stage<=Math.min(4,timeIndex))
+ const visibleIds=new Set(visibleNodes.map(node=>node.id))
+ const visibleEdges=semanticVideoEdges.filter(edge=>visibleIds.has(edge.source)&&visibleIds.has(edge.target)&&edge.confidence>=minConfidence)
+ useEffect(()=>{
+  if(!chartRef.current)return
+  const chart=echarts.init(chartRef.current)
+  const relationColors:Record<SemanticRelation,string>={'明确引用':'#7258d2','画面搬运':'#df8257','剪辑二创':'#cb6377','事件转述':'#4a86b8','观点回应':'#3b9485','进展跟进':'#596273'}
+  chart.setOption({
+   backgroundColor:'transparent',
+   animationDurationUpdate:450,
+   tooltip:{trigger:'item',confine:true,backgroundColor:'#202638',borderColor:'#465069',textStyle:{color:'#eef1f7',fontSize:12},formatter:(params:any)=>params.dataType==='edge'?`<b>${params.data.relation}</b> · 置信度 ${params.data.confidence}%<br/>${params.data.time}<br/><span style="color:#aeb7c8">${params.data.evidence}</span>`:`<b>${params.data.name}</b><br/>${params.data.author} · ${params.data.time}<br/>${params.data.vv} VV · ${params.data.role}`},
+   legend:[{data:['源头视频','解读/观点','搬运/二创','媒体核验','官方通报'],top:8,textStyle:{color:'#707887',fontSize:11},itemWidth:11,itemHeight:11}],
+   series:[{type:'graph',layout:'force',roam:true,draggable:true,focusNodeAdjacency:true,categories:[{name:'源头视频',itemStyle:{color:'#735bd0'}},{name:'解读/观点',itemStyle:{color:'#3d8f82'}},{name:'搬运/二创',itemStyle:{color:'#d77757'}},{name:'媒体核验',itemStyle:{color:'#4c82b0'}},{name:'官方通报',itemStyle:{color:'#596273'}}],force:{repulsion:720,edgeLength:[150,235],gravity:.08,friction:.65},label:{show:true,position:'bottom',distance:8,color:'#e8ebf3',fontSize:11,formatter:'{b}'},edgeSymbol:['none','arrow'],edgeSymbolSize:8,edgeLabel:{show:true,color:'#c7ceda',fontSize:10,backgroundColor:'#202638dd',padding:[3,5],borderRadius:3,formatter:(params:any)=>params.data.relation},lineStyle:{width:2,curveness:.12,opacity:.82},emphasis:{focus:'adjacency',lineStyle:{width:4}},data:visibleNodes.map(node=>({...node,value:Number(node.vv.replace('万','')),symbolSize:node.id==='origin'?62:42+Math.min(16,Number(node.vv.replace('万',''))/25),itemStyle:{borderColor:'#fff',borderWidth:2,shadowBlur:14,shadowColor:'#11182788'}})),links:visibleEdges.map(edge=>({...edge,lineStyle:{color:relationColors[edge.relation],type:edge.confidence<90?'dashed':'solid',width:Math.max(1.5,(edge.confidence-70)/10)}}))}]
+  })
+  chart.on('click',(params:any)=>{if(params.dataType==='node'){setSelectedNode(params.data);setSelectedEdge(null);const node=semanticVideoNodes.find(item=>item.id===params.data.id);if(node)select('video',node.item)}else if(params.dataType==='edge'){setSelectedEdge(params.data);setSelectedNode(null)}})
+  const resize=()=>chart.resize()
+  window.addEventListener('resize',resize)
+  return()=>{window.removeEventListener('resize',resize);chart.dispose()}
+ },[timeIndex,minConfidence])
+ const relationLegend:[SemanticRelation,string][]=[['明确引用','#7258d2'],['画面搬运','#df8257'],['剪辑二创','#cb6377'],['事件转述','#4a86b8'],['观点回应','#3b9485'],['进展跟进','#596273']]
+ return <div className="semanticPropagation">
+  <div className="relationDecisionHead"><div><b>不同视频传播关系 <SourceBadge type="ai"/></b><span>从明确引用、画面复用、二创和语义承接，还原事件中视频之间的传播路径。</span></div></div>
+  <ChainTimeline value={timeIndex} onChange={value=>{setTimeIndex(value);onTimeChange(value)}} total={visibleNodes.length} label="视频关系形成时间"/>
+  <div className="semanticGraphControls"><div><Network size={14}/><span><small>分析对象</small><b>事件内不同视频</b></span></div><div className="semanticRelationLegend">{relationLegend.map(([name,color])=><span key={name}><i style={{background:color}}/>{name}</span>)}</div><label>关系置信度 <select value={minConfidence} onChange={event=>setMinConfidence(Number(event.target.value))}><option value="80">≥ 80%</option><option value="90">≥ 90%</option><option value="95">≥ 95%</option></select></label></div>
+  <div className="semanticGraphWorkspace"><div ref={chartRef} className="semanticGraphChart"/><aside className="semanticGraphInspector">{selectedEdge?<><small>关系证据</small><h3>{selectedEdge.relation}</h3><strong>置信度 {selectedEdge.confidence}%</strong><dl><div><dt>发生时间</dt><dd>{selectedEdge.time}</dd></div><div><dt>判断证据</dt><dd>{selectedEdge.evidence}</dd></div><div><dt>关系说明</dt><dd>箭头表示内容语义或素材从上游视频向下游视频承接，并不代表用户直接转发。</dd></div></dl></>:selectedNode?<><small>{selectedNode.role}</small><h3>{selectedNode.name}</h3><strong>{selectedNode.vv} VV</strong><dl><div><dt>发布账号</dt><dd>{selectedNode.author}</dd></div><div><dt>发布时间</dt><dd>{selectedNode.time}</dd></div><div><dt>上下游关系</dt><dd>{semanticVideoEdges.filter(edge=>edge.source===selectedNode.id||edge.target===selectedNode.id).length} 条</dd></div></dl><button onClick={()=>{const node=semanticVideoNodes.find(item=>item.id===selectedNode.id);if(node)select('video',node.item)}}>查看视频详情</button></>:null}</aside></div>
+  <div className="semanticGraphFoot"><Sparkles size={14}/><span><b>阅读方式</b><small>节点代表不同视频，箭头代表内容承接；实线为高置信关系，虚线为需要进一步核验的语义关系。</small></span><em>{activeOpinion?`已联动观点：${activeOpinion}`:'当前展示全事件视频关系'}</em></div>
+ </div>
 }
 
 function RelationDecisionExplorer({select,timeContext,activeOpinion,onTimeChange}:{select:(type:string,item:any)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onTimeChange:(value:number)=>void}){
