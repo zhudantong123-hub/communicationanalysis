@@ -478,42 +478,39 @@ function OpinionDistribution({activeOpinion,onSelect}:{activeOpinion:string|null
  return <section className="opinionDistribution coreOpinions"><div className="opinionHead"><div><h2>核心观点 <SourceBadge type="ai"/></h2><p>观点色彩：负向 / 正向 / 中立；点击后渠道默认回到 Feed，并筛选下方代表视频</p></div><div className="opinionScope">{(['视频','评论'] as const).map(item=><button key={item} className={scope===item?'selected':''} onClick={()=>setScope(item)}>{item}观点</button>)}</div></div><div className="opinionLegend"><span className="negative">负向</span><span className="positive">正向</span><span className="neutral">中立</span></div><div className="coreOpinionGrid">{opinions.map(item=><button key={item[0]} className={`${item[4]} ${activeOpinion===item[0]?'selected':''}`} onClick={()=>onSelect(item[0])}><span>{item[0]}</span><b>{item[1]}</b><small>{item[2]} 条{scope==='视频'?'视频':'评论'}</small><p>{item[3]}</p><em>筛选代表视频 <ChevronRight size={12}/></em></button>)}</div></section>
 }
 const opinionRelationProfiles:any={
- '正向视频|正向支持':{label:'正向共鸣',share:'31%',growth:'+8%',tone:'good',source:'feed',ids:['v2','v11','v12'],summary:'正向内容获得评论区认可，主要通过 Feed 持续触达。'},
- '正向视频|中立/求证':{label:'事实求证',share:'12%',growth:'+5%',tone:'neutral',source:'search',ids:['v2','v11'],summary:'用户围绕事实、来源和处理进展主动求证。'},
- '正向视频|显性负向':{label:'评论区反转',share:'39%',growth:'+42%',tone:'risk',source:'search',ids:['v2','v3','v11','v12'],summary:'正向或权威内容未被完全接受，显性质疑主要由搜索流量带入。'},
- '正向视频|阴阳负向':{label:'隐性反转',share:'18%',growth:'+50%',tone:'risk',source:'search',ids:['v2','v3','v4','v11'],summary:'评论字面偏正向，结合语境实际表达质疑；搜索贡献该组合评论量的 43%。'},
- '中立视频|正向支持':{label:'正向反馈',share:'8%',growth:'+9%',tone:'good',source:'feed',ids:['v0','v11'],summary:'事实类内容获得认可与理性补充。'},
- '中立视频|中立/求证':{label:'事实讨论',share:'57%',growth:'-4%',tone:'neutral',source:'search',ids:['v0','v3','v11'],summary:'评论主要围绕事件经过、材料来源和事实边界展开。'},
- '中立视频|显性负向':{label:'负向聚集',share:'22%',growth:'+31%',tone:'warning',source:'search',ids:['v0','v3','v4'],summary:'中立内容成为显性质疑和负向情绪的聚集入口。'},
- '中立视频|阴阳负向':{label:'隐性负向聚集',share:'13%',growth:'+38%',tone:'warning',source:'share',ids:['v0','v3','v4','v12'],summary:'反讽话术在事实类视频下聚集，并通过分享回流扩散。'},
- '负向视频|正向支持':{label:'真实正向纠偏',share:'17%',growth:'+29%',tone:'good',source:'feed',ids:['v1','v10','v11'],summary:'评论通过补充事实、引用权威内容或反驳视频观点形成纠偏。'},
- '负向视频|中立/求证':{label:'观望讨论',share:'10%',growth:'-3%',tone:'neutral',source:'search',ids:['v1','v10'],summary:'用户尚未明确站队，主要请求证据和完整信息。'},
- '负向视频|显性负向':{label:'负向共振',share:'46%',growth:'+44%',tone:'risk',source:'feed',ids:['v0','v1','v3','v10'],summary:'视频负向观点与直接批评评论形成同向放大，Feed 是主要入口。'},
- '负向视频|阴阳负向':{label:'隐性负向共振',share:'27%',growth:'+61%',tone:'risk',source:'share',ids:['v1','v3','v4','v10'],summary:'反讽评论继续强化负向视频叙事，并出现跨评论区话术复用。'}
+ '正向视频|正向评论':{label:'正向共鸣',tone:'good',source:'feed',ids:['v2','v11','v12'],expression:'直接 82% · 反讽 6%',summary:'正向内容获得评论区认可，主要通过 Feed 持续触达。'},
+ '正向视频|中立/求证评论':{label:'事实求证',tone:'neutral',source:'search',ids:['v2','v11'],expression:'求证 71% · 补充 19%',summary:'用户围绕事实、来源和处理进展主动求证。'},
+ '正向视频|负向评论':{label:'评论区反转',tone:'risk',source:'search',ids:['v2','v3','v4','v11','v12'],expression:'直接 66% · 反讽 34%',summary:'正向或权威内容发布后，负向质疑仍持续增长，正向干预尚未有效缓解争议。'},
+ '中立视频|正向评论':{label:'正向反馈',tone:'good',source:'feed',ids:['v0','v11'],expression:'直接 76% · 补充 18%',summary:'事实类内容获得认可与理性补充。'},
+ '中立视频|中立/求证评论':{label:'事实讨论',tone:'neutral',source:'search',ids:['v0','v3','v11'],expression:'求证 64% · 补充 27%',summary:'评论主要围绕事件经过、材料来源和事实边界展开。'},
+ '中立视频|负向评论':{label:'负向聚集',tone:'warning',source:'search',ids:['v0','v3','v4','v12'],expression:'直接 63% · 反讽 29%',summary:'中立内容成为负向观点的聚集入口，反讽表达通过分享回流扩散。'},
+ '负向视频|正向评论':{label:'正向纠偏',tone:'good',source:'feed',ids:['v1','v10','v11'],expression:'直接 74% · 引证 21%',summary:'评论通过补充事实、引用权威内容或反驳视频观点形成纠偏。'},
+ '负向视频|中立/求证评论':{label:'观望求证',tone:'neutral',source:'search',ids:['v1','v10'],expression:'求证 69% · 补充 23%',summary:'用户尚未明确站队，主要请求证据和完整信息。'},
+ '负向视频|负向评论':{label:'负向共振',tone:'risk',source:'feed',ids:['v0','v1','v3','v4','v10'],expression:'直接 68% · 反讽 24%',summary:'视频负向观点与负向评论形成同向放大，并出现跨评论区话术复用。'}
 }
 const opinionRelationKeys=[
- '正向视频|正向支持','正向视频|中立/求证','正向视频|显性负向','正向视频|阴阳负向',
- '中立视频|正向支持','中立视频|中立/求证','中立视频|显性负向','中立视频|阴阳负向',
- '负向视频|正向支持','负向视频|中立/求证','负向视频|显性负向','负向视频|阴阳负向'
+ '正向视频|正向评论','正向视频|中立/求证评论','正向视频|负向评论',
+ '中立视频|正向评论','中立视频|中立/求证评论','中立视频|负向评论',
+ '负向视频|正向评论','负向视频|中立/求证评论','负向视频|负向评论'
 ]
 const opinionRelationSnapshots:any={
- full:{shares:[31,12,39,18,8,57,22,13,17,10,46,27],growth:[8,5,42,50,9,-4,31,38,29,-3,44,61],rowTotals:[42.8,31.6,53.9],label:'全周期累计'},
- start:{shares:[38,31,22,9,12,61,20,7,21,18,48,13],growth:[16,9,12,8,11,7,18,10,14,8,26,15],rowTotals:[2.6,4.1,3.3],label:'首发起量阶段'},
- amplify:{shares:[29,18,37,16,9,48,28,15,15,12,50,23],growth:[28,17,64,71,19,26,58,76,31,22,83,91],rowTotals:[12.4,10.8,18.6],label:'权威介入与观点放大阶段'},
- peak:{shares:[22,12,46,20,8,35,39,18,12,8,51,29],growth:[12,21,86,104,16,18,79,96,25,13,92,118],rowTotals:[18.7,14.5,26.2],label:'热榜搜索回流阶段'},
- response:{shares:[31,12,39,18,15,47,25,13,24,14,39,23],growth:[43,16,38,49,51,12,24,31,68,37,22,35],rowTotals:[15.9,12.7,19.8],label:'官方回应与二次发酵阶段'}
+ full:{shares:[31,12,57,8,57,35,17,10,73],growth:[8,5,46,9,-4,34,29,-3,50],rowTotals:[42.8,31.6,53.9],label:'全周期累计'},
+ start:{shares:[38,31,31,12,61,27,21,18,61],growth:[16,9,10,11,7,15,14,8,22],rowTotals:[2.6,4.1,3.3],label:'首发起量阶段'},
+ amplify:{shares:[29,18,53,9,48,43,15,12,73],growth:[28,17,67,19,26,64,31,22,87],rowTotals:[12.4,10.8,18.6],label:'权威介入与观点放大阶段'},
+ peak:{shares:[22,12,66,8,35,57,12,8,80],growth:[12,21,92,16,18,85,25,13,101],rowTotals:[18.7,14.5,26.2],label:'热榜搜索回流阶段'},
+ response:{shares:[31,12,57,15,47,38,24,14,62],growth:[43,16,42,51,12,27,68,37,28],rowTotals:[15.9,12.7,19.8],label:'官方回应与二次发酵阶段'}
 }
 function getOpinionRelationSnapshot(timeContext:AnalysisWindow){
  const snapshot=timeContext.index===null?opinionRelationSnapshots.full:timeContext.index<=3?opinionRelationSnapshots.start:timeContext.index<=7?opinionRelationSnapshots.amplify:timeContext.index<=11?opinionRelationSnapshots.peak:opinionRelationSnapshots.response
  const metrics:any={}
- opinionRelationKeys.forEach((key,index)=>{const rowIndex=Math.floor(index/4),share=snapshot.shares[index],volume=snapshot.rowTotals[rowIndex]*share/100;metrics[key]={share:`${share}%`,growth:`${snapshot.growth[index]>=0?'+':''}${snapshot.growth[index]}%`,volume:`${volume.toFixed(1)}万`}})
+ opinionRelationKeys.forEach((key,index)=>{const rowIndex=Math.floor(index/3),share=snapshot.shares[index],volume=snapshot.rowTotals[rowIndex]*share/100;metrics[key]={share:`${share}%`,growth:`${snapshot.growth[index]>=0?'+':''}${snapshot.growth[index]}%`,volume:`${volume.toFixed(1)}万`}})
  return {...snapshot,metrics}
 }
 const riskDiagnosisOptions=[
- {key:'正向视频|显性负向',name:'评论区反转',question:'视频转正，评论为什么仍在转负？',actual:39,expected:22,volume:'18.6万条',time:'07-07 15:10',description:'正向或权威视频发布后，显性负向评论仍持续增长。'},
- {key:'负向视频|显性负向',name:'负向超预期',question:'负向视频是否形成同向共振？',actual:46,expected:28,volume:'24.8万条',time:'07-06 20:40',description:'负向视频与直接批评评论形成同向放大，风险高于同类内容。'},
- {key:'正向视频|阴阳负向',name:'阴阳超预期',question:'隐性反讽是否超过正常表达水平？',actual:18,expected:8,volume:'7.7万条',time:'07-07 16:20',description:'反讽评论达到预期的 2.3 倍，主要集中于搜索进入用户。'},
- {key:'负向视频|正向支持',name:'正向纠偏增强',question:'评论区是否已出现有效纠偏？',actual:17,expected:10,volume:'6.4万条',time:'07-08 09:30',description:'事实补充、权威引用与反驳视频观点的评论明显增加。'}
+ {key:'正向视频|负向评论',name:'评论区反转',question:'视频转正，评论为什么仍在转负？',actual:57,expected:22,volume:'24.4万条',time:'07-07 15:10',description:'正向或权威视频发布后，负向评论仍持续增长，其中反讽表达占 34%。'},
+ {key:'负向视频|负向评论',name:'负向共振',question:'负向视频是否形成同向共振？',actual:73,expected:28,volume:'39.3万条',time:'07-06 20:40',description:'负向视频与负向评论形成同向放大，风险显著高于同类内容。'},
+ {key:'中立视频|负向评论',name:'负向聚集',question:'事实类内容是否成为负向聚集入口？',actual:35,expected:18,volume:'11.1万条',time:'07-07 16:20',description:'中立视频下负向评论超过预期，反讽表达主要由搜索和分享用户带入。'},
+ {key:'负向视频|正向评论',name:'正向纠偏增强',question:'评论区是否已出现有效纠偏？',actual:17,expected:10,volume:'9.2万条',time:'07-08 09:30',description:'事实补充、权威引用与反驳视频观点的评论明显增加。'}
 ]
 function RiskDiagnosisPanel({value,onChange}:{value:string,onChange:(value:string)=>void}){
  const selected=riskDiagnosisOptions.find(item=>item.key===value)||riskDiagnosisOptions[0]
@@ -526,32 +523,34 @@ function RiskDiagnosisPanel({value,onChange}:{value:string,onChange:(value:strin
  </section>
 }
 function OpinionRelationMatrix({value,onChange,timeContext,activeOpinion,onOpinionSelect}:{value:string|null,onChange:(value:string)=>void,timeContext:AnalysisWindow,activeOpinion:string|null,onOpinionSelect:(value:string)=>void}){
- const rows=['正向视频','中立视频','负向视频'],columns=['正向支持','中立/求证','显性负向','阴阳负向']
+ const rows=['正向视频','中立视频','负向视频'],columns=['正向评论','中立/求证评论','负向评论']
  const snapshot=getOpinionRelationSnapshot(timeContext)
  return <section className="opinionRelationMatrix">
-  <header><div><h2>视频—评论观点关系矩阵 <SourceBadge type="ai"/></h2><p>继承上方趋势的时间窗口；百分比为该类视频下各类评论量占比，每行合计 100%</p></div><div className="matrixMetric"><small>{timeContext.index===null?'当前范围':`${timeContext.date} 当日窗口`}</small><b>{snapshot.label}</b><em>随趋势选点更新</em></div></header>
-  <div className="opinionMatrixBody"><div className="opinionMatrixGrid"><span className="matrixCorner">视频观点 ↓<br/>评论反馈 →</span>{columns.map(column=><span className="matrixAxis top" key={column}>{column}</span>)}{rows.map(row=><div className="matrixRow" key={row}><span className="matrixAxis side">{row}</span>{columns.map(column=>{const key=`${row}|${column}`,item=opinionRelationProfiles[key],metrics=snapshot.metrics[key];return <button key={key} aria-pressed={value===key} className={`${item.tone} ${value===key?'selected':''}`} onClick={()=>onChange(key)}><span>{item.label}</span><b>{metrics.share}</b><small>{metrics.volume} 条评论</small><em>评论量环比 {metrics.growth}</em></button>})}</div>)}</div>
+  <header><div><h2>视频观点倾向—评论观点倾向矩阵 <SourceBadge type="ai"/></h2><p>矩阵位置表示实际观点倾向；颜色深浅表示评论占比，反讽等表达方式在格内与下钻结果中展示</p></div><div className="matrixMetric"><small>{timeContext.index===null?'当前范围':`${timeContext.date} 当日窗口`}</small><b>{snapshot.label}</b><em>每行合计 100%</em></div></header>
+  <div className="matrixDecision"><span><small>当前业务判断</small><b>评论区反转仍在扩大</b></span><p>正向视频下 57% 的评论仍为负向，较同类事件预期高 35 个百分点；建议继续定位承载视频与异常传播渠道。</p></div>
+  <div className="opinionMatrixBody"><div className="opinionMatrixGrid"><span className="matrixCorner">视频实际倾向 ↓<br/>评论实际倾向 →</span>{columns.map(column=><span className="matrixAxis top" key={column}>{column}</span>)}{rows.map(row=><div className="matrixRow" key={row}><span className="matrixAxis side">{row}</span>{columns.map(column=>{const key=`${row}|${column}`,item=opinionRelationProfiles[key],metrics=snapshot.metrics[key];return <button key={key} aria-pressed={value===key} className={`${item.tone} ${value===key?'selected':''}`} onClick={()=>onChange(key)}><span>{item.label}</span><b>{metrics.share}</b><small>{metrics.volume} 条评论</small><small className="expressionMix">表达：{item.expression}</small><em>评论量环比 {metrics.growth}</em></button>})}</div>)}</div>
    {value?<RelationOpinionTop5 relation={value} timeContext={timeContext} activeOpinion={activeOpinion} onSelect={onOpinionSelect} embedded/>:<aside className="matrixSelection matrixEmpty"><ScanLine size={20}/><small>具体观点 Top 5</small><h3>请选择一个矩阵格子</h3><p>这里将展示该“视频观点 × 评论反馈”组合下评论量最高的五个具体观点。</p><span>选中后继续定位渠道与代表视频</span></aside>}
   </div>
  </section>
 }
 const relationTopOpinions:any={
- '正向支持':[['官方回应说明处置正在推进','21.4%','8.9万'],['理性讨论有助于推动制度完善','18.7%','7.8万'],['应避免曝光未成年人个人信息','16.2%','6.7万'],['动物救助比围攻个人更重要','13.8%','5.7万'],['权威信息应优先于网传片段','10.6%','4.4万']],
- '中立/求证':[['原视频是否经过剪辑仍待核验','24.8%','6.2万'],['涉事人员身份是否得到确认','19.6%','4.9万'],['官方通报依据和时间线是什么','17.3%','4.3万'],['现有法律如何认定相关行为','14.1%','3.5万'],['网传处置结果来源是否可靠','11.7%','2.9万']],
- '显性负向':[['现有处置力度低于公众预期','27.6%','12.4万'],['未成年人身份不应成为免责盾牌','22.1%','9.9万'],['家长和学校应承担监护责任','18.4%','8.3万'],['虐待动物存在法律规制空白','15.9%','7.1万'],['正向通报没有回应核心质疑','9.8%','4.4万']],
- '阴阳负向':[['“处理得真及时”，早干什么去了','25.3%','7.6万'],['“保护得真好”，所以没人负责','21.8%','6.5万'],['“大家要理性”，等于不要追责','18.6%','5.6万'],['“已经很重视了”，然后呢','14.7%','4.4万'],['“相信通报”，但关键细节没说','11.2%','3.4万']]
+ '正向评论':[['官方回应说明处置正在推进','21.4%','8.9万','直接表达'],['理性讨论有助于推动制度完善','18.7%','7.8万','直接表达'],['应避免曝光未成年人个人信息','16.2%','6.7万','直接表达'],['动物救助比围攻个人更重要','13.8%','5.7万','补充表达'],['权威信息应优先于网传片段','10.6%','4.4万','引证表达']],
+ '中立/求证评论':[['原视频是否经过剪辑仍待核验','24.8%','6.2万','求证表达'],['涉事人员身份是否得到确认','19.6%','4.9万','求证表达'],['官方通报依据和时间线是什么','17.3%','4.3万','求证表达'],['现有法律如何认定相关行为','14.1%','3.5万','补充表达'],['网传处置结果来源是否可靠','11.7%','2.9万','求证表达']],
+ '负向评论':[['现有处置力度低于公众预期','27.6%','12.4万','直接表达'],['未成年人身份不应成为免责盾牌','22.1%','9.9万','直接表达'],['“处理得真及时”，早干什么去了','18.4%','8.3万','反讽表达'],['家长和学校应承担监护责任','15.9%','7.1万','直接表达'],['“大家要理性”，等于不要追责','9.8%','4.4万','反讽表达']]
 }
 function RelationOpinionTop5({relation,timeContext,activeOpinion,onSelect,embedded=false}:{relation:string,timeContext:AnalysisWindow,activeOpinion:string|null,onSelect:(value:string)=>void,embedded?:boolean}){
  const [videoTone,commentTone]=relation.split('|'),profile=opinionRelationProfiles[relation],items=relationTopOpinions[commentTone]
- return <section className={'relationOpinionTop5'+(embedded?' embedded':'')}><header><div><h2>具体观点 Top 5 <SourceBadge type="ai"/></h2><p>{videoTone} × {commentTone} · {timeContext.index===null?'全周期':`${timeContext.date} 当日窗口`} · 按评论量排序</p></div><span><small>当前关系</small><b>{profile.label}</b></span></header><div>{items.map((item:any,index:number)=><button key={item[0]} className={activeOpinion===item[0]?'selected':''} onClick={()=>onSelect(item[0])}><i>{index+1}</i><span><b>{item[0]}</b><small>{commentTone==='阴阳负向'?'结合上下文识别为反讽表达':`${commentTone}评论中的高频语义簇`}</small></span><strong>{item[1]}<small>{item[2]} 条评论</small></strong><ChevronRight size={14}/></button>)}</div><footer>点击观点，继续收窄渠道与代表视频</footer></section>
+ const [expression,setExpression]=useState('全部表达')
+ const visibleItems=expression==='全部表达'?items:items.filter((item:any)=>item[3]===expression)
+ return <section className={'relationOpinionTop5'+(embedded?' embedded':'')}><header><div><h2>该关系下的具体观点 Top 5 <SourceBadge type="ai"/></h2><p>{videoTone} × {commentTone} · {timeContext.index===null?'全周期':`${timeContext.date} 当日窗口`} · 按评论量排序</p></div><span><small>当前关系</small><b>{profile.label}</b></span></header><div className="expressionFilters">{['全部表达','直接表达','反讽表达'].map(item=><button key={item} className={expression===item?'selected':''} onClick={()=>setExpression(item)}>{item}</button>)}</div><div>{visibleItems.map((item:any,index:number)=><button key={item[0]} className={activeOpinion===item[0]?'selected':''} onClick={()=>onSelect(item[0])}><i>{index+1}</i><span><b>{item[0]}</b><small>实际倾向：{commentTone.replace('评论','')} · {item[3]}</small></span><strong>{item[1]}<small>{item[2]} 条评论</small></strong><ChevronRight size={14}/></button>)}</div><footer>{visibleItems.length?'点击观点，继续收窄渠道与代表视频':'当前关系下暂无该表达方式的高频观点'}</footer></section>
 }
 function Stats({open,setOpen,select,addToChat,activeOpinion,onOpinionChange,timeContext}){
  const [activeKeyword,setActiveKeyword]=useState('揭阳虐狗事件')
  const [period,setPeriod]=useState('近 7 天')
  const [videoFilter,setVideoFilter]=useState<string|null>(null)
  const [accountType,setAccountType]=useState('全部')
- const [opinionRelation,setOpinionRelation]=useState<string|null>('正向视频|正向支持')
- const relationProfile=opinionRelation?opinionRelationProfiles[opinionRelation]:opinionRelationProfiles['正向视频|阴阳负向']
+ const [opinionRelation,setOpinionRelation]=useState<string|null>('正向视频|负向评论')
+ const relationProfile=opinionRelation?opinionRelationProfiles[opinionRelation]:opinionRelationProfiles['正向视频|负向评论']
  const relationMetrics=opinionRelation?getOpinionRelationSnapshot(timeContext).metrics[opinionRelation]:null
  const paths=[
   {id:'feed',name:'Feed 推荐',plays:'3,814.2万',ratio:'60.3%',scenes:'推荐页 · 同城页 · 关注页',insight:'首发视频发布后 3 小时达到峰值，推荐页贡献了该路径 69.2% 的有效播放。',breakdown:[['推荐页','2,638.7万','69.2%'],['同城页','710.5万','18.6%'],['关注页','465.0万','12.2%']],contents:['揭阳疑似虐狗视频的完整经过','涉事者行为是否构成违法'],views:'虐待认定 38% · 责任追问 27% · 立法争议 21%'},
@@ -812,7 +811,7 @@ function SemanticVideoPropagationGraph({select,timeContext,activeOpinion,onTimeC
   })
   if(level>1)chart.setOption({series:[{edgeLabel:{show:false},lineStyle:{opacity:.7}}]})
   if(locatedId){const locatedIndex=visibleNodes.findIndex(node=>node.id===locatedId);if(locatedIndex>=0){chart.dispatchAction({type:'highlight',seriesIndex:0,dataIndex:locatedIndex});chart.dispatchAction({type:'showTip',seriesIndex:0,dataIndex:locatedIndex})}}
-  chart.on('click',(params:any)=>{if(params.dataType==='node'){setSelectedNode(params.data);setSelectedEdge(null);if(level===1&&params.data.expandable){const network=allPropagationNetworks.find(item=>item.id===params.data.id)||propagationNetworks[0];setActiveNetwork(network);setLevel(2);setSelectedNode(null);setActionFilter('全部')}}else if(params.dataType==='edge'){setSelectedEdge(params.data);setSelectedNode(null)}})
+  chart.on('click',(params:any)=>{if(params.dataType==='node'){setSelectedNode(params.data);setSelectedEdge(null);if(level===1&&params.data.expandable){const network=allPropagationNetworks.find(item=>item.id===params.data.id)||propagationNetworks[0];setActiveNetwork(network);setLevel(2);setSelectedNode(null);setSelectedEdge(propagationEdges.find(edge=>edge.anomaly));setActionFilter('全部')}}else if(params.dataType==='edge'){setSelectedEdge(params.data);setSelectedNode(null)}})
   const resize=()=>chart.resize()
   window.addEventListener('resize',resize)
   return()=>{window.removeEventListener('resize',resize);chart.dispose()}
@@ -820,7 +819,7 @@ function SemanticVideoPropagationGraph({select,timeContext,activeOpinion,onTimeC
  const actionLegend:[PropagationAction,string][]=[['发布','#8b97aa'],['分享到群','#ef6a61'],['点对点分享','#d58b45'],['点击观看','#50a9d6'],['推荐曝光','#7964d7'],['搜索点击','#3fa18e'],['评论导流','#ca6f9c'],['引用投稿','#e09b4f']]
  return <div className="semanticPropagation">
   <div className="relationDecisionHead"><div><b>传播网络地图 <SourceBadge type="ai"/></b><span>{level===1?'一个聚合点代表一组由真实传播动作连接的节点；点击后在当前位置展开。':level===2?`“${activeNetwork.name}”已在地图原位置展开，父级聚合点不再作为节点显示。`:'当前网络已继续展开至具体动作证据，其他传播网络仍保留在地图中。'}</span></div><div className="relationDecisionSummary"><Sparkles size={14}/><span><small>当前最高异常</small><b>群聊分享传播网络 · 分享→点击转化异常 +214%</b></span></div></div>
-  <div className="propagationUnifiedBar"><span className="levelState">{level===1?'传播网络概览':level===2?activeNetwork.name:'具体证据链'}</span>{level>1&&<button className="back" onClick={()=>{if(level===3){setLevel(2);setSelectedNode(null);setSelectedEdge(null)}else{setLevel(1);setSelectedNode(propagationNetworks[0]);setSelectedEdge(null);setActionFilter('全部')}}}>← 收起</button>}<span className="dataSummary">10.4 万条视频 · {visibleNodes.length} 个可见节点</span>{level===1&&<button className={'noiseToggle '+(showLowNoise?'selected':'')} onClick={()=>setShowLowNoise(value=>!value)} title="无分享、无有效点击、无下游承接"><ScanLine size={13}/>{showLowNoise?'隐藏低传播抽样':'低传播点 82,416 已降噪'}</button>}<label>动作 <select value={actionFilter} onChange={event=>setActionFilter(event.target.value as PropagationAction|'全部')}><option value="全部">全部</option>{actionLegend.map(([name])=><option key={name}>{name}</option>)}</select></label><button className={'entitySearchIcon '+(locatedId?'located':'')} onClick={()=>setSearchOpen(value=>!value)} aria-label="搜索视频、账号或群聊 ID" title="搜索实体 ID"><Search size={14}/></button>{searchOpen&&<form className="propagationEntitySearch compact" onSubmit={event=>{event.preventDefault();locateEntity()}}><input autoFocus value={searchInput} onChange={event=>setSearchInput(event.target.value)} placeholder="VID / UID / 群聊 ID"/><button type="submit">定位</button><button type="button" className="clear" onClick={()=>setSearchOpen(false)}><X size={12}/></button>{searchMessage&&<small className={searchMessage.startsWith('未')?'error':''}>{searchMessage}</small>}</form>}</div>
+  <div className="propagationUnifiedBar"><span className="levelState">{level===1?'传播网络概览':level===2?activeNetwork.name:'具体证据链'}</span>{level>1&&<button className="back" onClick={()=>{if(level===3){setLevel(2);setSelectedNode(null);setSelectedEdge(propagationEdges.find(edge=>edge.anomaly))}else{setLevel(1);setSelectedNode(propagationNetworks[0]);setSelectedEdge(null);setActionFilter('全部')}}}>← 收起</button>}<span className="dataSummary">10.4 万条视频 · {visibleNodes.length} 个可见节点</span>{level===1&&<button className={'noiseToggle '+(showLowNoise?'selected':'')} onClick={()=>setShowLowNoise(value=>!value)} title="无分享、无有效点击、无下游承接"><ScanLine size={13}/>{showLowNoise?'隐藏低传播抽样':'低传播点 82,416 已降噪'}</button>}{level===2&&<button className="evidenceEntry" onClick={()=>{setLevel(3);setSelectedNode(null);setSelectedEdge(evidenceEdges.find(edge=>edge.anomaly));setActionFilter('全部')}}><GitBranch size={13}/>查看证据链</button>}<label>动作 <select value={actionFilter} onChange={event=>setActionFilter(event.target.value as PropagationAction|'全部')}><option value="全部">全部</option>{actionLegend.map(([name])=><option key={name}>{name}</option>)}</select></label><button className={'entitySearchIcon '+(locatedId?'located':'')} onClick={()=>setSearchOpen(value=>!value)} aria-label="搜索视频、账号或群聊 ID" title="搜索实体 ID"><Search size={14}/></button>{searchOpen&&<form className="propagationEntitySearch compact" onSubmit={event=>{event.preventDefault();locateEntity()}}><input autoFocus value={searchInput} onChange={event=>setSearchInput(event.target.value)} placeholder="VID / UID / 群聊 ID"/><button type="submit">定位</button><button type="button" className="clear" onClick={()=>setSearchOpen(false)}><X size={12}/></button>{searchMessage&&<small className={searchMessage.startsWith('未')?'error':''}>{searchMessage}</small>}</form>}</div>
   <div className="semanticGraphWorkspace"><div ref={chartRef} className="semanticGraphChart"/><aside className="semanticGraphInspector">{selectedEdge?<><small>{level===3?'单条动作证据':'聚合传播动作'}</small><h3>{selectedEdge.relation}</h3><strong>{selectedEdge.count}</strong><dl><div><dt>发生时间</dt><dd>{selectedEdge.time}</dd></div><div><dt>可核验证据</dt><dd>{selectedEdge.evidence}</dd></div><div><dt>口径说明</dt><dd>该边来自行为日志归因；内容相似、观点一致或共同设备均不会单独生成传播边。</dd></div></dl>{level===2&&<button onClick={()=>{setLevel(3);setSelectedNode(null);setSelectedEdge(evidenceEdges.find(edge=>edge.anomaly));setActionFilter('全部')}}>查看具体证据链</button>}</>:selectedNode?<><small>{selectedNode.role}</small><h3>{selectedNode.name}</h3><strong>{selectedNode.amount}</strong>{selectedNode.lowNoise?<dl><div><dt>降噪原因</dt><dd>无分享、无有效点击、无下游承接，不参与传播网络聚合。</dd></div><div><dt>产品处理</dt><dd>默认不加载；仅在抽样模式中以微弱灰点展示。</dd></div></dl>:selectedNode.noiseException?<dl><div><dt>为什么没有被隐藏</dt><dd>虽然传播量低，但同设备控制 50 个账号集中投稿，命中操纵风险规则。</dd></div><div><dt>产品处理</dt><dd>不进入传播主网络，但作为橙色风险例外保留，可进入回查处置。</dd></div></dl>:level===1&&selectedNode.stats?<dl className="networkStats"><div><dt>关联视频数</dt><dd>{selectedNode.stats.videos}</dd></div><div><dt>参与账号数</dt><dd>{selectedNode.stats.accounts}</dd></div><div><dt>分享/点击次数</dt><dd>{selectedNode.stats.actions}</dd></div><div><dt>有效传播人数</dt><dd>{selectedNode.stats.people}</dd></div><div><dt>传播层数</dt><dd>{selectedNode.stats.depth}</dd></div><div><dt>VV贡献</dt><dd>{selectedNode.stats.vv}</dd></div><div><dt>主要传播动作</dt><dd>{selectedNode.stats.main}</dd></div></dl>:<dl><div><dt>节点范围</dt><dd>{selectedNode.meta}</dd></div><div><dt>传播动作</dt><dd>{graphEdges.filter(edge=>edge.source===selectedNode.id||edge.target===selectedNode.id).length} 条动作关系</dd></div><div><dt>异常状态</dt><dd>{selectedNode.anomaly?'分享量与有效点击转化显著高于基线':'当前未发现显著异常'}</dd></div></dl>}{level===1&&selectedNode.stats&&<button onClick={()=>{setActiveNetwork(selectedNode);setLevel(2);setSelectedNode(propagationNodes.find(node=>node.anomaly));setSelectedEdge(null)}}>进入局部传播结构</button>}{level>1&&selectedNode.item&&<button onClick={()=>select(selectedNode.category===0?'account':'video',selectedNode.item)}>查看对象详情</button>}</>:null}</aside></div>
   <div className="semanticGraphFoot"><Sparkles size={14}/><span><b>{level===1?'阅读方式':'交互方式'}</b><small>{level===1?'第一层不画网络间传播边：有真实动作相连就应合并为同一聚合点。点击岛屿进入内部结构；8.24 万条孤立投稿默认降噪。':level===2?'点击动作边查看聚合证据，并进入第三层核验具体用户—视频—群聊链路。':'点击每条边查看 share_id、message_id、click_id 与播放 request_id 等归因证据。'}</small></span><em>{activeOpinion?`已联动观点：${activeOpinion}`:'亮点表示当前最高异常传播网络'}</em></div>
  </div>
