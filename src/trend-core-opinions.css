@@ -1,6 +1,143 @@
 .commandCenter .trendGrid.trendOnly {
   grid-template-columns: minmax(0, 1.72fr) minmax(250px, .68fr) !important;
   align-items: stretch;
+  order: 2;
+}
+
+.commandCenter .trendMetricCards {
+  order: 0;
+}
+
+.actorSummaryStrip {
+  order: 1;
+  padding: 10px 12px 11px;
+  border-bottom: 1px solid #e8e5ef;
+  background: #fbfafd;
+}
+
+.actorSummaryStrip > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.actorSummaryStrip > header > div {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.actorSummaryStrip > header b {
+  color: #343a47;
+  font-size: 10px;
+}
+
+.actorSummaryStrip > header small,
+.actorSummaryStrip > header em,
+.actorSummaryStrip > footer {
+  color: #9299a5;
+  font-size: 7px;
+}
+
+.actorSummaryStrip > header em {
+  padding: 3px 6px;
+  border-radius: 8px;
+  background: #eeeaff;
+  color: #6b53bf;
+  font-style: normal;
+}
+
+.actorSummaryCards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.actorSummaryCards article {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0 8px;
+  padding: 9px 10px;
+  border: 1px solid #e5e1ed;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 7px rgba(53, 43, 89, .04);
+}
+
+.actorSummaryCards article > i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  grid-row: 1 / 3;
+  place-items: center;
+  border-radius: 8px;
+  background: #eeeaff;
+  color: #6d55c3;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.actorSummaryCards article:nth-child(2) > i {
+  background: #edf5ff;
+  color: #477eae;
+}
+
+.actorSummaryCards article:nth-child(3) > i {
+  background: #edf9f5;
+  color: #348b72;
+}
+
+.actorSummaryCards article:nth-child(4) > i {
+  background: #fff1f1;
+  color: #c65b63;
+}
+
+.actorSummaryCards article > span {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 6px;
+}
+
+.actorSummaryCards article small {
+  color: #7f8692;
+  font-size: 7px;
+}
+
+.actorSummaryCards article b {
+  color: #303643;
+  font-size: 14px;
+}
+
+.actorSummaryCards article em {
+  grid-column: 1 / -1;
+  min-width: 0;
+  overflow: hidden;
+  color: #9298a3;
+  font-size: 6px;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actorSummaryCards article strong {
+  grid-column: 2;
+  margin-top: 5px;
+  color: #6a54bd;
+  font-size: 7px;
+  font-weight: 600;
+}
+
+.actorSummaryStrip > footer {
+  margin-top: 7px;
+  text-align: right;
 }
 
 .trendCoreOpinionPanel {
@@ -127,6 +264,55 @@
   color: #6e58c2;
 }
 
+.coreNodePanel .trendCoreOpinionList > button > span > em.nodeType {
+  min-width: 30px;
+  box-sizing: border-box;
+  background: #eeeaff;
+  color: #6d55c3;
+  text-align: center;
+}
+
+.coreNodePanel .trendCoreOpinionList > button > span > em.nodeType.账号 {
+  background: #edf5ff;
+  color: #477eae;
+}
+
+.coreNodePanel .trendCoreOpinionList > button > span > em.nodeType.群聊 {
+  background: #edf9f5;
+  color: #348b72;
+}
+
+.coreNodePanel .trendCoreOpinionList > button > span > em.nodeType.搜索 {
+  background: #fff3e9;
+  color: #b56f38;
+}
+
+.coreNodeMeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px 8px;
+  padding-left: 24px;
+}
+
+.coreNodeMeta > strong {
+  color: #5b6270;
+  font-size: 7px;
+  font-weight: 600;
+}
+
+.coreNodeMeta > small {
+  color: #8e95a0;
+  font-size: 6px;
+  text-align: right;
+}
+
+.coreNodeMeta > b {
+  grid-column: 1 / -1;
+  color: #7259c8;
+  font-size: 7px;
+}
+
 .opinionCompareBars {
   display: grid;
   gap: 4px;
@@ -205,10 +391,24 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .actorSummaryCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 700px) {
   .trendCoreOpinionList {
     grid-template-columns: 1fr;
+  }
+
+  .actorSummaryCards {
+    grid-template-columns: 1fr;
+  }
+
+  .actorSummaryStrip > header > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
   }
 }

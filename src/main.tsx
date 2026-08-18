@@ -203,6 +203,7 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
  const [commentSentiment,setCommentSentiment]=useState<'negative'|'positive'|'neutral'|null>(null)
  const [linkedOpinionFilter,setLinkedOpinionFilter]=useState<{scope:'视频'|'评论',tone:string}|null>(null)
  const [videoOpinionFocus,setVideoOpinionFocus]=useState<string|null>(null)
+ const [activeCoreNode,setActiveCoreNode]=useState<string|null>(null)
  const [commentOpinionFocus,setCommentOpinionFocus]=useState<string|null>(null)
  const linkedSentiment=activeOpinion==='正向情感'?'positive':activeOpinion==='中立情感'?'neutral':activeOpinion==='负向情感'?'negative':activeSentiment
  const [hoverTimeIndex,setHoverTimeIndex]=useState<number|null>(null)
@@ -367,6 +368,14 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
   {name:'家长和学校应承担教育责任',video:12,comment:18,tone:'neutral',judgement:'评论放大'}
  ]
  const displayedComparisonRows=comparisonRows.map((item,index)=>{const time=guideTimeIndex??16;const video=Math.max(3,Math.round(item.video+(time-16)*([.55,.42,-.35,.28,.18][index])));const comment=Math.max(3,Math.round(item.comment+(time-16)*([.82,.58,-.22,.46,.31][index])));return {...item,video,comment,judgement:comment-video>=6?'评论放大':Math.abs(comment-video)<=2?'观点共振':'评论衍生'}})
+ const corePropagationNodes=[
+  {id:'video-origin',type:'视频',name:'首发视频 VID 825074',role:'首发扩散源',metric:'累计 VV 2,184.6万',contribution:'43.2%',timeIndex:0},
+  {id:'group-bridge',type:'群聊',name:'群聊 G-8F21',role:'跨群分享桥接',metric:'回流 VV 148.7万',contribution:'31.8%',timeIndex:9},
+  {id:'account-repost',type:'账号',name:'@揭阳现场',role:'搬运与二创放大',metric:'关联搬运 386条',contribution:'12.6%',timeIndex:5},
+  {id:'search-entry',type:'搜索',name:'揭阳虐狗事件经过',role:'搜索回流入口',metric:'搜索 486.2万次',contribution:'7.4%',timeIndex:13},
+  {id:'video-reheat',type:'视频',name:'线下声援二创 VID 825311',role:'二次升温节点',metric:'分享 18.6万次',contribution:'5.0%',timeIndex:11}
+ ]
+ const activeCoreNodeItem=corePropagationNodes.find(item=>item.id===activeCoreNode)
  return <section className="commandCenter"><div className="trendGrid trendOnly">
    <div className="trendPanel">
     <div className="panelTitle opinionCompareTitle"><div><b>传播态势与异常定位</b><small>查看真实传播指标的时间趋势，点击异常节点定位关键内容、账号与渠道</small></div><span>全周期 · 日粒度</span></div>
@@ -394,28 +403,34 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
      <div className="trendLabels dailyRange"><span>06-29</span><span>07-03</span><span>07-07</span><span>07-11</span><span>07-15</span></div>
     </div>
    </div>
-   <aside className="trendCoreOpinionPanel" aria-label="核心观点">
+   <aside className="trendCoreOpinionPanel coreNodePanel" aria-label="核心传播节点">
     <header>
-     <div><b>核心观点</b><small>{guideTimeIndex===null?'全周期聚合':`${trendTimes[guideTimeIndex]} 当日表达`}</small></div>
-     <em>{guideTimeIndex===null?'全量':'随时间联动'}</em>
+     <div><b>核心传播节点</b><small>{guideTimeIndex===null?'按真实传播关系识别':`${trendTimes[guideTimeIndex]} 关联节点`}</small></div>
+     <em>{guideTimeIndex===null?'全周期':'随时间联动'}</em>
     </header>
     <div className="trendCoreOpinionList">
-     {displayedComparisonRows.map((item,index)=>{
-      const selected=videoOpinionFocus===item.name
-      const maxValue=Math.max(item.video,item.comment,1)
-      return <button key={item.name} className={(selected?'selected ':'')+item.tone} aria-pressed={selected} onClick={()=>selectScopedOpinion('视频',item.name,item.tone)}>
-       <span><i>{index+1}</i><b>{item.name}</b><em>{item.judgement}</em></span>
-       <div className="opinionCompareBars">
-        <label><small>视频表达</small><i><u style={{width:`${item.video/maxValue*100}%`}}/></i><strong>{item.video}%</strong></label>
-        <label><small>评论反馈</small><i><u style={{width:`${item.comment/maxValue*100}%`}}/></i><strong>{item.comment}%</strong></label>
-       </div>
+     {corePropagationNodes.map((item,index)=>{
+      const selected=activeCoreNode===item.id
+      return <button key={item.id} className={selected?'selected':''} aria-pressed={selected} onClick={()=>{const next=selected?null:item.id;setActiveCoreNode(next);setSelectedTimeIndex(next===null?null:item.timeIndex);setSelectedInsight(null);onTimeWindowChange(next===null?null:item.timeIndex)}}>
+       <span><i>{index+1}</i><b>{item.name}</b><em className={`nodeType ${item.type}`}>{item.type}</em></span>
+       <div className="coreNodeMeta"><strong>{item.role}</strong><small>{item.metric}</small><b>传播贡献 {item.contribution}</b></div>
       </button>
      })}
     </div>
-    <footer><Sparkles size={13}/><span><small>当前判断</small><b>{videoOpinionFocus?`已聚焦“${videoOpinionFocus}”，下方模块已同步筛选`:'评论侧对处罚与责任的讨论强于视频供给侧'}</b></span></footer>
+    <footer><Sparkles size={13}/><span><small>{activeCoreNodeItem?'当前选中':'节点摘要'}</small><b>{activeCoreNodeItem?`${activeCoreNodeItem.name} · ${activeCoreNodeItem.role} · ${activeCoreNodeItem.metric}`:'首发视频负责起量，群聊桥接与搜索回流推动风险跨阶段扩散'}</b></span></footer>
    </aside>
   </div>
   <div className="trendMetricCards">{trendMetrics.map(item=><article key={item[0]}><span>{item[0]}</span><b>{item[1]}</b><em>{item[2]}</em></article>)}</div>
+  <section className="actorSummaryStrip" aria-label="传播主体概览">
+   <header><div><b>传播主体概览</b><small>谁在定调、放大和承接本次事件传播</small></div><em>全周期</em></header>
+   <div className="actorSummaryCards">
+    <article><i>媒</i><span><small>参与媒体</small><b>26家</b><em>央媒 8家 · 发文 132条</em></span><strong>贡献 VV 1,284.6万</strong></article>
+    <article><i>账</i><span><small>关联账号</small><b>1,062个</b><em>核心 38 · 桥接 12</em></span><strong>异常账号 17个</strong></article>
+    <article><i>群</i><span><small>可识别群聊</small><b>186个</b><em>高频 27 · 跨群桥接 8</em></span><strong>回流 VV 243.6万</strong></article>
+    <article><i>异</i><span><small>异常传播视频</small><b>47条</b><em>搬运 386 · 二创 214</em></span><strong>需优先下钻</strong></article>
+   </div>
+   <footer>私聊回流 VV 186.4万，受合规限制仅展示汇总数据，不支持会话下钻</footer>
+  </section>
  </section>
 }
 const trafficTree=[
