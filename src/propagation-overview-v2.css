@@ -1,0 +1,25 @@
+.metricLegend{display:flex;align-items:center;justify-content:center;gap:8px;height:28px;padding:0;background:transparent}
+.metricLegend button{gap:7px;padding:6px 10px;border:0;border-radius:3px;background:transparent;box-shadow:none;color:#555e6c;font-size:10px;opacity:.38}
+.metricLegend button:hover{border:0;background:rgba(240,237,248,.7);color:#4e5663;opacity:.72}
+.metricLegend button.selected{border:0;background:transparent;color:#414957;font-weight:600;opacity:1}
+.metricLegend button i{width:20px;height:2px;border-radius:2px;background:#a8adba}
+.metricLegend button.vv i{background:#8068d9}.metricLegend button.comments i{background:#d26470}.metricLegend button.searches i{background:#3f9ebf}.metricLegend button.shares i{background:#d48b42}.metricLegend button.videos i{background:#4da66a}.propagationLine.vv{stroke:#8068d9}.propagationLine.comments{stroke:#d26470}.propagationLine.searches{stroke:#3f9ebf}.propagationLine.shares{stroke:#d48b42}.propagationLine.videos{stroke:#4da66a}.propagationLine{stroke-opacity:.9}.anomalyPoints button.vv>i{border-color:#8068d9}.anomalyPoints button.comments>i{border-color:#d26470}.anomalyPoints button.searches>i{border-color:#3f9ebf}.anomalyPoints button.shares>i{border-color:#d48b42}.anomalyPoints button.videos>i{border-color:#4da66a}
+.propagationOverview>header{align-items:center}
+.propagationArea{fill-opacity:.09}
+.propagationArea.vv{fill:#8068d9}.propagationArea.comments{fill:#d26470}.propagationArea.searches{fill:#3f9ebf}.propagationArea.shares{fill:#d48b42}
+.propagationOverview{padding-right:5px}
+.commandCenter .trendOnly .trendPanel{padding-right:4px!important}
+.propagationChart,.propagationDates{margin-right:0}
+.propagationOverview{height:300px}
+.commandCenter .trendOnly .trendChart{height:300px!important;min-height:300px!important}
+.commandCenter .trendOnly .trendPanel{min-height:346px!important;grid-template-rows:46px 300px!important}
+.propagationAxis,.propagationAxis.vv,.propagationAxis.comments,.propagationAxis.searches,.propagationAxis.shares{color:#858c98}
+.anomalyPoints button>span{top:17px;bottom:auto}
+.anomalyPoints button.active>span{display:block}
+.anomalyPoints button.active>i{background:#8068d9}
+.anomalyHoverGuide{position:absolute;z-index:2;top:0;bottom:0;border-left:1px dashed rgba(128,104,217,.58);pointer-events:none}
+.commandCenter .trendChart>.dualAiOverlay{display:none!important}
+.propagationDetailCard{position:absolute;z-index:12;width:245px;box-sizing:border-box;padding:10px 11px;border:1px solid #dcd5f1;border-radius:8px;background:#fff;box-shadow:0 12px 28px rgba(66,54,109,.17)}
+.propagationDetailCard.center{transform:translateX(-50%)}.propagationDetailCard.edgeLeft{transform:translateX(0)}.propagationDetailCard.edgeRight{transform:translateX(-100%)}
+.propagationDetailCard.above{transform:translate(-50%,calc(-100% - 18px))}.propagationDetailCard.edgeLeft.above{transform:translate(0,calc(-100% - 18px))}.propagationDetailCard.edgeRight.above{transform:translate(-100%,calc(-100% - 18px))}
+.propagationDetailCard.below{margin-top:36px}.propagationDetailCard>button{position:absolute;top:5px;right:6px;width:20px;height:20px;color:#8d849f;font-size:15px}.propagationDetailCard>span{display:block;padding-right:18px;color:#755cc9;font-size:8px}.propagationDetailCard>b{display:block;margin-top:5px;color:#414754;font-size:11px;line-height:1.4}.propagationDetailCard dl{display:grid;gap:6px;margin:8px 0 0;padding-top:7px;border-top:1px solid #ebe7f3}.propagationDetailCard dl>div{display:grid;grid-template-columns:48px minmax(0,1fr);gap:6px}.propagationDetailCard dt{color:#7f6ac5;font-size:8px}.propagationDetailCard dd{margin:0;color:#666d79;font-size:8px;line-height:1.45}

@@ -1,0 +1,23 @@
+.expressionCompare{padding-left:0}
+.compareTitle{position:static;width:auto;height:18px;display:flex;align-items:center;justify-content:space-between;flex-direction:row}
+.compareTitle span{display:flex;align-items:center;color:#747b87;line-height:1}
+.compareTitle i{display:inline-block;width:15px;height:0;margin-right:4px;border-top:2px solid #7662c7}
+.compareTitle .consumerKey{margin-left:10px;border-top-style:dashed;border-color:#c65f69}
+.sentimentComparisons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sentimentCompare{height:66px;box-sizing:border-box;padding:4px 7px 3px;border:1px solid rgba(222,217,235,.7);border-radius:6px;background:rgba(255,255,255,.48)}
+.sentimentCompare header{height:14px;display:flex;align-items:center;justify-content:space-between}
+.sentimentCompare header b{font-size:8px}
+.sentimentCompare header span{color:#8c929d;font-size:7px}
+.sentimentCompare svg{width:100%;height:43px!important;overflow:visible}
+.sentimentCompare .differenceArea{fill:rgba(128,104,217,.11)}
+.sentimentCompare .creatorLine,.sentimentCompare .consumerLine{fill:none;stroke:#7560c8;stroke-width:1.7;vector-effect:non-scaling-stroke}
+.sentimentCompare .consumerLine{stroke:#c45f69;stroke-dasharray:4 3}
+.sentimentCompare.neutral .creatorLine{stroke:#8e99ad}
+.sentimentCompare.neutral .consumerLine{stroke:#626f84}
+.sentimentCompare.positive .creatorLine{stroke:#55ac69}
+.sentimentCompare.positive .consumerLine{stroke:#2f8e48}
+.expressionCompare .divergenceTag{right:8px;top:-1px;bottom:auto;transform:translateY(-100%)}
+.sharedDates{margin-left:34px}
+.heatAxis{left:-46px}
+.heatChart{margin-left:46px}
+.propagationOverview>header{height:30px;justify-content:flex-end}
