@@ -116,6 +116,7 @@ function AIChatWorkspace({onOpenReport,onGenerate,reportTitle,collapsed,referenc
 }
 function App(){
  const [tab,setTab]=useState('传播数据统计'),[selected,setSelected]=useState({type:'video',item:videos[0]}),[open,setOpen]=useState<string[]>(['feed']),[highlight,setHighlight]=useState(false)
+ const [primaryTab,setPrimaryTab]=useState('站内内容')
  const [detailOpen,setDetailOpen]=useState(false)
  const [reportEvent,setReportEvent]=useState('揭阳虐狗事件')
  const [artifactOpen,setArtifactOpen]=useState(true)
@@ -145,18 +146,33 @@ function App(){
       <span className="operatorAvatar" aria-label="当前账号：运营">运营</span>
     </div>
   </div>
-  <div className="appBody"><div className="sideShell auiSideNav"><div className="sideRail">{sideItems.map(([Icon,label])=><button type="button" key={label} className={label==='应急'?'active':''} aria-current={label==='应急'?'page':undefined}><Icon/><span>{label}</span></button>)}</div></div><AIChatWorkspace reference={chatReference} onClearReference={()=>setChatReference(null)} collapsed={chatCollapsed} reportTitle={reportEvent} onOpenReport={()=>{setArtifactOpen(true);setTab('传播数据统计');setDetailOpen(false)}} onGenerate={event=>{setReportEvent(event);setArtifactOpen(true);setTab('传播数据统计');setDetailOpen(false)}}/>
+  <div className="appBody"><div className="sideShell auiSideNav"><div className="sideRail">{sideItems.map(([Icon,label])=><button type="button" key={label} className={label==='应急'?'active':''} aria-current={label==='应急'?'page':undefined}><Icon/><span>{label}</span></button>)}</div></div><AIChatWorkspace reference={chatReference} onClearReference={()=>setChatReference(null)} collapsed={chatCollapsed} reportTitle={reportEvent} onOpenReport={()=>{setArtifactOpen(true);setPrimaryTab('站内内容');setTab('传播数据统计');setDetailOpen(false)}} onGenerate={event=>{setReportEvent(event);setArtifactOpen(true);setPrimaryTab('站内内容');setTab('传播数据统计');setDetailOpen(false)}}/>
   <div className="layout full"><section className="left">
    <div className="artifactTabs"><button className={'chatPanelToggle '+(chatCollapsed?'collapsed':'')} onClick={()=>setChatCollapsed(value=>!value)} aria-label={chatCollapsed?'展开对话区域':'收起对话区域'}><ChevronRight size={16}/></button><button className={artifactOpen?'active':''} onClick={()=>setArtifactOpen(true)}><FileText size={14}/><span>{reportEvent}</span>{artifactOpen&&<X size={13} onClick={event=>{event.stopPropagation();setArtifactOpen(false)}}/>}</button><button className="newArtifactTab" onClick={()=>setArtifactOpen(true)} aria-label="打开当前事件报告">+</button></div>
-   {artifactOpen?<div className="artifactViewport">
-   <div className="hero"><h1>{reportEvent==='揭阳虐狗事件'?'揭阳虐狗事件':reportEvent}</h1><p>{reportEvent==='揭阳虐狗事件'?'2026 年 6 月 28 日，广东揭阳揭东区新亨镇发生未成年人伤害流浪狗事件；6 月 29 日相关视频在网络传播。6 月 30 日，新亨镇人民政府通报已成立工作组调查处理，4 名涉事人员均未满 14 周岁，均已送专门学校教育，并呼吁不要传播相关信息、拒绝网暴。7 月中下旬，讨论进一步延伸至未成年人教育与监护责任、动物保护立法，以及线下和境外声援。':`AI 已围绕“${reportEvent}”完成内容聚合、传播趋势识别、观点聚类和账号关系分析。当前报告展示模拟的全链路研判结果，可继续通过左侧对话追加分析要求。`}</p></div>
-   <InsightCommandCenter select={select} activeOpinion={activeOpinion} timeFilterIndex={analysisWindow.index} onOpinionSelect={focusOpinion} onTimeWindowChange={index=>setAnalysisWindow(getAnalysisWindow(index))}/>
-   <nav>{([['传播数据统计',Sparkles],['传播关系链',GitBranch],['相关指令',Flag]] as [string, any][]).map(([n,Icon])=><button key={n} className={tab===n?'active':''} onClick={()=>setTab(n)}><Icon size={16}/>{n}</button>)}</nav>
-   <AnalysisFilterBar timeContext={analysisWindow} opinion={activeOpinion} tab={tab} onClearTime={()=>setAnalysisWindow(fullAnalysisWindow)} onClearOpinion={()=>setActiveOpinion(null)} onClearAll={()=>{setAnalysisWindow(fullAnalysisWindow);setActiveOpinion(null)}}/>
-   <div className="content">{tab==='传播数据统计'?<Stats open={open} setOpen={setOpen} select={select} activeOpinion={activeOpinion} onOpinionChange={setActiveOpinion} timeContext={analysisWindow} addToChat={(video:any,index:number)=>{setChatReference({...video,coverIndex:index%4});setChatCollapsed(false)}}/>:tab==='传播关系链'?<LinkedPropagationViews select={select} highlight={highlight} setHighlight={setHighlight} timeContext={analysisWindow} activeOpinion={activeOpinion} onTimeChange={index=>setAnalysisWindow(getAnalysisWindow(index))}/>:<><GovernanceScope context={analysisWindow}/><RelatedCommands eventName={reportEvent} timeContext={analysisWindow} activeOpinion={activeOpinion}/></>}</div>
-   </div>:<div className="artifactEmpty"><div><FileText size={28}/><h2>暂无打开的分析报告</h2><p>从左侧快捷分析打开当前事件，或输入新事件生成报告。</p><button onClick={()=>setArtifactOpen(true)}>打开当前事件报告</button></div></div>}
+   {artifactOpen?<div className="artifactViewport"><div className="eventReportLayout">
+    <section className="eventDescriptionPanel">
+     <div className="eventDescriptionCard"><span>事件描述</span><h1>{reportEvent==='揭阳虐狗事件'?'揭阳虐狗事件':reportEvent}</h1><div className="eventTags"><em>热点事件</em><em>持续发酵</em></div><p>{reportEvent==='揭阳虐狗事件'?'2026 年 6 月 28 日，广东揭阳揭东区新亨镇发生未成年人伤害流浪狗事件；6 月 29 日相关视频在网络传播。6 月 30 日，新亨镇人民政府通报已成立工作组调查处理，4 名涉事人员均未满 14 周岁，均已送专门学校教育，并呼吁不要传播相关信息、拒绝网暴。7 月中下旬，讨论进一步延伸至未成年人教育与监护责任、动物保护立法，以及线下和境外声援。':`AI 已围绕“${reportEvent}”完成内容聚合、传播趋势识别、观点聚类和账号关系分析。当前报告展示模拟的全链路研判结果，可继续通过左侧对话追加分析要求。`}</p><dl><div><dt>事件周期</dt><dd>06-28 — 07月下旬</dd></div><div><dt>当前阶段</dt><dd>二次扩散</dd></div><div><dt>重点关注</dt><dd>观点偏差与跨圈传播</dd></div></dl></div>
+    </section>
+    <main className="eventReportMain">
+     <div className="reportPrimaryTabs">{([['相关舆情',FileText],['相关指令',Flag],['站内内容',Play]] as [string,any][]).map(([name,Icon])=><button key={name} className={primaryTab===name?'active':''} aria-pressed={primaryTab===name} onClick={()=>setPrimaryTab(name)}><Icon size={13}/>{name}</button>)}</div>
+     {primaryTab==='站内内容'?<div className="stationContent">
+      <InsightCommandCenter select={select} activeOpinion={activeOpinion} timeFilterIndex={analysisWindow.index} onOpinionSelect={focusOpinion} onTimeWindowChange={index=>setAnalysisWindow(getAnalysisWindow(index))}/>
+      <nav className="reportSecondaryTabs">{([['传播数据统计',Sparkles],['传播关系链',GitBranch]] as [string, any][]).map(([n,Icon])=><button key={n} className={tab===n?'active':''} onClick={()=>setTab(n)}><Icon size={16}/>{n}</button>)}</nav>
+      <AnalysisFilterBar timeContext={analysisWindow} opinion={activeOpinion} tab={tab} onClearTime={()=>setAnalysisWindow(fullAnalysisWindow)} onClearOpinion={()=>setActiveOpinion(null)} onClearAll={()=>{setAnalysisWindow(fullAnalysisWindow);setActiveOpinion(null)}}/>
+      <div className="content">{tab==='传播数据统计'?<Stats open={open} setOpen={setOpen} select={select} activeOpinion={activeOpinion} onOpinionChange={setActiveOpinion} timeContext={analysisWindow} addToChat={(video:any,index:number)=>{setChatReference({...video,coverIndex:index%4});setChatCollapsed(false)}}/>:<LinkedPropagationViews select={select} highlight={highlight} setHighlight={setHighlight} timeContext={analysisWindow} activeOpinion={activeOpinion} onTimeChange={index=>setAnalysisWindow(getAnalysisWindow(index))}/>}</div>
+     </div>:primaryTab==='相关指令'?<div className="primaryTabContent"><GovernanceScope context={analysisWindow}/><RelatedCommands eventName={reportEvent} timeContext={analysisWindow} activeOpinion={activeOpinion}/></div>:<RelatedPublicOpinion eventName={reportEvent}/>}
+    </main>
+   </div></div>:<div className="artifactEmpty"><div><FileText size={28}/><h2>暂无打开的分析报告</h2><p>从左侧快捷分析打开当前事件，或输入新事件生成报告。</p><button onClick={()=>setArtifactOpen(true)}>打开当前事件报告</button></div></div>}
   </section>{detailOpen&&<Detail state={selected} close={()=>setDetailOpen(false)}/>}</div></div>
  </div>
+}
+function RelatedPublicOpinion({eventName}:{eventName:string}){
+ const items=[
+  {source:'本地资讯',time:'06-29 18:40',title:`${eventName}相关视频引发关注，属地启动调查`,summary:'事件现场内容进入公开讨论，用户关注事件经过与后续处理。',heat:'热度 86.4万',tone:'事实进展'},
+  {source:'社会观察',time:'07-16 14:20',title:'讨论延伸至未成年人教育与监护责任',summary:'传播议题由单一事件讨论向家庭教育、学校责任等方向扩展。',heat:'热度 62.8万',tone:'议题延伸'},
+  {source:'舆情观察室',time:'07-21 21:34',title:'线下声援内容推动事件进入二次扩散',summary:'相关内容跨圈传播，动物保护立法与网络暴力边界成为新增讨论方向。',heat:'热度 51.6万',tone:'持续发酵'}
+ ]
+ return <section className="relatedOpinionView"><header><div><b>相关舆情</b><span>汇总与当前事件直接相关的外部舆情及关键进展</span></div><em>共 18 条</em></header><div className="relatedOpinionList">{items.map((item,index)=><article key={item.title}><i>{index+1}</i><div><span>{item.source} · {item.time}</span><h3>{item.title}</h3><p>{item.summary}</p></div><div className="opinionMeta"><b>{item.heat}</b><em>{item.tone}</em></div></article>)}</div></section>
 }
 function RelatedCommands({eventName,timeContext,activeOpinion}:{eventName:string,timeContext:AnalysisWindow,activeOpinion:string|null}){
  const [level,setLevel]=useState('全部')
