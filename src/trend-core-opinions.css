@@ -1,0 +1,214 @@
+.commandCenter .trendGrid.trendOnly {
+  grid-template-columns: minmax(0, 1.72fr) minmax(250px, .68fr) !important;
+  align-items: stretch;
+}
+
+.trendCoreOpinionPanel {
+  display: grid;
+  min-width: 0;
+  height: 396px;
+  box-sizing: border-box;
+  grid-template-rows: 54px minmax(0, 1fr) auto;
+  border-left: 1px solid #e8e4f1;
+  background: linear-gradient(180deg, #fbfaff 0%, #f8f7fc 100%);
+}
+
+.trendCoreOpinionPanel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 13px;
+  border-bottom: 1px solid #e8e4f1;
+}
+
+.trendCoreOpinionPanel > header > div,
+.trendCoreOpinionPanel > footer > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.trendCoreOpinionPanel > header b {
+  color: #343a47;
+  font-size: 11px;
+}
+
+.trendCoreOpinionPanel > header small,
+.trendCoreOpinionPanel > footer small {
+  color: #9299a5;
+  font-size: 7px;
+}
+
+.trendCoreOpinionPanel > header em {
+  flex: none;
+  padding: 3px 6px;
+  border-radius: 8px;
+  background: #eeeaff;
+  color: #6b53bf;
+  font-size: 7px;
+  font-style: normal;
+}
+
+.trendCoreOpinionList {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.trendCoreOpinionList > button {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 12px;
+  border-bottom: 1px solid #ece9f3;
+  background: transparent;
+  color: #444b57;
+  text-align: left;
+  transition: background .15s ease, box-shadow .15s ease;
+}
+
+.trendCoreOpinionList > button:hover,
+.trendCoreOpinionList > button.selected {
+  background: #f0ecff;
+  box-shadow: inset 3px 0 #765fd0;
+}
+
+.trendCoreOpinionList > button > span {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.trendCoreOpinionList > button > span > i {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  border-radius: 5px;
+  background: #eae5fb;
+  color: #6e57c2;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.trendCoreOpinionList > button > span > b {
+  min-width: 0;
+  overflow: hidden;
+  color: #454b57;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trendCoreOpinionList > button > span > em {
+  padding: 2px 5px;
+  border-radius: 7px;
+  background: #fff0f1;
+  color: #c5535e;
+  font-size: 6px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.trendCoreOpinionList > button.positive > span > em {
+  background: #edf9f4;
+  color: #2f9874;
+}
+
+.trendCoreOpinionList > button.neutral > span > em {
+  background: #f0edff;
+  color: #6e58c2;
+}
+
+.opinionCompareBars {
+  display: grid;
+  gap: 4px;
+  padding-left: 24px;
+}
+
+.opinionCompareBars label {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 25px;
+  align-items: center;
+  gap: 5px;
+}
+
+.opinionCompareBars small {
+  color: #8e95a0;
+  font-size: 6px;
+}
+
+.opinionCompareBars label > i {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #e8e5ef;
+}
+
+.opinionCompareBars label > i > u {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #8068d9;
+  text-decoration: none;
+}
+
+.opinionCompareBars label:nth-child(2) > i > u {
+  background: #d46a75;
+}
+
+.opinionCompareBars strong {
+  color: #5f6672;
+  font-size: 7px;
+  text-align: right;
+}
+
+.trendCoreOpinionPanel > footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 8px 10px 10px;
+  padding: 8px 9px;
+  border: 1px solid #ddd6f2;
+  border-radius: 7px;
+  background: #fff;
+  color: #7259c8;
+}
+
+.trendCoreOpinionPanel > footer b {
+  color: #535966;
+  font-size: 7px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+@media (max-width: 1050px) {
+  .commandCenter .trendGrid.trendOnly {
+    grid-template-columns: 1fr !important;
+  }
+
+  .trendCoreOpinionPanel {
+    height: auto;
+    grid-template-rows: 48px auto auto;
+    border-top: 1px solid #e8e4f1;
+    border-left: 0;
+  }
+
+  .trendCoreOpinionList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .trendCoreOpinionList {
+    grid-template-columns: 1fr;
+  }
+}

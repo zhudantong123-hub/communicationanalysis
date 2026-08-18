@@ -15,6 +15,7 @@ import PropagationOverview from './PropagationOverview'
 import './propagation-overview.css'
 import './propagation-overview-v2.css'
 import './propagation-overview-v3.css'
+import './trend-core-opinions.css'
 
 const videos=[
  {id:'v0',author:'揭阳现场',handle:'@jieyang-live',title:'网传新亨镇未成年人伤害流浪狗视频引发关注',time:'06-29 10:15',play:'328.6万',interaction:'12.8万',tone:'现场视频',grade:'首发',status:'通过',c:'violet'},
@@ -393,6 +394,26 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
      <div className="trendLabels dailyRange"><span>06-29</span><span>07-03</span><span>07-07</span><span>07-11</span><span>07-15</span></div>
     </div>
    </div>
+   <aside className="trendCoreOpinionPanel" aria-label="核心观点">
+    <header>
+     <div><b>核心观点</b><small>{guideTimeIndex===null?'全周期聚合':`${trendTimes[guideTimeIndex]} 当日表达`}</small></div>
+     <em>{guideTimeIndex===null?'全量':'随时间联动'}</em>
+    </header>
+    <div className="trendCoreOpinionList">
+     {displayedComparisonRows.map((item,index)=>{
+      const selected=videoOpinionFocus===item.name
+      const maxValue=Math.max(item.video,item.comment,1)
+      return <button key={item.name} className={(selected?'selected ':'')+item.tone} aria-pressed={selected} onClick={()=>selectScopedOpinion('视频',item.name,item.tone)}>
+       <span><i>{index+1}</i><b>{item.name}</b><em>{item.judgement}</em></span>
+       <div className="opinionCompareBars">
+        <label><small>视频表达</small><i><u style={{width:`${item.video/maxValue*100}%`}}/></i><strong>{item.video}%</strong></label>
+        <label><small>评论反馈</small><i><u style={{width:`${item.comment/maxValue*100}%`}}/></i><strong>{item.comment}%</strong></label>
+       </div>
+      </button>
+     })}
+    </div>
+    <footer><Sparkles size={13}/><span><small>当前判断</small><b>{videoOpinionFocus?`已聚焦“${videoOpinionFocus}”，下方模块已同步筛选`:'评论侧对处罚与责任的讨论强于视频供给侧'}</b></span></footer>
+   </aside>
   </div>
   <div className="trendMetricCards">{trendMetrics.map(item=><article key={item[0]}><span>{item[0]}</span><b>{item[1]}</b><em>{item[2]}</em></article>)}</div>
  </section>
