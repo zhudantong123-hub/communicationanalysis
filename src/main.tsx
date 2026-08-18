@@ -430,6 +430,12 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
     <article><i>群</i><span><small>可识别群聊</small><b>186个</b><em>高频 27 · 跨群桥接 8</em></span><strong>回流 VV 243.6万</strong></article>
     <article><i>异</i><span><small>异常传播视频</small><b>47条</b><em>搬运 386 · 二创 214</em></span><strong>需优先下钻</strong></article>
    </div>
+   <div className="anomalySummaryRow" aria-label="异常时间与渠道">
+    <b>异常时间与渠道</b>
+    <button onClick={()=>{setSelectedTimeIndex(0);setSelectedInsight(0);setOpinionScope('视频');onTimeWindowChange(0)}}><time>06-29</time><span><strong>Feed 推荐</strong><small>首发视频快速起量</small></span><em>首次发酵</em></button>
+    <button onClick={()=>{setSelectedTimeIndex(11);setSelectedInsight(1);setOpinionScope('视频');onTimeWindowChange(11)}}><time>07月中旬</time><span><strong>群聊分享</strong><small>线下声援内容回流</small></span><em>分享回流 +214%</em></button>
+    <button onClick={()=>{setSelectedTimeIndex(13);setSelectedInsight(2);setOpinionScope('视频');onTimeWindowChange(13)}}><time>07月下旬</time><span><strong>搜索回流</strong><small>境外报道推动跨圈扩散</small></span><em>较基线 +59.2%</em></button>
+   </div>
    <footer>私聊回流 VV 186.4万，受合规限制仅展示汇总数据，不支持会话下钻</footer>
   </section>
  </section>

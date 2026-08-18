@@ -140,6 +140,80 @@
   text-align: right;
 }
 
+.anomalySummaryRow {
+  display: grid;
+  grid-template-columns: auto repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.anomalySummaryRow > b {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  color: #6e57c2;
+  font-size: 7px;
+  white-space: nowrap;
+}
+
+.anomalySummaryRow > button {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border: 1px solid #e6e0f4;
+  border-radius: 7px;
+  background: #f8f5ff;
+  color: #4b5260;
+  text-align: left;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+
+.anomalySummaryRow > button:hover {
+  border-color: #c9bbef;
+  background: #f2edff;
+  transform: translateY(-1px);
+}
+
+.anomalySummaryRow time {
+  color: #735ac8;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.anomalySummaryRow span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.anomalySummaryRow strong {
+  color: #3e4552;
+  font-size: 7px;
+}
+
+.anomalySummaryRow small {
+  overflow: hidden;
+  color: #8e95a0;
+  font-size: 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anomalySummaryRow em {
+  padding: 3px 5px;
+  border-radius: 7px;
+  background: #fff0f1;
+  color: #c5535e;
+  font-size: 6px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
 .trendCoreOpinionPanel {
   display: grid;
   min-width: 0;
@@ -409,6 +483,14 @@
 
   .actorSummaryCards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .anomalySummaryRow {
+    grid-template-columns: 1fr;
+  }
+
+  .anomalySummaryRow > b {
+    padding: 0;
   }
 }
 
