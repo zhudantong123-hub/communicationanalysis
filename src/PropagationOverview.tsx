@@ -1,14 +1,15 @@
 import {useState} from 'react'
 
 type Props={onEvent:(index:number)=>void}
-type MetricKey='vv'|'comments'|'searches'|'shares'
+type MetricKey='videos'|'vv'|'comments'|'likes'|'accounts'
 
 const dates=['06.29','06.30','07.03','07.07','07.11','07.15','07.19','07.23','07.28']
 const metrics:Record<MetricKey,{label:string,unit:string,max:number,values:number[],ticks:string[]}>= {
- vv:{label:'播放量',unit:'万',max:1000,values:[260,860,780,620,470,360,290,240,210,190,220,280,390,520,470,410,350],ticks:['1,000','750','500','250']},
+ videos:{label:'视频量',unit:'条',max:500,values:[86,268,312,286,241,196,164,142,128,117,136,173,226,294,271,238,204],ticks:['500','375','250','125']},
+ vv:{label:'VV 量',unit:'万',max:1000,values:[260,860,780,620,470,360,290,240,210,190,220,280,390,520,470,410,350],ticks:['1,000','750','500','250']},
  comments:{label:'评论量',unit:'万条',max:100,values:[22,68,76,64,51,43,37,32,29,27,31,39,52,61,57,49,42],ticks:['100','75','50','25']},
- searches:{label:'搜索量',unit:'万次',max:600,values:[180,486,438,340,268,220,184,156,138,126,148,196,286,412,384,318,270],ticks:['600','450','300','150']},
- shares:{label:'分享量',unit:'万次',max:80,values:[18,67,61,52,44,37,32,28,25,23,26,34,46,58,54,47,41],ticks:['80','60','40','20']}
+ likes:{label:'点赞量',unit:'万次',max:300,values:[64,214,248,221,186,157,139,124,116,108,122,151,189,236,218,192,168],ticks:['300','225','150','75']},
+ accounts:{label:'关联账号',unit:'个',max:1200,values:[238,764,936,841,708,614,528,472,438,411,456,542,684,826,779,701,623],ticks:['1,200','900','600','300']}
 }
 const anomalies:[{index:number,label:string,detail:string,metric:MetricKey},{index:number,label:string,detail:string,metric:MetricKey},{index:number,label:string,detail:string,metric:MetricKey}]=[
  {index:0,label:'06-29 · 网传视频出现',detail:'相关视频开始在网络传播',metric:'vv'},

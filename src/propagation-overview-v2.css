@@ -3,17 +3,17 @@
 .metricLegend button:hover{border:0;background:rgba(240,237,248,.7);color:#4e5663;opacity:.72}
 .metricLegend button.selected{border:0;background:transparent;color:#414957;font-weight:600;opacity:1}
 .metricLegend button i{width:20px;height:2px;border-radius:2px;background:#a8adba}
-.metricLegend button.vv i{background:#8068d9}.metricLegend button.comments i{background:#d26470}.metricLegend button.searches i{background:#3f9ebf}.metricLegend button.shares i{background:#d48b42}.metricLegend button.videos i{background:#4da66a}.propagationLine.vv{stroke:#8068d9}.propagationLine.comments{stroke:#d26470}.propagationLine.searches{stroke:#3f9ebf}.propagationLine.shares{stroke:#d48b42}.propagationLine.videos{stroke:#4da66a}.propagationLine{stroke-opacity:.9}.anomalyPoints button.vv>i{border-color:#8068d9}.anomalyPoints button.comments>i{border-color:#d26470}.anomalyPoints button.searches>i{border-color:#3f9ebf}.anomalyPoints button.shares>i{border-color:#d48b42}.anomalyPoints button.videos>i{border-color:#4da66a}
+.metricLegend button.videos i{background:#4da66a}.metricLegend button.vv i{background:#8068d9}.metricLegend button.comments i{background:#d26470}.metricLegend button.likes i{background:#d48b42}.metricLegend button.accounts i{background:#3f9ebf}.propagationLine.videos{stroke:#4da66a}.propagationLine.vv{stroke:#8068d9}.propagationLine.comments{stroke:#d26470}.propagationLine.likes{stroke:#d48b42}.propagationLine.accounts{stroke:#3f9ebf}.propagationLine{stroke-opacity:.9}.anomalyPoints button.videos>i{border-color:#4da66a}.anomalyPoints button.vv>i{border-color:#8068d9}.anomalyPoints button.comments>i{border-color:#d26470}.anomalyPoints button.likes>i{border-color:#d48b42}.anomalyPoints button.accounts>i{border-color:#3f9ebf}
 .propagationOverview>header{align-items:center}
 .propagationArea{fill-opacity:.09}
-.propagationArea.vv{fill:#8068d9}.propagationArea.comments{fill:#d26470}.propagationArea.searches{fill:#3f9ebf}.propagationArea.shares{fill:#d48b42}
+.propagationArea.videos{fill:#4da66a}.propagationArea.vv{fill:#8068d9}.propagationArea.comments{fill:#d26470}.propagationArea.likes{fill:#d48b42}.propagationArea.accounts{fill:#3f9ebf}
 .propagationOverview{padding-right:5px}
 .commandCenter .trendOnly .trendPanel{padding-right:4px!important}
 .propagationChart,.propagationDates{margin-right:0}
 .propagationOverview{height:300px}
 .commandCenter .trendOnly .trendChart{height:300px!important;min-height:300px!important}
 .commandCenter .trendOnly .trendPanel{min-height:346px!important;grid-template-rows:46px 300px!important}
-.propagationAxis,.propagationAxis.vv,.propagationAxis.comments,.propagationAxis.searches,.propagationAxis.shares{color:#858c98}
+.propagationAxis,.propagationAxis.videos,.propagationAxis.vv,.propagationAxis.comments,.propagationAxis.likes,.propagationAxis.accounts{color:#858c98}
 .anomalyPoints button>span{top:17px;bottom:auto}
 .anomalyPoints button.active>span{display:block}
 .anomalyPoints button.active>i{background:#8068d9}
