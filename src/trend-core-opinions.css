@@ -287,6 +287,21 @@
   color: #b56f38;
 }
 
+.coreNodePanel .trendCoreOpinionList > button > span > em.nodeType.起始 {
+  background: #eeeaff;
+  color: #6d55c3;
+}
+
+.coreNodePanel .trendCoreOpinionList > button > span > em.nodeType.扩散 {
+  background: #edf5ff;
+  color: #477eae;
+}
+
+.coreNodePanel .trendCoreOpinionList > button > span > em.nodeType.跨圈 {
+  background: #fff3e9;
+  color: #b56f38;
+}
+
 .coreNodeMeta {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

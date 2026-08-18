@@ -299,7 +299,7 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
   视频:[
    {index:0,short:'网传视频出现',title:'6月29日相关视频开始在网络传播',detail:'网传“新亨镇未成年人伤害流浪狗”视频出现，事件从本地现场内容进入公共讨论。',impact:'播放、评论与搜索同步上升（Demo 指标）',evidence:'公开通报确认6月29日相关视频已在网络传播',coreVideo:'网传新亨镇未成年人伤害流浪狗视频',opinions:['要求核实事件经过','关注涉事人员处置','呼吁停止传播血腥画面']},
    {index:11,short:'线下声援出现',title:'7月中旬议题从线上讨论延伸到线下传播',detail:'围绕事件的声援内容开始通过线下广告、图片记录和二次转述重新进入社交平台，形成新一轮内容传播。',impact:'播放、分享与搜索出现第二阶段抬升（Demo 指标）',evidence:'7月中下旬公开报道记录多地线下声援活动',coreVideo:'线下声援画面及相关议题解读',opinions:['持续关注事件后续','推动动物保护立法','避免传播未成年人身份信息']},
-   {index:13,short:'议题再次扩散',title:'7月中下旬讨论转向线下及境外声援',detail:'事件关注从视频本身延伸至动物保护立法，线下广告和境外报道推动议题再次扩散。',impact:'评论、搜索与分享出现第二阶段抬升（Demo 指标）',evidence:'7月中下旬多家媒体报道线下及境外声援活动',coreVideo:'从揭阳事件讨论动物保护立法',opinions:['推动动物保护立法','持续关注事件后续','避免将公共讨论转为人身攻击']}
+   {index:13,short:'境外报道扩散',title:'7月下旬境外报道推动事件再次扩散',detail:'事件关注从视频本身延伸至动物保护立法，境外报道和声援内容推动议题跨圈传播。',impact:'评论、搜索与分享出现第二阶段抬升（Demo 指标）',evidence:'7月下旬多家媒体报道境外声援活动',coreVideo:'从揭阳事件讨论动物保护立法',opinions:['推动动物保护立法','持续关注事件后续','避免将公共讨论转为人身攻击']}
   ],
   评论:[
    {index:5,short:'低播放 × 高评论',title:'责任提问视频播放一般，评论异常集中',detail:'央视新闻置顶责任讨论后，视频播放未达同类头部水平，但二级评论快速增长。',impact:'VV 低于同类 P50，评论率高于基线 2.8 倍',evidence:'置顶提问带动 3,800 条回复，二级评论占比 63%',coreVideo:'央视新闻：未成年人应承担何种责任',opinions:['未成年人也应承担相应责任','家长和学校应承担教育矫治责任','反对公布未成年人个人信息']},
@@ -309,6 +309,9 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
  } as const
  const activeInsights=insightSets[opinionScope]
  const anomalyReasonSummary:Record<string,string>={
+  '网传视频出现':'相关视频开始在网络传播',
+  '线下声援出现':'相关议题从线上延伸到线下',
+  '境外报道扩散':'境外报道推动议题跨圈传播',
   '高播放正向 × 高负评':'视频正向 52% / 评论负向 45% / 偏离 28pp',
   '高播放中立 × 负向聚集':'负向评论 44% / 高于同类 19pp',
   '正向供给上升 × 负向未降':'正向供给 +31% / 负评仅降 3pp',
@@ -369,11 +372,9 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
  ]
  const displayedComparisonRows=comparisonRows.map((item,index)=>{const time=guideTimeIndex??16;const video=Math.max(3,Math.round(item.video+(time-16)*([.55,.42,-.35,.28,.18][index])));const comment=Math.max(3,Math.round(item.comment+(time-16)*([.82,.58,-.22,.46,.31][index])));return {...item,video,comment,judgement:comment-video>=6?'评论放大':Math.abs(comment-video)<=2?'观点共振':'评论衍生'}})
  const corePropagationNodes=[
-  {id:'video-origin',type:'视频',name:'首发视频 VID 825074',role:'首发扩散源',metric:'累计 VV 2,184.6万',contribution:'43.2%',timeIndex:0},
-  {id:'group-bridge',type:'群聊',name:'群聊 G-8F21',role:'跨群分享桥接',metric:'回流 VV 148.7万',contribution:'31.8%',timeIndex:9},
-  {id:'account-repost',type:'账号',name:'@揭阳现场',role:'搬运与二创放大',metric:'关联搬运 386条',contribution:'12.6%',timeIndex:5},
-  {id:'search-entry',type:'搜索',name:'揭阳虐狗事件经过',role:'搜索回流入口',metric:'搜索 486.2万次',contribution:'7.4%',timeIndex:13},
-  {id:'video-reheat',type:'视频',name:'线下声援二创 VID 825311',role:'二次升温节点',metric:'分享 18.6万次',contribution:'5.0%',timeIndex:11}
+  {id:'event-origin',type:'起始',name:'06-29 · 网传视频出现',role:'相关视频开始在网络传播',metric:'播放、评论与搜索同步上升',contribution:'首次发酵',timeIndex:0},
+  {id:'event-offline',type:'扩散',name:'07月中旬 · 线下声援出现',role:'相关议题从线上讨论延伸到线下传播',metric:'分享与搜索出现第二阶段抬升',contribution:'二次升温',timeIndex:11},
+  {id:'event-overseas',type:'跨圈',name:'07月下旬 · 境外报道扩散',role:'境外报道和声援推动动物保护立法讨论',metric:'评论、搜索与分享继续增长',contribution:'跨圈扩散',timeIndex:13}
  ]
  const activeCoreNodeItem=corePropagationNodes.find(item=>item.id===activeCoreNode)
  return <section className="commandCenter"><div className="trendGrid trendOnly">
@@ -417,7 +418,7 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
       </button>
      })}
     </div>
-    <footer><Sparkles size={13}/><span><small>{activeCoreNodeItem?'当前选中':'节点摘要'}</small><b>{activeCoreNodeItem?`${activeCoreNodeItem.name} · ${activeCoreNodeItem.role} · ${activeCoreNodeItem.metric}`:'首发视频负责起量，群聊桥接与搜索回流推动风险跨阶段扩散'}</b></span></footer>
+    <footer><Sparkles size={13}/><span><small>{activeCoreNodeItem?'当前选中':'节点摘要'}</small><b>{activeCoreNodeItem?`${activeCoreNodeItem.name} · ${activeCoreNodeItem.role}`:'三个节点分别对应首次发酵、二次升温和跨圈扩散'}</b></span></footer>
    </aside>
   </div>
   <div className="trendMetricCards">{trendMetrics.map(item=><article key={item[0]}><span>{item[0]}</span><b>{item[1]}</b><em>{item[2]}</em></article>)}</div>
