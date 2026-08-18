@@ -422,21 +422,13 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
    </aside>
   </div>
   <div className="trendMetricCards">{trendMetrics.map(item=><article key={item[0]}><span>{item[0]}</span><b>{item[1]}</b><em>{item[2]}</em></article>)}</div>
-  <section className="actorSummaryStrip" aria-label="传播主体概览">
-   <header><div><b>传播主体概览</b><small>谁在定调、放大和承接本次事件传播</small></div><em>全周期</em></header>
-   <div className="actorSummaryCards">
-    <article><i>媒</i><span><small>参与媒体</small><b>26家</b><em>央媒 8家 · 发文 132条</em></span><strong>贡献 VV 1,284.6万</strong></article>
-    <article><i>账</i><span><small>关联账号</small><b>1,062个</b><em>核心 38 · 桥接 12</em></span><strong>异常账号 17个</strong></article>
-    <article><i>群</i><span><small>可识别群聊</small><b>186个</b><em>高频 27 · 跨群桥接 8</em></span><strong>回流 VV 243.6万</strong></article>
-    <article><i>异</i><span><small>异常传播视频</small><b>47条</b><em>搬运 386 · 二创 214</em></span><strong>需优先下钻</strong></article>
-   </div>
+  <section className="actorSummaryStrip anomalyOnlySummary" aria-label="传播异常摘要">
+   <header><div><b>传播异常摘要</b><small>哪些时间发生异常，由什么渠道推动</small></div><em>全周期</em></header>
    <div className="anomalySummaryRow" aria-label="异常时间与渠道">
-    <b>异常时间与渠道</b>
     <button onClick={()=>{setSelectedTimeIndex(0);setSelectedInsight(0);setOpinionScope('视频');onTimeWindowChange(0)}}><time>06-29</time><span><strong>Feed 推荐</strong><small>首发视频快速起量</small></span><em>首次发酵</em></button>
     <button onClick={()=>{setSelectedTimeIndex(11);setSelectedInsight(1);setOpinionScope('视频');onTimeWindowChange(11)}}><time>07月中旬</time><span><strong>群聊分享</strong><small>线下声援内容回流</small></span><em>分享回流 +214%</em></button>
     <button onClick={()=>{setSelectedTimeIndex(13);setSelectedInsight(2);setOpinionScope('视频');onTimeWindowChange(13)}}><time>07月下旬</time><span><strong>搜索回流</strong><small>境外报道推动跨圈扩散</small></span><em>较基线 +59.2%</em></button>
    </div>
-   <footer>私聊回流 VV 186.4万，受合规限制仅展示汇总数据，不支持会话下钻</footer>
   </section>
  </section>
 }
