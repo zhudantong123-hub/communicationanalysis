@@ -1,0 +1,3 @@
+.anomalyPoints button>span{display:block}
+.anomalyPoints button.point0>span{left:0;transform:none}
+.anomalyPoints button.point2>span{top:58px}
