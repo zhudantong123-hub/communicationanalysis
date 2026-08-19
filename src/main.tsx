@@ -138,10 +138,11 @@ function App(){
   <div className="layout full"><section className="left">
    <div className="artifactViewport"><div className="eventReportLayout">
     <section className="eventDescriptionPanel">
-     <div className="eventDescriptionCard"><span>事件描述</span><h1>{reportEvent==='揭阳虐狗事件'?'揭阳虐狗事件':reportEvent}</h1><div className="eventTags"><em>热点事件</em><em>持续发酵</em></div><p>{reportEvent==='揭阳虐狗事件'?'2026 年 6 月 28 日，广东揭阳揭东区新亨镇发生未成年人伤害流浪狗事件；6 月 29 日相关视频在网络传播。6 月 30 日，新亨镇人民政府通报已成立工作组调查处理，4 名涉事人员均未满 14 周岁，均已送专门学校教育，并呼吁不要传播相关信息、拒绝网暴。7 月中下旬，讨论进一步延伸至未成年人教育与监护责任、动物保护立法，以及线下和境外声援。':`AI 已围绕“${reportEvent}”完成内容聚合、传播趋势识别、观点聚类和账号关系分析。当前报告展示模拟的全链路研判结果，可继续追加分析要求。`}</p><dl><div><dt>事件周期</dt><dd>06-28 — 07月下旬</dd></div><div><dt>当前阶段</dt><dd>二次扩散</dd></div><div><dt>重点关注</dt><dd>观点偏差与跨圈传播</dd></div></dl>
+     <div className="eventDescriptionCard"><span>事件描述</span><h1>{reportEvent==='揭阳虐狗事件'?'揭阳虐狗事件':reportEvent}</h1><div className="eventTags"><em>热点事件</em><em>长尾观察</em></div><p>{reportEvent==='揭阳虐狗事件'?'2026 年 6 月 28 日，广东揭阳揭东区新亨镇发生未成年人伤害流浪狗事件；6 月 29 日相关视频在网络传播。6 月 30 日，新亨镇人民政府通报已成立工作组调查处理，4 名涉事人员均未满 14 周岁，均已送专门学校教育，并呼吁不要传播相关信息、拒绝网暴。7 月中下旬，讨论进一步延伸至未成年人教育与监护责任、动物保护立法，以及线下和境外声援。':`AI 已围绕“${reportEvent}”完成内容聚合、传播趋势识别、观点聚类和账号关系分析。当前报告展示模拟的全链路研判结果，可继续追加分析要求。`}</p>
+      <section className="currentEventStage" aria-label="当前事件阶段"><span>当前事件阶段</span><b>长尾期</b><p>二次扩散高点已过，整体热度回落；搜索和群聊仍有残余传播。</p><em>关注搜索回流、群聊分享与二创搬运</em></section>
+      <dl><div><dt>事件周期</dt><dd>06-28 — 07月下旬</dd></div><div><dt>阶段依据</dt><dd>播放回落，搜索与分享仍持续</dd></div></dl>
       <section className="eventSideSection"><h2>站内内容</h2><div className="eventMiniVideos">{videos.slice(0,3).map((video,index)=><button key={video.id} className={'eventMiniVideo cover'+index} onClick={()=>select('video',video)} aria-label={`查看视频：${video.title}`}><i><Play size={13} fill="currentColor"/></i><span>00:{36+index*11}</span><b>{video.tone}</b></button>)}</div></section>
       <section className="eventSideSection"><h2>关联账号</h2><div className="eventAccounts">{accounts.slice(0,2).map(account=><button key={account.id} onClick={()=>select('account',account)}><i className={'avatar '+account.c}>{account.name[0]}</i><span><b>{account.name}</b><small>{account.auth} · 粉丝 {account.fans}</small></span><ChevronRight size={13}/></button>)}</div></section>
-      <section className="eventSideSection eventHistory"><h2>事件脉络</h2><ol><li><time>06-29</time><b>首批相关视频开始传播</b><span>现场内容进入推荐与搬运链路</span></li><li><time>06-30</time><b>属地发布调查处理进展</b><span>讨论转向处置结果与责任归属</span></li><li><time>07月中旬</time><b>线下声援内容出现</b><span>议题延伸至教育、监护与立法</span></li><li><time>07月下旬</time><b>境外报道带动二次扩散</b><span>跨圈传播与观点偏差同步增加</span></li></ol></section>
      </div>
     </section>
     <main className="eventReportMain">
@@ -203,7 +204,7 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
  const [commentSentiment,setCommentSentiment]=useState<'negative'|'positive'|'neutral'|null>(null)
  const [linkedOpinionFilter,setLinkedOpinionFilter]=useState<{scope:'视频'|'评论',tone:string}|null>(null)
  const [videoOpinionFocus,setVideoOpinionFocus]=useState<string|null>(null)
- const [activeCoreNode,setActiveCoreNode]=useState<string|null>(null)
+ const [activeTimelineEvent,setActiveTimelineEvent]=useState<string|null>(null)
  const [commentOpinionFocus,setCommentOpinionFocus]=useState<string|null>(null)
  const linkedSentiment=activeOpinion==='正向情感'?'positive':activeOpinion==='中立情感'?'neutral':activeOpinion==='负向情感'?'negative':activeSentiment
  const [hoverTimeIndex,setHoverTimeIndex]=useState<number|null>(null)
@@ -371,12 +372,21 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
   {name:'家长和学校应承担教育责任',video:12,comment:18,tone:'neutral',judgement:'评论放大'}
  ]
  const displayedComparisonRows=comparisonRows.map((item,index)=>{const time=guideTimeIndex??16;const video=Math.max(3,Math.round(item.video+(time-16)*([.55,.42,-.35,.28,.18][index])));const comment=Math.max(3,Math.round(item.comment+(time-16)*([.82,.58,-.22,.46,.31][index])));return {...item,video,comment,judgement:comment-video>=6?'评论放大':Math.abs(comment-video)<=2?'观点共振':'评论衍生'}})
- const corePropagationNodes=[
-  {id:'event-origin',type:'起始',name:'06-29 · 网传视频出现',role:'相关视频开始在网络传播',metric:'播放、评论与搜索同步上升',contribution:'首次发酵',timeIndex:0},
-  {id:'event-offline',type:'扩散',name:'07月中旬 · 线下声援出现',role:'相关议题从线上讨论延伸到线下传播',metric:'分享与搜索出现第二阶段抬升',contribution:'二次升温',timeIndex:11},
-  {id:'event-overseas',type:'跨圈',name:'07月下旬 · 境外报道扩散',role:'境外报道和声援推动动物保护立法讨论',metric:'评论、搜索与分享继续增长',contribution:'跨圈扩散',timeIndex:13}
+ const eventTimelineNodes=[
+  {id:'event-origin',type:'萌芽',name:'06-29 · 首批视频传播',role:'现场内容进入推荐与搬运链路',metric:'播放开始增长',impact:'事件进入公共讨论',timeIndex:0},
+  {id:'event-response',type:'升温',name:'06-30 · 属地通报发布',role:'讨论转向处置结果与责任归属',metric:'评论与搜索增长',impact:'权威信息带动关注',timeIndex:1},
+  {id:'event-offline',type:'复燃',name:'07月中旬 · 线下声援出现',role:'议题延伸至教育、监护与立法',metric:'分享回流 +214%',impact:'事件再次升温',timeIndex:11},
+  {id:'event-overseas',type:'扩散',name:'07月下旬 · 境外报道跟进',role:'跨圈传播扩大讨论范围',metric:'搜索较基线 +59.2%',impact:'进入二次扩散',timeIndex:13}
  ]
- const activeCoreNodeItem=corePropagationNodes.find(item=>item.id===activeCoreNode)
+ const lifecycleStages=[
+  {name:'萌芽',range:'06-29—07-01',index:1,span:3},
+  {name:'升温',range:'07-03—07-09',index:5,span:4},
+  {name:'爆发',range:'07-11—07-13',index:8,span:2},
+  {name:'回落',range:'07-15—07-17',index:10,span:2},
+  {name:'复燃',range:'07-19—07-23',index:12,span:3},
+  {name:'长尾',range:'07-25—07-28',index:15,span:3}
+ ]
+ const activeTimelineEventItem=eventTimelineNodes.find(item=>item.id===activeTimelineEvent)
  return <section className="commandCenter"><div className="trendGrid trendOnly">
    <div className="trendPanel">
     <div className="panelTitle opinionCompareTitle"><div><b>传播态势与异常定位</b><small>查看真实传播指标的时间趋势，点击异常节点定位关键内容、账号与渠道</small></div><span>全周期 · 日粒度</span></div>
@@ -403,22 +413,26 @@ function InsightCommandCenter({select,activeOpinion,timeFilterIndex,onOpinionSel
      </div>}
      <div className="trendLabels dailyRange"><span>06-29</span><span>07-03</span><span>07-07</span><span>07-11</span><span>07-15</span></div>
     </div>
+    <div className="eventLifecycleAxis" aria-label="事件生命周期">
+     <b>事件生命周期</b>
+     <div>{lifecycleStages.map((stage,index)=><button key={stage.name} className={`${stage.name==='长尾'?'current ':''}stage${index}`} style={{flex:stage.span}} onClick={()=>{setSelectedTimeIndex(stage.index);setSelectedInsight(null);onTimeWindowChange(stage.index)}}><span>{stage.name}</span><small>{stage.range}</small></button>)}</div>
+    </div>
    </div>
-   <aside className="trendCoreOpinionPanel coreNodePanel" aria-label="核心传播节点">
+   <aside className="trendCoreOpinionPanel coreNodePanel eventTimelinePanel" aria-label="事件脉络">
     <header>
-     <div><b>核心传播节点</b><small>{guideTimeIndex===null?'按真实传播关系识别':`${trendTimes[guideTimeIndex]} 关联节点`}</small></div>
+     <div><b>事件脉络</b><small>{guideTimeIndex===null?'结合趋势查看关键事件':`${trendTimes[guideTimeIndex]} 时间联动`}</small></div>
      <em>{guideTimeIndex===null?'全周期':'随时间联动'}</em>
     </header>
     <div className="trendCoreOpinionList">
-     {corePropagationNodes.map((item,index)=>{
-      const selected=activeCoreNode===item.id
-      return <button key={item.id} className={selected?'selected':''} aria-pressed={selected} onClick={()=>{const next=selected?null:item.id;setActiveCoreNode(next);setSelectedTimeIndex(next===null?null:item.timeIndex);setSelectedInsight(null);onTimeWindowChange(next===null?null:item.timeIndex)}}>
+     {eventTimelineNodes.map((item,index)=>{
+      const selected=activeTimelineEvent===item.id
+      return <button key={item.id} className={selected?'selected':''} aria-pressed={selected} onClick={()=>{const next=selected?null:item.id;setActiveTimelineEvent(next);setSelectedTimeIndex(next===null?null:item.timeIndex);setSelectedInsight(null);onTimeWindowChange(next===null?null:item.timeIndex)}}>
        <span><i>{index+1}</i><b>{item.name}</b><em className={`nodeType ${item.type}`}>{item.type}</em></span>
-       <div className="coreNodeMeta"><strong>{item.role}</strong><small>{item.metric}</small><b>传播贡献 {item.contribution}</b></div>
+       <div className="coreNodeMeta"><strong>{item.role}</strong><small>{item.metric}</small><b>{item.impact}</b></div>
       </button>
      })}
     </div>
-    <footer><Sparkles size={13}/><span><small>{activeCoreNodeItem?'当前选中':'节点摘要'}</small><b>{activeCoreNodeItem?`${activeCoreNodeItem.name} · ${activeCoreNodeItem.role}`:'三个节点分别对应首次发酵、二次升温和跨圈扩散'}</b></span></footer>
+    <footer><Clock3 size={13}/><span><small>{activeTimelineEventItem?'当前选中':'当前阶段'}</small><b>{activeTimelineEventItem?`${activeTimelineEventItem.name} · ${activeTimelineEventItem.impact}`:'事件已进入长尾期，搜索和群聊仍需持续观察'}</b></span></footer>
    </aside>
   </div>
   <div className="trendMetricCards">{trendMetrics.map(item=><article key={item[0]}><span>{item[0]}</span><b>{item[1]}</b><em>{item[2]}</em></article>)}</div>

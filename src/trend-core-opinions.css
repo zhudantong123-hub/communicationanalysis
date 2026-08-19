@@ -4,6 +4,17 @@
   order: 2;
 }
 
+.commandCenter .trendGrid.trendOnly .trendPanel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.commandCenter .trendGrid.trendOnly .trendPanel > .panelTitle,
+.commandCenter .trendGrid.trendOnly .trendPanel > .trendChart {
+  flex: none;
+}
+
 .commandCenter .trendMetricCards {
   order: 0;
 }
@@ -204,10 +215,66 @@
   white-space: nowrap;
 }
 
+.eventLifecycleAxis {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px 10px;
+  border-top: 1px solid #e5e1ee;
+  background: #fbfafd;
+}
+
+.eventLifecycleAxis > b {
+  color: #555d69;
+  font-size: 8px;
+}
+
+.eventLifecycleAxis > div {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 7px;
+}
+
+.eventLifecycleAxis button {
+  display: flex;
+  min-width: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border-right: 1px solid #fff9;
+  background: #eeeaf8;
+  color: #696f7a;
+}
+
+.eventLifecycleAxis button.stage1 { background: #e8effb; }
+.eventLifecycleAxis button.stage2 { background: #f8e8e9; }
+.eventLifecycleAxis button.stage3 { background: #edf1f6; }
+.eventLifecycleAxis button.stage4 { background: #f8eee5; }
+.eventLifecycleAxis button.stage5 { background: #e9f2ee; }
+
+.eventLifecycleAxis button:hover,
+.eventLifecycleAxis button.current {
+  box-shadow: inset 0 -2px #745bd0;
+  color: #554297;
+}
+
+.eventLifecycleAxis button span {
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.eventLifecycleAxis button small {
+  color: #9298a3;
+  font-size: 5px;
+}
+
 .trendCoreOpinionPanel {
   display: grid;
   min-width: 0;
-  height: 396px;
+  height: auto;
   box-sizing: border-box;
   grid-template-rows: 54px minmax(0, 1fr) auto;
   border-left: 1px solid #e8e4f1;
@@ -366,6 +433,52 @@
   color: #b56f38;
 }
 
+.eventTimelinePanel .trendCoreOpinionList {
+  position: relative;
+}
+
+.eventTimelinePanel .trendCoreOpinionList:before {
+  position: absolute;
+  top: 19px;
+  bottom: 19px;
+  left: 20px;
+  width: 1px;
+  background: #dcd5ef;
+  content: '';
+}
+
+.eventTimelinePanel .trendCoreOpinionList > button {
+  position: relative;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.eventTimelinePanel .trendCoreOpinionList > button > span > i {
+  z-index: 1;
+  border: 2px solid #f9f7ff;
+  border-radius: 50%;
+}
+
+.eventTimelinePanel .trendCoreOpinionList > button > span > em.nodeType.萌芽 {
+  background: #eeeaff;
+  color: #6d55c3;
+}
+
+.eventTimelinePanel .trendCoreOpinionList > button > span > em.nodeType.升温 {
+  background: #edf5ff;
+  color: #477eae;
+}
+
+.eventTimelinePanel .trendCoreOpinionList > button > span > em.nodeType.复燃 {
+  background: #fff0f1;
+  color: #c5535e;
+}
+
+.eventTimelinePanel .trendCoreOpinionList > button > span > em.nodeType.扩散 {
+  background: #fff3e9;
+  color: #b56f38;
+}
+
 .coreNodeMeta {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -478,6 +591,10 @@
   .anomalySummaryRow {
     grid-template-columns: 1fr;
   }
+
+  .eventLifecycleAxis {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 700px) {
@@ -493,5 +610,9 @@
     align-items: flex-start;
     flex-direction: column;
     gap: 2px;
+  }
+
+  .eventLifecycleAxis > div {
+    overflow-x: auto;
   }
 }
