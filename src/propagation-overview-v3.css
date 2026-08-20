@@ -1,3 +1,24 @@
 .anomalyPoints button>span{display:block}
 .anomalyPoints button.point0>span{left:0;transform:none}
-.anomalyPoints button.point2>span{top:58px}
+.anomalyPoints button.point2>span{right:0;left:auto;transform:none}
+.anomalyPoints button.timeAnomaly{top:100%;}
+.anomalyPoints button.timeAnomaly>i{border-color:#8068d9;background:#fff}
+.anomalyPoints button.timeAnomaly>span{top:auto;bottom:195px}
+.anomalyPoints button.timeAnomaly>span{width:auto;min-width:94px;padding:4px 7px;white-space:nowrap}
+.anomalyPoints button.timeAnomaly>span b{font-size:7px;line-height:1.2}
+.anomalyPoints button.timeAnomaly.active>i,
+.anomalyPoints button.timeAnomaly:hover>i,
+.anomalyPoints button.timeAnomaly:focus>i{background:#8068d9}
+.propagationDetailCard.timelineEvidence{width:270px}
+.multiMetricEvidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:8px;padding-top:7px;border-top:1px solid #ebe7f3}
+.multiMetricEvidence>strong{grid-column:1/-1;color:#7f6ac5;font-size:8px}
+.multiMetricEvidence>p{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0;padding:5px 6px;border-radius:5px;background:#f6f3fd;color:#747b87;font-size:8px}
+.multiMetricEvidence>p b{color:#554297;font-size:8px;white-space:nowrap}
+.propagationOverview>.eventLifecycleAxis{margin:3px -5px 0 -18px;padding-top:3px;padding-bottom:3px;border-top:0;background:transparent}
+.propagationOverview{height:326px}
+.commandCenter .trendOnly .trendChart{height:326px!important;min-height:326px!important}
+.commandCenter .trendOnly .trendPanel{min-height:372px!important;grid-template-rows:46px 326px!important}
+.propagationDates{position:relative;display:block;height:12px}
+.propagationDates>span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.propagationDates>span.first{transform:none}
+.propagationDates>span.last{transform:translateX(-100%)}

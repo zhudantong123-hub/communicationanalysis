@@ -1,0 +1,577 @@
+/* Final layout for the propagation trend workspace: timeline | stacked trends | opinion details. */
+.commandCenter .trendGrid.trendOnly {
+  display: grid;
+  grid-template-columns: minmax(520px, 1fr) !important;
+  grid-template-areas: "trend";
+  align-items: stretch;
+  column-gap: 0;
+  row-gap: 0;
+}
+
+.commandCenter .trendGrid.trendOnly > .trendPanel {
+  grid-area: trend;
+  display: grid;
+  min-width: 0;
+  min-height: 360px !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: 44px 316px !important;
+  padding: 0 12px 12px !important;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.commandCenter .trendOnly .trendPanel > .panelTitle {
+  grid-column: 1;
+  grid-row: 1;
+  padding: 0 2px;
+}
+
+.commandCenter .trendOnly .trendPanel > .trendHoverLegends,
+.commandCenter .trendOnly .trendChart > .propagationOverview,
+.commandCenter .trendOnly .trendChart > .trendLabels,
+.commandCenter .trendOnly .trendChart > .timePointMarker,
+.commandCenter .trendOnly .trendChart > .opinionPointMarker,
+.commandCenter .trendOnly .trendChart > .chartInsightPopover {
+  display: none !important;
+}
+
+.commandCenter .trendOnly .trendPanel > .trendChart {
+  position: relative;
+  display: block !important;
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  height: 316px !important;
+  min-height: 316px !important;
+  overflow: visible;
+}
+
+.commandCenter .trendOnly .dualOpinionCharts {
+  position: relative;
+  display: grid !important;
+  width: 100%;
+  height: 452px;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: 222px 222px !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+}
+
+.commandCenter .trendOnly .dualOpinionCharts::after { display: none !important; }
+
+.commandCenter .trendOnly .mergedOpinionChart {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 316px;
+  padding: 39px 8px 25px 34px;
+  overflow: hidden;
+  border: 1px solid #ddd8e7;
+  border-radius: 9px;
+  background: linear-gradient(180deg, rgba(248,250,255,.92), rgba(252,253,255,.72));
+}
+
+.commandCenter .trendOnly .mergedSentimentStack {
+  display: block;
+  width: 100%;
+  height: 251px;
+  overflow: visible;
+}
+
+.commandCenter .trendOnly .mergedScopeHeader {
+  position: absolute;
+  z-index: 4;
+  right: 9px;
+  left: 9px;
+  display: flex;
+  height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  background: rgba(255,255,255,.9);
+}
+
+.commandCenter .trendOnly .mergedScopeHeader.video { top: 1px; }
+.commandCenter .trendOnly .mergedScopeHeader.comment { top: 226px; }
+.commandCenter .trendOnly .mergedScopeHeader .rowScopeLabel b { margin-right: 6px; }
+.commandCenter .trendOnly .mergedScopeHeader .sentimentStackLegend { position: static !important; }
+
+.commandCenter .trendOnly .mergedSentimentStack .scopeDivider {
+  stroke: rgba(130, 141, 160, .34);
+  stroke-dasharray: 3 4;
+  stroke-width: 1;
+}
+
+.commandCenter .trendOnly .mergedSentimentStack .stackArea.positive { fill: #63c878; fill-opacity: .42; }
+.commandCenter .trendOnly .mergedSentimentStack .stackArea.neutral { fill: #aeb7c6; fill-opacity: .5; }
+.commandCenter .trendOnly .mergedSentimentStack .stackArea.negative { fill: #ff8064; fill-opacity: .5; }
+.commandCenter .trendOnly .mergedSentimentStack .line { fill: none; stroke: #ec6248; stroke-width: 2.2; vector-effect: non-scaling-stroke; }
+.commandCenter .trendOnly .mergedSentimentStack .hoverTimeGuide { stroke: rgba(82,111,233,.62); stroke-dasharray: 3 3; stroke-width: 1; vector-effect: non-scaling-stroke; }
+
+.commandCenter .trendOnly .mergedTimeAxis {
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  left: 34px;
+  display: flex;
+  justify-content: space-between;
+  color: #8e95a0;
+  font-size: 7px;
+}
+
+.commandCenter .trendOnly .unifiedTrendLegend {
+  display: none;
+}
+
+.commandCenter .trendOnly .trendMetricToolbar {
+  position: absolute;
+  z-index: 7;
+  top: 5px;
+  right: 8px;
+  left: 9px;
+  display: flex;
+  height: 32px;
+  align-items: center;
+  gap: 18px;
+  padding: 0 8px;
+  border-bottom: 1px solid rgba(224,227,235,.72);
+}
+
+.commandCenter .trendOnly .trendMetricToolbar button,
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl {
+  display: inline-flex;
+  height: 31px;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #a9afb9;
+  font-size: 10px;
+}
+
+.commandCenter .trendOnly .trendMetricToolbar button.active { color: #303746; }
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl.active { color: #303746; }
+.commandCenter .trendOnly .trendMetricToolbar button i { width: 10px; height: 2px; border-radius: 2px; opacity: .22; }
+.commandCenter .trendOnly .trendMetricToolbar button.active i { opacity: 1; }
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl { position: relative; gap: 0; padding-right: 17px; }
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl button { height: 31px; color: inherit; }
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl.active button i { opacity: 1; }
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl::after { position: absolute; top: 11px; right: 4px; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; content: ''; transform: rotate(45deg); pointer-events: none; }
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl .vvStackTrigger { position: absolute; z-index: 2; top: 0; right: 0; width: 22px; min-width: 22px; height: 31px; padding: 0; opacity: 0; cursor: pointer; }
+.commandCenter .trendOnly .trendMetricToolbar .vvMetricControl:not(.active)::after { opacity: .45; }
+.commandCenter .trendOnly .trendMetricToolbar .vvStackMenu { position: absolute; z-index: 30; top: 38px; left: 18px; display: grid; min-width: 112px; gap: 2px; padding: 6px; border: 1px solid #d9dce5; border-radius: 9px; background: rgba(255,255,255,.98); box-shadow: 0 7px 18px rgba(40,48,72,.18); }
+.commandCenter .trendOnly .trendMetricToolbar .vvStackMenu button { display: grid; width: 100%; height: 28px; grid-template-columns: 14px 1fr; align-items: center; gap: 3px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: #343b48; font-size: 10px; text-align: left; white-space: nowrap; }
+.commandCenter .trendOnly .trendMetricToolbar .vvStackMenu button:hover,
+.commandCenter .trendOnly .trendMetricToolbar .vvStackMenu button.selected { background: #eef2ff; color: #526fec; }
+.commandCenter .trendOnly .trendMetricToolbar .vvStackMenu button i { width: auto; height: auto; background: none !important; font-style: normal; opacity: 1; }
+
+.commandCenter .trendOnly .mergedSentimentStack.unified .primaryTrendArea { fill: rgba(96,120,255,.09); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .vvStack.layer1 { fill: rgba(91,196,112,.22); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .vvStack.layer2 { fill: rgba(89,145,242,.19); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .vvStack.layer3 { fill: rgba(255,103,87,.16); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .metricStack.layer1 { fill: rgba(91,196,112,.2); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .metricStack.layer2 { fill: rgba(89,145,242,.17); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .metricStack.layer3 { fill: rgba(255,103,87,.14); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine.metric { fill: none; stroke-width: 1.8; vector-effect: non-scaling-stroke; filter: drop-shadow(0 1px 1px rgba(60,77,130,.06)); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine.metric.primary { stroke-width: 2.5; }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine.metric.vv { stroke-width: 2.1; }
+
+.commandCenter .trendOnly .unifiedTrendLegend span { display: inline-flex; align-items: center; gap: 4px; }
+.commandCenter .trendOnly .unifiedTrendLegend i { width: 12px; height: 2px; border-radius: 2px; background: currentColor; }
+.commandCenter .trendOnly .unifiedTrendLegend .videoVv { color: #556ff0; }
+.commandCenter .trendOnly .unifiedTrendLegend .commentVolume { color: #33b9e9; }
+.commandCenter .trendOnly .unifiedTrendLegend .videoOpinion { color: #ef8d42; }
+.commandCenter .trendOnly .unifiedTrendLegend .commentOpinion { color: #e55364; }
+.commandCenter .trendOnly .unifiedTrendLegend .videoOpinion i,
+.commandCenter .trendOnly .unifiedTrendLegend .commentOpinion i { height: 0; border-top: 2px dashed currentColor; background: none; }
+
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedArea.video { fill: rgba(85,111,240,.1); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedArea.comment { fill: rgba(51,185,233,.08); }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine { fill: none; stroke-width: 2.2; vector-effect: non-scaling-stroke; }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine.videoVv { stroke: #556ff0; }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine.commentVolume { stroke: #33b9e9; }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine.videoOpinion { stroke: #ef8d42; stroke-dasharray: 5 4; }
+.commandCenter .trendOnly .mergedSentimentStack.unified .unifiedLine.commentOpinion { stroke: #e55364; stroke-dasharray: 5 4; }
+
+.commandCenter .trendOnly .dualOpinionRow,
+.commandCenter .trendOnly .dualOpinionRow + .dualOpinionRow {
+  box-sizing: border-box;
+  width: 100%;
+  height: 222px !important;
+  margin: 0 !important;
+  padding: 35px 8px 29px 34px !important;
+  overflow: hidden !important;
+  border: 1px solid #ddd8e7 !important;
+  border-right: 1px solid #ddd8e7 !important;
+  border-radius: 9px !important;
+  background: linear-gradient(90deg, rgba(239, 244, 255, .58), rgba(248, 245, 255, .36)) !important;
+}
+
+.commandCenter .trendOnly .dualOpinionRow.video,
+.commandCenter .trendOnly .dualOpinionRow.comment { margin: 0 !important; }
+.commandCenter .trendOnly .dualOpinionRow.comment { background: linear-gradient(90deg, rgba(255, 241, 243, .52), rgba(246, 244, 255, .34)) !important; }
+
+.commandCenter .trendOnly .dualOpinionRow > header {
+  top: 0 !important;
+  right: 0;
+  left: 0;
+  height: 34px !important;
+  padding: 0 3px !important;
+  border: 0 !important;
+  background: #fff !important;
+}
+
+.commandCenter .trendOnly .rowScopeLabel b { color: #343b48; font-size: 11px; }
+.commandCenter .trendOnly .rowScopeLabel small { display: inline; color: #9299a4; font-size: 7px; }
+
+.commandCenter .trendOnly .sentimentStackLegend {
+  position: static !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+.commandCenter .trendOnly .sentimentStackLegend button { font-size: 7px !important; }
+.commandCenter .trendOnly .sentimentStackLegend button i { width: 7px !important; height: 7px !important; }
+
+.commandCenter .trendOnly .trendChart .dualOpinionRow svg.sentimentStack {
+  display: block !important;
+  width: 100%;
+  height: 154px !important;
+  border-bottom: 1px solid #aeb5c2 !important;
+  background-color: rgba(238, 242, 250, .24) !important;
+  background-image: none !important;
+}
+
+.commandCenter .trendOnly .dualOpinionRow::after {
+  right: 8px !important;
+  bottom: 8px !important;
+  left: 34px !important;
+  color: #8e95a0 !important;
+  font-size: 7px !important;
+  word-spacing: 4px !important;
+}
+
+.commandCenter .trendOnly .dualOpinionRow.video::after,
+.commandCenter .trendOnly .dualOpinionRow.comment::after {
+  content: "06-29      07-03      07-07      07-11      07-15      07-28" !important;
+}
+
+.commandCenter .trendOnly .stackArea.positive { fill: #63c878 !important; fill-opacity: .45 !important; }
+.commandCenter .trendOnly .stackArea.neutral { fill: #aeb7c6 !important; fill-opacity: .58 !important; }
+.commandCenter .trendOnly .stackArea.negative { fill: #ff8064 !important; fill-opacity: .56 !important; }
+.commandCenter .trendOnly .vvLine,
+.commandCenter .trendOnly .commentVolumeLine { stroke: #ec6248 !important; stroke-width: 2.4 !important; }
+
+.commandCenter .trendOnly .dualOpinionRow.video::before,
+.commandCenter .trendOnly .dualOpinionRow.comment::before {
+  display: none !important;
+  content: none !important;
+}
+
+.timeAnomalyOverlay {
+  position: absolute;
+  z-index: 12;
+  top: 39px;
+  right: 8px;
+  bottom: 28px;
+  left: 34px;
+  pointer-events: none;
+}
+
+.timeAnomalyMarker {
+  position: absolute;
+  top: 2px;
+  display: flex;
+  min-width: 96px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border: 1px solid #bdc8eb;
+  border-radius: 5px;
+  background: rgba(255,255,255,.94);
+  color: #516acb;
+  text-align: left;
+  box-shadow: 0 3px 9px rgba(64,82,150,.12);
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.timeAnomalyMarker::after {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  height: 204px;
+  border-left: 1px dashed rgba(82,111,233,.55);
+  content: '';
+  pointer-events: none;
+}
+
+.timeAnomalyMarker.point0 { transform: none; }
+.timeAnomalyMarker.point0::after { left: 0; }
+.timeAnomalyMarker.point2 { transform: translateX(-15%); }
+.timeAnomalyMarker.point2::after { left: 15%; }
+.timeAnomalyMarker.point5 { transform: translateX(-100%); }
+.timeAnomalyMarker.point5::after { left: 100%; }
+.timeAnomalyMarker:hover,
+.timeAnomalyMarker.active { border-color: #526fe9; background: #eef2ff; box-shadow: 0 4px 12px rgba(60,82,170,.18); }
+.timeAnomalyMarker > i {
+  position: relative;
+  width: 8px;
+  height: 9px;
+  flex: none;
+  border-left: 1px solid #526fe9;
+}
+.timeAnomalyMarker > i::after {
+  position: absolute;
+  top: 0;
+  left: 1px;
+  width: 6px;
+  height: 5px;
+  border-radius: 1px;
+  background: #526fe9;
+  content: '';
+}
+.timeAnomalyMarker > span { display: flex; flex-direction: column; gap: 1px; }
+.timeAnomalyMarker b { color: #424b5a; font-size: 7px; white-space: nowrap; }
+.timeAnomalyMarker small { color: #89909d; font-size: 6px; }
+
+.timeAnomalyDetail {
+  position: absolute;
+  z-index: 20;
+  top: 34px;
+  width: 235px;
+  padding: 10px 11px;
+  border: 1px solid #cfc7e8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(54,43,91,.18);
+  transform: translateX(-45%);
+  pointer-events: auto;
+}
+.timeAnomalyDetail.point0 { transform: none; }
+.timeAnomalyDetail.point2 { transform: translateX(-100%); }
+.timeAnomalyDetail.point5 { transform: translateX(-100%); }
+.timeAnomalyDetail > button { position: absolute; top: 6px; right: 6px; display: grid; width: 20px; height: 20px; place-items: center; color: #878e9a; }
+.timeAnomalyDetail > span { display: block; padding-right: 20px; color: #5269c7; font-size: 7px; }
+.timeAnomalyDetail > b { display: block; margin-top: 4px; color: #404754; font-size: 9px; }
+.timeAnomalyDetail > p { margin: 4px 0 0; color: #747b87; font-size: 7px; line-height: 1.45; }
+.timeAnomalyDetail dl { display: grid; gap: 5px; margin: 7px 0 0; padding-top: 6px; border-top: 1px solid #ebe7f3; }
+.timeAnomalyDetail dl > div { display: grid; grid-template-columns: 44px minmax(0,1fr); gap: 5px; }
+.timeAnomalyDetail dt { color: #7183cc; font-size: 7px; }
+.timeAnomalyDetail dd { margin: 0; color: #666d79; font-size: 7px; }
+
+.trendOpinionDetailPanel {
+  grid-area: opinions;
+  display: grid;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 500px;
+  grid-template-rows: 222px 222px;
+  gap: 8px;
+  padding-top: 48px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.trendOpinionDetailPanel > section {
+  box-sizing: border-box;
+  min-height: 0;
+  height: 222px;
+  padding: 11px 10px 9px;
+  overflow: hidden;
+  border: 1px solid #ddd8e7;
+  border-left: 0;
+  border-radius: 0 9px 9px 0;
+  background: transparent;
+}
+.trendOpinionDetailPanel > section + section { border-top: 1px solid #ddd8e7; }
+.trendOpinionDetailPanel > section > header {
+  display: flex;
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.trendOpinionDetailPanel header > div { display: flex; flex-direction: column; gap: 2px; }
+.trendOpinionDetailPanel header b { color: #3f4652; font-size: 9px; }
+.trendOpinionDetailPanel header small,
+.trendOpinionDetailPanel header > span { color: #959ba5; font-size: 7px; }
+.trendOpinionDetailPanel section > div { display: flex; flex-direction: column; gap: 3px; }
+.trendOpinionDetailPanel section > div > button {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 15px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 4px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #555d69;
+  text-align: left;
+}
+.trendOpinionDetailPanel section > div > button:hover,
+.trendOpinionDetailPanel section > div > button.selected { border-color: #d9d1ef; background: #f7f4ff; }
+.trendOpinionDetailPanel button > i { color: #8b929d; font-size: 8px; font-style: normal; font-weight: 700; }
+.trendOpinionDetailPanel button:nth-child(-n+2) > i { color: #d45d52; }
+.trendOpinionDetailPanel button > span { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+.trendOpinionDetailPanel button > span b { overflow: hidden; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
+.trendOpinionDetailPanel button > span small { color: #a0a5ae; font-size: 6px; }
+.trendOpinionDetailPanel button > strong { color: #6e7581; font-size: 7px; text-align: right; }
+.trendOpinionDetailPanel button.negative > strong { color: #cf615d; }
+.trendOpinionDetailPanel button.positive > strong { color: #3a9678; }
+
+@media (max-width: 1080px) {
+  .commandCenter .trendGrid.trendOnly { grid-template-columns: minmax(460px, 1fr) 210px !important; gap: 7px; }
+}
+
+@media (max-width: 880px) {
+  .commandCenter .trendGrid.trendOnly {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "trend" "opinions";
+  }
+  .trendOpinionDetailPanel { height: auto; }
+  .trendOpinionDetailPanel { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .trendOpinionDetailPanel > section + section { border-top: 0; border-left: 1px solid #e7e3ed; }
+}
+
+.sideEventHistory ol { gap: 9px; }
+.sideEventHistory li { display: block; }
+.sideEventHistory li > button {
+  position: relative;
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 6px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  text-align: left;
+}
+.sideEventHistory li > button:hover,
+.sideEventHistory li > button.selected { border-color: #d9d0ef; background: #f5f1ff; }
+.sideEventHistory li time { grid-column: 1; }
+.sideEventHistory li b { grid-column: 1; }
+.sideEventHistory li span { grid-column: 1 / -1; }
+.sideEventHistory li em {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  padding: 2px 5px;
+  border-radius: 8px;
+  background: #eeeaff;
+  color: #6d55c3;
+  font-size: 6px;
+  font-style: normal;
+}
+
+/* Specific viewpoints live in the Station Content tab and inherit the top timeline selection. */
+.stationOpinionDetails {
+  margin: 10px 12px 0;
+  overflow: hidden;
+  border: 1px solid #ded9e8;
+  border-radius: 10px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 4px 14px rgba(49,42,73,.05);
+}
+.stationOpinionDetails.compact { margin: 0 0 12px; }
+.stationOpinionDetails.compact .stationOpinionColumns { margin-top: 0; border-top: 0; }
+.stationOpinionDetails > header {
+  display: flex;
+  width: 100%;
+  height: auto !important;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 13px !important;
+  border-bottom: 1px solid #ebe7f1 !important;
+  background: linear-gradient(90deg,rgba(247,244,255,.92),rgba(255,255,255,.72)) !important;
+}
+.stationOpinionDetails > header > div { display: flex; flex-direction: column; gap: 2px; }
+.stationOpinionDetails > header span { color: #735bc8; font-size: 7px; }
+.stationOpinionDetails > header h2 { margin: 0; color: #343b48; font-size: 12px; }
+.stationOpinionDetails > header p { margin: 0; color: #8a919c; font-size: 7px; }
+.stationOpinionDetails > header em { padding: 4px 7px; border-radius: 10px; background: #eeeaff; color: #6b53bf; font-size: 7px; font-style: normal; }
+.stationOpinionDecision { display: flex; align-items: flex-start; gap: 7px; margin: 9px 11px 0; padding: 8px 10px; border: 1px solid #ded6f3; border-radius: 7px; background: #f8f5ff; color: #7058c4; }
+.stationOpinionDecision > span { display: flex; flex-direction: column; gap: 2px; }
+.stationOpinionDecision small { color: #8d80bb; font-size: 6px; }
+.stationOpinionDecision b { color: #4d5360; font-size: 8px; line-height: 1.55; }
+.stationOpinionColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 9px; border-top: 1px solid #ebe7f1; }
+.stationOpinionColumns > section { min-width: 0; padding: 10px 11px 11px; }
+.stationOpinionColumns > section + section { border-left: 1px solid #e8e4ed; }
+.stationOpinionColumns > section > header {
+  display: flex;
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.stationOpinionColumns > section > header > div { display: flex; flex-direction: column; gap: 2px; }
+.stationOpinionColumns > section > header b { color: #414854; font-size: 11px; }
+.stationOpinionColumns > section > header small,
+.stationOpinionColumns > section > header > span { color: #969ca6; font-size: 8px; }
+.stationOpinionColumns > section > div { display: flex; flex-direction: column; gap: 3px; }
+.stationOpinionColumns .opinionSentimentSummary { gap: 8px; margin: 2px 0 8px; }
+.stationOpinionColumns .opinionSentimentBar { display: flex; width: 100%; height: 10px; gap: 2px; overflow: hidden; border-radius: 6px; background: #eef0f4; }
+.stationOpinionColumns .opinionSentimentBar button { min-width: 5px; height: 10px; padding: 0; border: 0; opacity: .78; transition: opacity .15s, filter .15s; }
+.stationOpinionColumns .opinionSentimentBar button:hover,
+.stationOpinionColumns .opinionSentimentBar button.selected { opacity: 1; filter: saturate(1.18); }
+.stationOpinionColumns .opinionSentimentBar button.positive { background: #72d683; }
+.stationOpinionColumns .opinionSentimentBar button.neutral { background: #bdc4cf; }
+.stationOpinionColumns .opinionSentimentBar button.negative { background: #ff7465; }
+.stationOpinionColumns .opinionSentimentStats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+.stationOpinionColumns .opinionSentimentStats button { display: grid; grid-template-columns: 8px auto auto 1fr; align-items: center; gap: 4px; padding: 0; border: 0; background: transparent; color: #69717e; font-size: 8px; text-align: left; }
+.stationOpinionColumns .opinionSentimentStats button > i { width: 7px; height: 7px; border-radius: 2px; }
+.stationOpinionColumns .opinionSentimentStats button.positive > i { background: #54c96b; }
+.stationOpinionColumns .opinionSentimentStats button.neutral > i { background: #aeb6c3; }
+.stationOpinionColumns .opinionSentimentStats button.negative > i { background: #ef594c; }
+.stationOpinionColumns .opinionSentimentStats button b { color: #4b5360; font-size: 9px; }
+.stationOpinionColumns .opinionSentimentStats button span { color: #9299a4; font-size: 7px; }
+.stationOpinionColumns .opinionSentimentStats button.selected { color: #4f66d6; font-weight: 600; }
+.stationOpinionColumns .stationOpinionTopList { display: flex; flex-direction: column; gap: 3px; }
+.stationOpinionColumns .stationOpinionItem {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 17px minmax(0,1fr) 65px;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 7px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #555d69;
+  text-align: left;
+}
+.stationOpinionColumns button.stationOpinionItem { width: 100%; cursor: pointer; }
+.stationOpinionColumns button.stationOpinionItem:hover { background: #faf9ff; }
+.stationOpinionColumns .stationOpinionItem.selected { border-color: #bfcaf8; background: #f0f3ff; box-shadow: inset 3px 0 #6078ff; }
+.stationOpinionColumns .comment .stationOpinionItem.selected { border-color: #f0c9c3; background: #fff5f2; box-shadow: inset 3px 0 #ff6757; }
+.stationOpinionColumns .stationOpinionItem.linked { border-color: #f0c9c3; background: #fff5f2; box-shadow: inset 3px 0 #ff6757; }
+.stationOpinionColumns .stationOpinionItem > i { color: #8d949f; font-size: 9px; font-style: normal; font-weight: 700; }
+.stationOpinionColumns .stationOpinionItem:nth-child(-n+2) > i { color: #d15d58; }
+.stationOpinionColumns .stationOpinionItem > span { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+.stationOpinionColumns .stationOpinionItem > span b { overflow: hidden; color: #4c5360; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.stationOpinionColumns .stationOpinionItem > span small { color: #9aa0a9; font-size: 7px; }
+.stationOpinionColumns .stationOpinionItem > strong { display: flex; flex-direction: column; gap: 1px; color: #6b7280; font-size: 10px; text-align: right; }
+.stationOpinionColumns .stationOpinionItem.negative > strong { color: #cd5c58; }
+.stationOpinionColumns .stationOpinionItem.positive > strong { color: #368e72; }
+.stationOpinionColumns .stationOpinionItem > strong small { color: #9da3ad; font-size: 7px; font-weight: 400; white-space: nowrap; }
+@media(max-width:900px){.stationOpinionColumns{grid-template-columns:1fr}.stationOpinionColumns>section+section{border-top:1px solid #e8e4ed;border-left:0}}

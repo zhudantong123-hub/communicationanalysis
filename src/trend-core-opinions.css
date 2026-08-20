@@ -216,22 +216,24 @@
 }
 
 .eventLifecycleAxis {
-  display: grid;
-  grid-template-columns: 70px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px 10px;
+  position: relative;
+  padding: 8px 5px 10px 70px;
   border-top: 1px solid #e5e1ee;
   background: #fbfafd;
 }
 
 .eventLifecycleAxis > b {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
   color: #555d69;
   font-size: 8px;
 }
 
 .eventLifecycleAxis > div {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(32, minmax(0, 1fr));
   min-width: 0;
   overflow: hidden;
   border-radius: 7px;
@@ -593,7 +595,8 @@
   }
 
   .eventLifecycleAxis {
-    grid-template-columns: 1fr;
+    padding-right: 5px;
+    padding-left: 70px;
   }
 }
 
@@ -613,6 +616,6 @@
   }
 
   .eventLifecycleAxis > div {
-    overflow-x: auto;
+    overflow: hidden;
   }
 }
